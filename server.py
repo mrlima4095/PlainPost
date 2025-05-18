@@ -34,31 +34,7 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        self.send(client_socket, "Password:\n")
-
-        passwd = 
-        if passwd != self.config['passwd']: 
-            self.send(client_socket, "Wrong Password!\n")
-            client_socket.close(); print(f"[-] {addr[0]} - bad login")
-
-            return
-
-        print(f"[+] {addr[0]} connected")
-
-        try:
-            while True:
-                command = client_socket.recv(4096).decode('utf-8').strip()
-                if not command:
-                    print(f"[-] {addr[0]} disconnected")
-                    break
-
-                self.send(client_socket, self.execute_command(command))
-
-        except Exception as e:
-            print(f"[-] {addr[0]} -- {e}")
-
-        finally:
-            client_socket.close()
+        self
 
     def execute_command(self, command):
         try: return subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT).decode('utf-8')
