@@ -47,9 +47,9 @@ class Server:
         self.request = json.loads(self.read(client_socket))
 
         if self.auth(self.request['user'], self.request['password']):
+            if self.request['']
 
-
-        else: self.send(client_socket, "Login failed!")
+        else: self.send(client_socket, "1")
 
 
     def auth(self, username, password):
@@ -69,3 +69,5 @@ class Server:
 
 if __name__ == '__main__':
     Server().start()
+
+# {"user": "admin", "password": "123", }
