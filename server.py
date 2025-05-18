@@ -73,6 +73,8 @@ class Server:
                 user_data['password'] = password
                 user_data['level'] = "1"
                 user_data['mails'] = []
+                
+                json.dump
 
     def send(self, client_socket, text): client_socket.sendall(text.encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
