@@ -47,17 +47,17 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        self.request = json.loads(self.read(client_socket))
+        request = json.loads(self.read(client_socket))
         
-        if self.request['action'] == "signup": return self.send(client_socket, self.signup(self.request['username'], self.request['password']))
+        if request['action'] == "signup": return self.send(client_socket, self.signup(self.request['username'], self.request['password']))
         
-        if self.auth(self.request['username'], self.request['password']):
-            if self.request['action'] == "": return
-            elif self.request['action'] == "send": self.send(client_socket, self.send_mail(self.request['username'], self.request['to'], self.request['content']))
-            elif self.request['action'] == "read": self.send(client_socket, self.read_mail(self.request['username']))
-            elif self.request['action'] == "clear":
-            elif self.request['action'] == "delete":
-            elif self.request['action'] == "me":
+        if self.auth(request['username'], self.request['password']):
+            if request['action'] == "": return
+            elif request['action'] == "send": self.send(client_socket, self.send_mail(request['username'], request['to'], request['content']))
+            elif request['action'] == "read": self.send(client_socket, self.read_mail(request['username']))
+            elif request['action'] == "clear": self.send(client_socket, self.clear(request['username']))
+            #elif request['action'] == "delete":
+            #elif request['action'] == "me":
             else: self.send(client_socket, "2")
 
         else: self.send(client_socket, "1")
