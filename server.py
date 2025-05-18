@@ -106,7 +106,16 @@ class Server:
             return '\n'.join(user_data['mails'])
     
     def clear(self, username):
-    
+        with open(username, "r") as file:
+            user_data = json.load(file)
+                
+            user_data['mails'] = []
+            
+        with open(username, "wt+") as file:
+            json.dump(user_data, file, indent=4)
+                
+        return "0"
+        
     def send(self, client_socket, text): client_socket.sendall(text.encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
 
