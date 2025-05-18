@@ -46,10 +46,10 @@ class Server:
     def handle_client(self, client_socket, addr):
         self.request = json.loads(self.read(client_socket))
         
-        if self.request['action'] == "signup": return 
+        if self.request['action'] == "signup": return self.signup(self.request['username'], self.request['password'])
         
         if self.auth(self.request['username'], self.request['password']):
-            if self.request['']
+            if self.request['read']
 
         else: self.send(client_socket, "1")
 
