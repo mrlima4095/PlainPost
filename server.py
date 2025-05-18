@@ -99,7 +99,12 @@ class Server:
                 
             return "0"
         else: return "4"
-        
+    def read_mail(self, username):
+        with open(username, "r") as file:
+            user_data = json.load(file)
+            
+            return '\n'.join(user_data['mails'])
+            
     def send(self, client_socket, text): client_socket.sendall(text.encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
 
