@@ -46,7 +46,7 @@ class Server:
     def handle_client(self, client_socket, addr):
         self.request = json.loads(self.read(client_socket))
         
-        if self.request['action'] == "new_account": return 
+        if self.request['action'] == "signup": return 
         
         if self.auth(self.request['username'], self.request['password']):
             if self.request['']
