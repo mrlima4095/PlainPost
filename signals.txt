@@ -2,4 +2,4 @@
 1   auth error
 2   invalid request
 3   user already registred
-4
+4   user not found
