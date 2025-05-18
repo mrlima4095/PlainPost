@@ -71,7 +71,7 @@ class Server:
                 
                 user_data['username'] = username
                 user_data['password'] = password
-                user_data['level'] = "1"
+                user_data['coins'] = "0"
                 user_data['mails'] = []
                 
                 json.dump(user_data, file, indent=4)
@@ -82,5 +82,3 @@ class Server:
 if __name__ == '__main__':
     Server().start()
 
-# {"user": "admin", "password": "123", "action": "read,send,passwd,me"}
-# {"user": "admin", "password": "123", "permission": 1, "index":[]}
