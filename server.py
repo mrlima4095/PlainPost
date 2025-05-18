@@ -45,7 +45,9 @@ class Server:
 
     def handle_client(self, client_socket, addr):
         self.request = json.loads(self.read(client_socket))
-
+        
+        if self.request['action'] == "new_account": return 
+        
         if self.auth(self.request['user'], self.request['password']):
             if self.request['']
 
@@ -61,8 +63,11 @@ class Server:
                 if user_data['password'] == password: return True
                 else: return False
         else: return False
-
-
+    def singup(self, username, password):
+        if os.path.exists(username): return False
+        else:
+            with open(username, "wt+") as file:
+                
 
     def send(self, client_socket, text): client_socket.sendall(text.encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
@@ -70,4 +75,5 @@ class Server:
 if __name__ == '__main__':
     Server().start()
 
-# {"user": "admin", "password": "123", }
+# {"user": "admin", "password": "123", "action": "read,send,passwd,me"}
+# {"user"}
