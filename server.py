@@ -2,11 +2,21 @@
 # -*- coding: utf-8 -*-
 #
 
+# Criar contas
+# Requisições de API
+# | Ver meus dados
+# | Mudar senha
+# | Enviar email
+# | Ler emails
+# | Deletar emails
+# | Deletar todos emails
+# | Apagar conta
+
 import sys
 import socket
 import subprocess
 import threading
-import os
+import os, json
 
 class Server:
     def __init__(self):
@@ -34,11 +44,22 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        self
+        self.request = json.loads(self.read(client_socket))
 
-    def execute_command(self, command):
-        try: return subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT).decode('utf-8')
-        except subprocess.CalledProcessError as e: return e.output.decode('utf-8')
+        if self.auth(self.request['user'], self.request['password']):
+
+
+        else: self.send(client_socket, "Login failed!")
+
+
+    def auth(self, username, password):
+
+        if os.path.exists(username):
+            with open() as user_data:
+        else:
+            return False
+
+
 
     def send(self, client_socket, text): client_socket.sendall(text.encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
