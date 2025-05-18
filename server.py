@@ -54,7 +54,7 @@ class Server:
         if self.auth(self.request['username'], self.request['password']):
             if self.request['action'] == "": return
             elif self.request['action'] == "send": self.send(client_socket, self.send_mail(self.request['username'], self.request['to'], self.request['content']))
-            elif self.request['action'] == "read":
+            elif self.request['action'] == "read": self.send(client_socket, self.read_mail(self.request['username']))
             elif self.request['action'] == "clear":
             elif self.request['action'] == "delete":
             elif self.request['action'] == "me":
@@ -104,7 +104,9 @@ class Server:
             user_data = json.load(file)
             
             return '\n'.join(user_data['mails'])
-            
+    
+    def clear(self, username):
+    
     def send(self, client_socket, text): client_socket.sendall(text.encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
 
