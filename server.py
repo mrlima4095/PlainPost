@@ -67,7 +67,10 @@ class Server:
         if os.path.exists(username): return False
         else:
             with open(username, "wt+") as file:
+                user_data = {}
                 
+                user_data['password'] = password
+                user_data['level'] = "1"
 
     def send(self, client_socket, text): client_socket.sendall(text.encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
@@ -76,4 +79,4 @@ if __name__ == '__main__':
     Server().start()
 
 # {"user": "admin", "password": "123", "action": "read,send,passwd,me"}
-# {"user"}
+# {"user": "admin", "password": "123", "permission": 1, "index":[]}
