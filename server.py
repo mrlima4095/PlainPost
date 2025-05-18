@@ -55,9 +55,12 @@ class Server:
     def auth(self, username, password):
 
         if os.path.exists(username):
-            with open() as user_data:
-        else:
-            return False
+            with open(username, "r") as file:
+                user_data = json.load(file)
+                
+                if user_data['password'] == password: return True
+                else: return False
+        else: return False
 
 
 
