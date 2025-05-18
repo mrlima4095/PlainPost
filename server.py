@@ -18,6 +18,9 @@ import subprocess
 import threading
 import os, json
 
+from datetime import datetime
+
+
 class Server:
     def __init__(self):
         self.config = {}
@@ -46,10 +49,16 @@ class Server:
     def handle_client(self, client_socket, addr):
         self.request = json.loads(self.read(client_socket))
         
-        if self.request['action'] == "signup": return self.signup(self.request['username'], self.request['password'])
+        if self.request['action'] == "signup": return self.send(client_socket, self.signup(self.request['username'], self.request['password']))
         
         if self.auth(self.request['username'], self.request['password']):
-            if self.request['read']
+            if self.request['action'] == "": return
+            elif self.request['action'] == "send": self.send(client_socket, self.send_mail(self.request['username'], self.request['to'], self.request['content']))
+            elif self.request['action'] == "read":
+            elif self.request['action'] == "clear":
+            elif self.request['action'] == "delete":
+            elif self.request['action'] == "me":
+            else: self.send(client_socket, "2")
 
         else: self.send(client_socket, "1")
 
@@ -64,7 +73,7 @@ class Server:
                 else: return False
         else: return False
     def singup(self, username, password):
-        if os.path.exists(username): return False
+        if os.path.exists(username): return "3"
         else:
             with open(username, "wt+") as file:
                 user_data = {}
@@ -75,7 +84,22 @@ class Server:
                 user_data['mails'] = []
                 
                 json.dump(user_data, file, indent=4)
+                
+            return "0"
 
+    def send_mail(self, sender, target, content):
+        if os.path.exists(username): 
+            with open(username, "r") as file:
+                user_data = json.load(file)
+                
+                user_data['mails'].append(datetime.now().strftime(f"[%M:%H %d/%m/%Y - {sender}] {content}"))
+            
+            with open(username, "wt+") as file:
+                json.dump(user_data, file, indent=4)
+                
+            return "0"
+        else: return "4"
+        
     def send(self, client_socket, text): client_socket.sendall(text.encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
 
