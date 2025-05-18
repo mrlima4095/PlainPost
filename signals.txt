@@ -1,5 +1,5 @@
 0   good
 1   auth error
 2   invalid request
-3
+3   user already registred
 4
