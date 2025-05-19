@@ -55,9 +55,9 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        keys = self.auth(client_socket)
+        status, username = self.auth(client_socket)
 
-        if keys[0] == "0":
+        if status == "0":
             self.send(client_socket, "0")
             
             while True:
@@ -71,37 +71,37 @@ class Server:
                 print(f"[+] {addr[0]} -> {raw}")
                     
                 if request['action'] == "send":
-                    status = self.send_mail(keys[1], request['to'], request['content'])
+                    status = self.send_mail(username, request['to'], request['content'])
 
                     self.send(client_socket, status)
                 elif request['action'] == "read":
-                    status = self.read_mail(keys[1])
+                    status = self.read_mail(username)
 
                     self.send(client_socket, status)
                 elif request['action'] == "clear": 
-                    status = self.clear(keys[1])
+                    status = self.clear(username)
 
                     self.send(client_socket, status)
                 elif request['action'] == "transfer":
-                    status = self.transfer_coins(keys[1], request['to'], request['amount'])
+                    status = self.transfer_coins(username, request['to'], request['amount'])
 
                     self.send(client_socket, status)
                 elif request['action'] == "changepass":
-                    status = self.change_password(keys[1], request['newpass'])
+                    status = self.change_password(username, request['newpass'])
 
                     self.send(client_socket, status)
                 elif request['action'] == "me":
-                    status = self.show_info(keys[1])
+                    status = self.show_info(username)
 
                     self.send(client_socket, status)
                 elif request['action'] == "signoff": 
-                    status = self.signoff(keys[1])
+                    status = self.signoff(username)
 
                     self.send(client_socket, status); break
                 elif request['action'] == "signup": self.send(client_socket, "9")
                 elif request['action'] == "status": self.send(client_socket, "0")
                 else: self.send(client_socket, "2")
-        elif keys[0] == "1": self.send(client_socket, "1") 
+        elif status == "1": self.send(client_socket, "1") 
 
         client_socket.close()
 
@@ -116,7 +116,7 @@ class Server:
             if self.cursor.fetchone():
                 self.send(client_socket, "3")
 
-                return (False, "null")
+                return ("3", self.send(client_socket, "3"))
 
             self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (request['username'], request['password']))
             self.db.commit()
@@ -129,7 +129,7 @@ class Server:
     def show_info(self, username):
         self.cursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
         row = self.cursor.fetchone()
-        if row: return f"[{row['role']}] {username}\nCoins: {row['coins']}"
+        if row: return f"[{row['role']}] {username} (Coins: {row['coins']})"
         else: return "4"
 
     # User auth tools
