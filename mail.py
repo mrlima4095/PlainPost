@@ -63,16 +63,15 @@ class Server:
             return self.send(client_socket, status)
 
         if self.auth(request['username'], request['password']):
-            action = request.get("action", "")
-            if action == "send":
+            if request['action'] == "send":
                 status = self.send_mail(request['username'], request['to'], request['content'])
 
                 self.send(client_socket, status)
-            elif action == "read":
+            elif request['action'] == "read":
                 status = self.read_mail(request['username'])
 
                 self.send(client_socket, status)
-            elif action == "clear": 
+            elif request['action'] == "clear": 
                 status = self.clear(request['username'])
 
                 self.send(client_socket, status)
