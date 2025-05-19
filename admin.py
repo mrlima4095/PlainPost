@@ -36,7 +36,7 @@ class AdminPanel:
         except IndexError as e: print(f"[!] Missed arguments")
         except Exception as e: print(f"[!] Error: {e}")
 
-    def help(self): print(open("admin-help.txt", "r").read())
+    def help(self): print("register,unregister,password,role,list,send,read,clear,clear-all,give-coin,take-coin")
 
     # User payloads
     def register(self, username, password):
