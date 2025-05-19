@@ -115,7 +115,6 @@ class Server:
                             (target, sender, full_content, timestamp))
         self.db.commit()
         return "0"
-
     def read_mail(self, username):
         self.cursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
         mails = [row["content"] for row in self.cursor.fetchall()]
