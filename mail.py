@@ -106,7 +106,7 @@ class Server:
             if self.cursor.fetchone():
                 self.send(client_socket, "3")
 
-                return (False)
+                return (False, "null")
 
             self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (request['username'], request['password']))
             self.db.commit()
