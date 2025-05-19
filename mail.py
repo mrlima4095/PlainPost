@@ -82,9 +82,9 @@ class Server:
 
                     self.send(client_socket, status)
                 elif request['action'] == "chargepass":
-                        status = self.change_password(request['username'], request['newpass'])
+                    status = self.change_password(request['username'], request['newpass'])
 
-                        self.send(client_socket, status)
+                    self.send(client_socket, status)
                 elif request['action'] == "signoff": 
                     status = self.signoff(request['username'])
 
