@@ -100,8 +100,8 @@ class Server:
     def auth(self, client_socket):
         try: 
             raw = self.read(client_socket)
-                    request = json.loads(raw)
-                except json.decoder.JSONDecodeError: self.send(client_socket, "5")
+            request = json.loads(raw)
+        except json.decoder.JSONDecodeError: return (False, "null", self.send(client_socket, "5"))
                 
         if 'action' in request and request['action'] == "signup":
             self.cursor.execute("SELECT * FROM users WHERE username = ?", (request['username'],))
