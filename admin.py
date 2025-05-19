@@ -18,8 +18,8 @@ class AdminPanel:
         try:
             if args[1] == "register": panel.register(args[2], args[3])
             elif args[1] == "unregister": panel.unregister(args[2])
-            elif args[1] ==  "password": panel.change_password(args[2], args[3])
-            elif args[1] ==  "role": panel.change_role(args[2], args[3])
+            elif args[1] ==  "password": panel.changepass(args[2], args[3])
+            elif args[1] ==  "role": panel.changerole(args[2], args[3])
             elif args[1] ==  "list": panel.list_users()
 
             elif args[1] == "send": panel.send(args[2], ' '.join(args[3:]))
@@ -27,8 +27,8 @@ class AdminPanel:
             elif args[1] ==  "clear": panel.clear(args[2])
             elif args[1] ==  "clear-all": panel.clear_all()
 
-            elif args[1] ==  "give-coin": panel.add_coins(args[2], int(args[3]))
-            elif args[1] ==  "take-coin": panel.remove_coins(args[2], int(args[3]))
+            elif args[1] ==  "give-coin": panel.give_coins(args[2], int(args[3]))
+            elif args[1] ==  "take-coin": panel.take_coins(args[2], int(args[3]))
 
             elif args[1] == "help": self.help()
 
@@ -88,11 +88,11 @@ class AdminPanel:
         print("[~] All emails cleared from database.")
     
     # Coins
-    def add_coins(self, username, amount):
+    def give_coins(self, username, amount):
         self.cursor.execute("UPDATE users SET coins = coins + ? WHERE username = ?", (amount, username))
         self.db.commit()
         print(f"[+] Added {amount} coins to '{username}'.")
-    def remove_coins(self, username, amount):
+    def take_coins(self, username, amount):
         self.cursor.execute("UPDATE users SET coins = MAX(coins - ?, 0) WHERE username = ?", (amount, username))
         self.db.commit()
         print(f"[-] Removed {amount} coins from '{username}'.")
