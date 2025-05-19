@@ -61,7 +61,7 @@ class Server:
                 
                 if not raw: break
             
-                print(f"[+] {addr[0]} -> {raw}")
+                print(f"[+] {addr[0]} -> {raw}", file="logs.txt")
     
                 if request['action'] == "signup":
                     status = self.signup(request['username'], request['password'])
