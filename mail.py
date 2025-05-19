@@ -15,7 +15,7 @@ class Server:
     def __init__(self):
 
         self.host = "0.0.0.0"
-        self.port = 10142
+        self.port = 10143
 
         self.db = sqlite3.connect("mailserver.db", check_same_thread=False)
         self.db.row_factory = sqlite3.Row
