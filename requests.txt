@@ -1,0 +1,3 @@
+{"username":"usuario","password":"senha","action":"send","to":"destinatario","content":"corpo da mensagem"}
+{"username":"usuario","password":"senha","action":"read"}
+{"username":"usuario","password":"senha","action":"clear"}
