@@ -3,4 +3,4 @@
 2   invalid request
 3   user already registred
 4   user not found
-5   internal error
+5   malformed request
