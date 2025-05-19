@@ -37,7 +37,7 @@ class Server:
             CREATE TABLE IF NOT EXISTS users (
                 username TEXT PRIMARY KEY,
                 password TEXT NOT NULL,
-                coins INTEGER DEFAULT 0,
+                coins INTEGER DEFAULT 0
             )
         """)
         self.cursor.execute("""
@@ -76,10 +76,8 @@ class Server:
                 self.send(client_socket, self.send_mail(request['username'], request['to'], request['content']))
             elif action == "read":
                 self.send(client_socket, self.read_mail(request['username']))
-            elif action == "clear":
-                self.send(client_socket, self.clear(request['username']))
-            else:
-                self.send(client_socket, "2")
+            elif action == "clear": self.send(client_socket, self.clear(request['username']))
+            else: self.send(client_socket, "2")
         else:
             self.send(client_socket, "1")
 
