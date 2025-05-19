@@ -57,7 +57,7 @@ class Server:
     def handle_client(self, client_socket, addr):
         keys = self.auth(client_socket)
 
-        if keys[0] == True:
+        if keys[0] == "0":
             self.send(client_socket, "0")
             
             while True:
@@ -97,10 +97,11 @@ class Server:
                 elif request['action'] == "signoff": 
                     status = self.signoff(keys[1])
 
-                    self.send(client_socket, status)
+                    self.send(client_socket, status); break
+                elif request['action'] == "signup": self.send(client_socket, "9")
                 elif request['action'] == "status": self.send(client_socket, "0")
                 else: self.send(client_socket, "2")
-        else: self.send(client_socket, "1")
+        elif keys[0] == "1": self.send(client_socket, "1") 
 
         client_socket.close()
 
@@ -108,7 +109,7 @@ class Server:
         try: 
             raw = self.read(client_socket)
             request = json.loads(raw)
-        except json.decoder.JSONDecodeError: return (False, "null", self.send(client_socket, "5"))
+        except json.decoder.JSONDecodeError: return ("5", self.send(client_socket, "5"))
                 
         if 'action' in request and request['action'] == "signup":
             self.cursor.execute("SELECT * FROM users WHERE username = ?", (request['username'],))
@@ -120,9 +121,16 @@ class Server:
             self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (request['username'], request['password']))
             self.db.commit()
             return (True, request['username'])
+        elif 'action' in request: return ("9", self.send(client_socket, "9"))
         
         self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (request['username'], request['password']))
-        return (self.cursor.fetchone() is not None, request['username'])
+        return ("0" if self.cursor.fetchone() is not None else "1", request['username'])
+
+    def show_info(self, username):
+        self.cursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
+        row = self.cursor.fetchone()
+        if row: return f"[{row['role']}] {username}\nCoins: {row['coins']}"
+        else: return "4"
 
     # User auth tools
     def signoff(self, username):
@@ -184,12 +192,6 @@ class Server:
         
         return "0"
 
-    def show_info(self, username):
-        self.cursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
-        row = self.cursor.fetchone()
-        if row:
-            return f"[{row['role']}] {username}\nCoins: {row['coins']}"
-        return "4"
     
     # Socket Operations (Read and Write)
     def send(self, client_socket, text): client_socket.sendall(f"{text}\n".encode('utf-8'))
