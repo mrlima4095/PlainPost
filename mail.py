@@ -68,27 +68,27 @@ class Server:
                 print(f"[+] {addr[0]} -> {raw}")
                     
                 if request['action'] == "send":
-                    status = self.send_mail(request['username'], request['to'], request['content'])
+                    status = self.send_mail(keys[1], request['to'], request['content'])
 
                     self.send(client_socket, status)
                 elif request['action'] == "read":
-                    status = self.read_mail(request['username'])
+                    status = self.read_mail(keys[1])
 
                     self.send(client_socket, status)
                 elif request['action'] == "clear": 
-                    status = self.clear(request['username'])
+                    status = self.clear(keys[1])
 
                     self.send(client_socket, status)
                 elif request['action'] == "transfer":
-                    status = self.transfer_coins(request['username'], request['to'], request['amount'])
+                    status = self.transfer_coins(keys[1], request['to'], request['amount'])
 
                     self.send(client_socket, status)
                 elif request['action'] == "changepass":
-                    status = self.change_password(request['username'], request['newpass'])
+                    status = self.change_password(keys[1], request['newpass'])
 
                     self.send(client_socket, status)
                 elif request['action'] == "signoff": 
-                    status = self.signoff(request['username'])
+                    status = self.signoff(keys[1])
 
                     self.send(client_socket, status)
                 elif request['action'] == "status": self.send(client_socket, "200")
