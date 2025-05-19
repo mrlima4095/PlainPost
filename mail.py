@@ -14,7 +14,7 @@ from datetime import datetime
 class Server:
     def __init__(self):
 
-        self.host = "127.0.0.1"
+        self.host = "0.0.0.0"
         self.port = 10142
 
         self.db = sqlite3.connect("mailserver.db", check_same_thread=False)
