@@ -81,6 +81,10 @@ class Server:
                         status = self.clear(request['username'])
     
                         self.send(client_socket, status)
+                    elif request['action'] == "signoff": 
+                        status = self.signoff(request['username'])
+    
+                        self.send(client_socket, status)
                     else: self.send(client_socket, "2")
                 else: self.send(client_socket, "1")
             except Exception: self.send(client_socket, "5")
@@ -95,6 +99,11 @@ class Server:
             return "3"
 
         self.cursor.execute("INSERT INTO users (username, password, coins) VALUES (?, ?, 0)", (username, password))
+        self.db.commit()
+        return "0"
+    def signoff(self, username):
+        self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
+        self.cursor.execute("DELETE FROM users WHERE username = ?", (username,))
         self.db.commit()
         return "0"
 
