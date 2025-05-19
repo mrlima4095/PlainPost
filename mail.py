@@ -58,15 +58,24 @@ class Server:
         request = json.loads(request)
 
         if request['action'] == "signup":
-            return self.send(client_socket, self.signup(request['username'], request['password']))
+            status = self.signup(request['username'], request['password'])
+
+            return self.send(client_socket, status)
 
         if self.auth(request['username'], request['password']):
             action = request.get("action", "")
             if action == "send":
-                self.send(client_socket, self.send_mail(request['username'], request['to'], request['content']))
+                status = self.send_mail(request['username'], request['to'], request['content'])
+
+                self.send(client_socket, status)
             elif action == "read":
-                self.send(client_socket, self.read_mail(request['username']))
-            elif action == "clear": self.send(client_socket, self.clear(request['username']))
+                status = self.read_mail(request['username'])
+
+                self.send(client_socket, status)
+            elif action == "clear": 
+                status = self.clear(request['username'])
+
+                self.send(client_socket, status)
             else: self.send(client_socket, "2")
         else:
             self.send(client_socket, "1")
