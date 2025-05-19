@@ -120,7 +120,7 @@ class Server:
 
             self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (request['username'], request['password']))
             self.db.commit()
-            return (True, request['username'])
+            return ("0", request['username'])
         elif 'action' in request: return ("9", self.send(client_socket, "9"))
         
         self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (request['username'], request['password']))
