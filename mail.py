@@ -83,7 +83,7 @@ class Server:
                 elif request['action'] == "status": self.send(client_socket, "0")
                 else: self.send(client_socket, "2")
             else: self.send(client_socket, "1")
-        except KeyError: self.send(client_socket, "5")
+        except json.decoder.JSONDecodeError: self.send(client_socket, "5")
         
         client_socket.close()
     def auth(self, username, password):
