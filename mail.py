@@ -102,13 +102,13 @@ class Server:
         request = json.loads(raw)
 
         if 'action' in request and request['action'] == "signup":
-            self.cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+            self.cursor.execute("SELECT * FROM users WHERE username = ?", (request['username'],))
             if self.cursor.fetchone():
                 self.send(client_socket, "3")
 
                 return (False)
 
-            self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (username, password))
+            self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (request['username'], request['password']))
             self.db.commit()
             return (True, request['username'])
         
