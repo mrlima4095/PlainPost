@@ -68,7 +68,7 @@ class Server:
                     request = json.loads(raw)
                 except json.decoder.JSONDecodeError: self.send(client_socket, "5"); continue
                 
-                print(f"[+] {addr[0]} -> {raw}")
+                print(datetime.now().strftime(f"[%H:%M %d/%m/%Y - {username}] {addr[0]} -> {raw}"), file="logs.txt")
                     
                 if request['action'] == "send":
                     status = self.send_mail(username, request['to'], request['content'])
