@@ -83,8 +83,8 @@ if __name__ == '__main__':
         sys.exit(0)
 
     try:
-        if args[1] == "create": panel.create_user(args[2], args[3])
-        elif args[1] == "delete": panel.delete_user(args[2])
+        if args[1] == "register": panel.create_user(args[2], args[3])
+        elif args[1] == "unregister": panel.delete_user(args[2])
         elif args[1] == "send": panel.send_mail(args[2], ' '.join(args[3:]))
         elif args[1] ==  "clear-user": panel.clear_user_mail(args[2])
         elif args[1] ==  "clear-all": panel.clear_all_mail()
@@ -92,8 +92,8 @@ if __name__ == '__main__':
         elif args[1] ==  "list-users": panel.list_users()
         elif args[1] ==  "list-mails": panel.list_all_mails()
         elif args[1] ==  "password": panel.change_password(args[2], args[3])
-        elif args[1] ==  "add-coins": panel.add_coins(args[2], int(args[3]))
-        elif args[1] ==  "remove-coins": panel.remove_coins(args[2], int(args[3]))
+        elif args[1] ==  "add-coin": panel.add_coins(args[2], int(args[3]))
+        elif args[1] ==  "remove-coin": panel.remove_coins(args[2], int(args[3]))
         else: print("[-] invalid request")
     except Exception as e:
         print(f"[!] Error: {e}")
