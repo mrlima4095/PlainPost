@@ -58,6 +58,8 @@ class Server:
         keys = self.auth(client_socket)
 
         if keys[0] == True:
+            self.send(client_socket, "0")
+            
             while True:
                 try: 
                     raw = self.read(client_socket)
