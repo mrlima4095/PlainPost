@@ -90,6 +90,10 @@ class Server:
                     status = self.change_password(keys[1], request['newpass'])
 
                     self.send(client_socket, status)
+                elif request['action'] == "me":
+                    status = self.show_info(keys[1])
+
+                    self.send(client_socket, status)
                 elif request['action'] == "signoff": 
                     status = self.signoff(keys[1])
 
