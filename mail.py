@@ -54,30 +54,32 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        raw = self.read(client_socket)
-        request = json.loads(raw)
+        while True:
+            raw = self.read(client_socket)
+            request = json.loads(raw)
 
-        if request['action'] == "signup":
-            status = self.signup(request['username'], request['password'])
+            if not raw: break
 
-            return self.send(client_socket, status)
+            if request['action'] == "signup":
+                status = self.signup(request['username'], request['password'])
 
-        if self.auth(request['username'], request['password']):
-            if request['action'] == "send":
-                status = self.send_mail(request['username'], request['to'], request['content'])
+                return self.send(client_socket, status)
 
-                self.send(client_socket, status)
-            elif request['action'] == "read":
-                status = self.read_mail(request['username'])
+            if self.auth(request['username'], request['password']):
+                if request['action'] == "send":
+                    status = self.send_mail(request['username'], request['to'], request['content'])
 
-                self.send(client_socket, status)
-            elif request['action'] == "clear": 
-                status = self.clear(request['username'])
+                    self.send(client_socket, status)
+                elif request['action'] == "read":
+                    status = self.read_mail(request['username'])
 
-                self.send(client_socket, status)
-            else: self.send(client_socket, "2")
-        else:
-            self.send(client_socket, "1")
+                    self.send(client_socket, status)
+                elif request['action'] == "clear": 
+                    status = self.clear(request['username'])
+
+                    self.send(client_socket, status)
+                else: self.send(client_socket, "2")
+            else: self.send(client_socket, "1")
 
     def auth(self, username, password):
         self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
@@ -114,11 +116,9 @@ class Server:
         self.db.commit()
         return "0"
 
-    def send(self, client_socket, text):
-        client_socket.sendall(f"{text}\n".encode('utf-8'))
-
-    def read(self, client_socket):
-        return client_socket.recv(4095).decode('utf-8').strip()
+    # Socket Operations (Read and Write)
+    def send(self, client_socket, text): client_socket.sendall(f"{text}\n".encode('utf-8'))
+    def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
 
 
 if __name__ == '__main__':
