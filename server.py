@@ -23,17 +23,9 @@ from datetime import datetime
 
 class Server:
     def __init__(self):
-        self.config = {}
 
-        with open("server.properties", "r") as file:
-            for line in file.readlines():
-                line = line.strip()
-                if "=" in line:
-                    key, value = line.split("=", 1)
-                    self.config[key.strip()] = value.strip()
-
-        self.host = self.config['host']
-        self.port = int(self.config['port'])
+        self.host = "127.0.0.1"
+        self.port = 10142
 
         self.db = sqlite3.connect("mailserver.db", check_same_thread=False)
         self.db.row_factory = sqlite3.Row
@@ -45,7 +37,7 @@ class Server:
             CREATE TABLE IF NOT EXISTS users (
                 username TEXT PRIMARY KEY,
                 password TEXT NOT NULL,
-                coins INTEGER DEFAULT 0
+                coins INTEGER DEFAULT 0,
             )
         ''')
         self.cursor.execute('''
@@ -72,7 +64,8 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        request = json.loads(self.read(client_socket))
+        request = self.read(client_socket)
+        request = json.loads(request)
 
         if request['action'] == "signup":
             return self.send(client_socket, self.signup(request['username'], request['password']))
