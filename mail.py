@@ -54,8 +54,8 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        request = self.read(client_socket)
-        request = json.loads(request)
+        raw = self.read(client_socket)
+        request = json.loads(raw)
 
         if request['action'] == "signup":
             status = self.signup(request['username'], request['password'])
