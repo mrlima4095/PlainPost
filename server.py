@@ -33,14 +33,14 @@ class Server:
         self.init_db()
 
     def init_db(self):
-        self.cursor.execute('''
+        self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 username TEXT PRIMARY KEY,
                 password TEXT NOT NULL,
                 coins INTEGER DEFAULT 0,
             )
-        ''')
-        self.cursor.execute('''
+        """)
+        self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS mails (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 recipient TEXT,
@@ -49,7 +49,7 @@ class Server:
                 timestamp TEXT,
                 FOREIGN KEY(recipient) REFERENCES users(username)
             )
-        ''')
+        """)
         self.db.commit()
 
     def start(self):
