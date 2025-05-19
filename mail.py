@@ -55,7 +55,9 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        if self.auth(client_socket):
+        keys = self.auth(client_socket)
+
+        if keys[0] == True:
             while True:
                 try: 
                     raw = self.read(client_socket)
@@ -104,14 +106,14 @@ class Server:
             if self.cursor.fetchone():
                 self.send(client_socket, "3")
 
-                return False
+                return (False)
 
             self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (username, password))
             self.db.commit()
-            return True
+            return (True, request['username'])
         
         self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (request['username'], request['password']))
-        return self.cursor.fetchone() is not None
+        return (self.cursor.fetchone() is not None, request['username'])
 
     # User auth tools
     def signoff(self, username):
