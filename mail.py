@@ -85,7 +85,7 @@ class Server:
                         status = self.signoff(request['username'])
     
                         self.send(client_socket, status)
-                    elif request['action'] == "status"
+                    elif request['action'] == "status": self.send(client_socket, "0")
                     else: self.send(client_socket, "2")
                 else: self.send(client_socket, "1")
             except Exception: self.send(client_socket, "5")
