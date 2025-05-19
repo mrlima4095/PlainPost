@@ -2,16 +2,6 @@
 # -*- coding: utf-8 -*-
 #
 
-# Criar contas
-# Requisições de API
-# | Ver meus dados
-# | Mudar senha
-# | Enviar email
-# | Ler emails
-# | Deletar emails
-# | Deletar todos emails
-# | Apagar conta
-
 import sys
 import socket
 import sqlite3
@@ -88,7 +78,7 @@ class Server:
     def signup(self, username, password):
         self.cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
         if self.cursor.fetchone():
-            return "3"  # Usuário já existe
+            return "3"
 
         self.cursor.execute("INSERT INTO users (username, password, coins) VALUES (?, ?, 0)", (username, password))
         self.db.commit()
@@ -97,7 +87,7 @@ class Server:
     def send_mail(self, sender, target, content):
         self.cursor.execute("SELECT * FROM users WHERE username = ?", (target,))
         if self.cursor.fetchone() is None:
-            return "4"  # Destinatário não encontrado
+            return "4"
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
         full_content = f"[{timestamp} - {sender}] {content}"
@@ -117,7 +107,7 @@ class Server:
         return "0"
 
     def send(self, client_socket, text):
-        client_socket.sendall(text.encode('utf-8'))
+        client_socket.sendall(f"{text}\n".encode('utf-8'))
 
     def read(self, client_socket):
         return client_socket.recv(4095).decode('utf-8').strip()
