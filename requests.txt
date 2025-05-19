@@ -1,8 +1,13 @@
-{"username":"usuario","password":"senha","action":"send","to":"destinatario","content":"corpo da mensagem"}
-{"username":"usuario","password":"senha","action":"read"}
-{"username":"usuario","password":"senha","action":"clear"}
-{"username":"usuario","password":"senha","action":"transfer","to":"destinatario","amount":"1"}
-{"username":"usuario","password":"senha","action":"changepass","newpass":"novasenha"}
-{"username":"usuario","password":"senha","action":"signoff"}
-{"username":"usuario","password":"senha","action":"status"}
+Logar-se
+{"username":"usuario","password":"senha"}
 {"username":"usuario","password":"senha","action":"signup"}
+
+Operações
+
+{"action":"send","to":"destinatario","content":"corpo da mensagem"}
+{"action":"read"}
+{"action":"clear"}
+{"action":"transfer","to":"destinatario","amount":"1"}
+{"action":"changepass","newpass":"novasenha"}
+{"action":"signoff"}
+{"action":"status"}
