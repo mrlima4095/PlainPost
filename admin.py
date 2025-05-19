@@ -12,7 +12,7 @@ class AdminPanel:
         self.cursor = self.db.cursor()
         self.cursor.execute("PRAGMA foreign_keys = ON;")
 
-    def run(self, args=sys.argv)
+    def run(self, args=sys.argv):
         if len(args) < 2: self.help(); sys.exit(0)
 
         try:
