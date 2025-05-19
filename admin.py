@@ -12,27 +12,57 @@ class AdminPanel:
         self.cursor = self.db.cursor()
         self.cursor.execute("PRAGMA foreign_keys = ON;")
 
-    # Users
-    def create_user(self, username, password):
+    def run(self, args=sys.argv)
+        if len(args) < 2: self.help(); sys.exit(0)
+
+        try:
+            if args[1] == "register": panel.register(args[2], args[3])
+            elif args[1] == "unregister": panel.unregister(args[2])
+            elif args[1] ==  "password": panel.change_password(args[2], args[3])
+            elif args[1] ==  "role": panel.change_role(args[2], args[3])
+            elif args[1] ==  "list": panel.list_users()
+
+            elif args[1] == "send": panel.send(args[2], ' '.join(args[3:]))
+            elif args[1] ==  "read": panel.list_all_mails()
+            elif args[1] ==  "clear": panel.clear(args[2])
+            elif args[1] ==  "clear-all": panel.clear_all()
+
+            elif args[1] ==  "give-coin": panel.add_coins(args[2], int(args[3]))
+            elif args[1] ==  "take-coin": panel.remove_coins(args[2], int(args[3]))
+
+            elif args[1] == "help": self.help()
+
+            else: print("[!] invalid request")
+        except IndexError as e: print(f"[!] Missed arguments")
+        except Exception as e: print(f"[!] Error: {e}")
+
+    def help(self): print(open("admin-help.txt", "r").read())
+
+    # User payloads
+    def register(self, username, password):
         self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (username, password))
         self.db.commit()
         print(f"[+] User '{username}' created.")
-    def delete_user(self, username):
+    def unregister(self, username):
         self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         self.cursor.execute("DELETE FROM users WHERE username = ?", (username,))
         self.db.commit()
         print(f"[-] User '{username}' deleted.")
-    def change_password(self, username, newpass):
+    def changepass(self, username, newpass):
         self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (newpass, username))
         self.db.commit()
         print(f"[+] Password for '{username}' changed.")
-    def change_role(self, username, role):
+    def changerole(self, username, role):
         self.cursor.execute("UPDATE users SET role = ? WHERE username = ?", (role, username))
         self.db.commit()
         print(f"[+] User '{username}' role changed to '{role}'.")
+    def list_users(self):
+        self.cursor.execute("SELECT username, role, coins FROM users")
+        for row in self.cursor.fetchall():
+            print(f"[{row['role']}] {row['username']} (Coins: {row['coins']})")
         
     # Mails
-    def send_mail(self, target, content):
+    def send(self, target, content):
         self.cursor.execute("SELECT * FROM users WHERE username = ?", (target,))
         if not self.cursor.fetchone():
             print("[!] Target user does not exist.")
@@ -44,26 +74,18 @@ class AdminPanel:
                             (target, "admin", full_content, timestamp))
         self.db.commit()
         print(f"[+] Email sent to {target}.")
-    def clear_user_mail(self, username):
-        self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
-        self.db.commit()
-        print(f"[~] Cleared all emails for '{username}'.")
-    def clear_all_mail(self):
-        self.cursor.execute("DELETE FROM mails")
-        self.db.commit()
-        print("[~] All emails cleared from database.")
-
-    
-    def list_users(self):
-        self.cursor.execute("SELECT username, role, coins FROM users")
-        for row in self.cursor.fetchall():
-            print(f"- {row['username']} (role={row['role']}, coins={row['coins']})")
-
     def list_all_mails(self):
         self.cursor.execute("SELECT * FROM mails")
         for mail in self.cursor.fetchall():
             print(f"{mail['recipient']} -> {mail['content']}\n")
-
+    def clear(self, username):
+        self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
+        self.db.commit()
+        print(f"[~] Cleared all emails for '{username}'.")
+    def clear_all(self):
+        self.cursor.execute("DELETE FROM mails")
+        self.db.commit()
+        print("[~] All emails cleared from database.")
     
     # Coins
     def add_coins(self, username, amount):
@@ -77,23 +99,4 @@ class AdminPanel:
 
 if __name__ == '__main__':
     panel = AdminPanel()
-    args = sys.argv
-
-    if len(args) < 2:
-        sys.exit(0)
-
-    try:
-        if args[1] == "register": panel.create_user(args[2], args[3])
-        elif args[1] == "unregister": panel.delete_user(args[2])
-        elif args[1] == "send": panel.send_mail(args[2], ' '.join(args[3:]))
-        elif args[1] ==  "clear-user": panel.clear_user_mail(args[2])
-        elif args[1] ==  "clear-all": panel.clear_all_mail()
-        elif args[1] ==  "role": panel.change_role(args[2], args[3])
-        elif args[1] ==  "list-users": panel.list_users()
-        elif args[1] ==  "list-mails": panel.list_all_mails()
-        elif args[1] ==  "password": panel.change_password(args[2], args[3])
-        elif args[1] ==  "add-coin": panel.add_coins(args[2], int(args[3]))
-        elif args[1] ==  "remove-coin": panel.remove_coins(args[2], int(args[3]))
-        else: print("[-] invalid request")
-    except Exception as e:
-        print(f"[!] Error: {e}")
+    panel.run()
