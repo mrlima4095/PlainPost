@@ -180,6 +180,13 @@ class Server:
         
         return "0"
 
+    def show_info(self, username):
+        self.cursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
+        row = self.cursor.fetchone()
+        if row:
+            return f"[{row['role']}] {username}\nCoins: {row['coins']}"
+        return "4"
+    
     # Socket Operations (Read and Write)
     def send(self, client_socket, text): client_socket.sendall(f"{text}\n".encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
