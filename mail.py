@@ -58,6 +58,8 @@ class Server:
         try:
             raw = self.read(client_socket)
             request = json.loads(raw)
+            
+            print(f"[+] {addr[0]} -> {raw}")
 
             if request['action'] == "signup":
                 status = self.signup(request['username'], request['password'])
