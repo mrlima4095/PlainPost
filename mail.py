@@ -63,10 +63,11 @@ class Server:
             while True:
                 try: 
                     raw = self.read(client_socket)
+                    
+                    if not raw: break
                     request = json.loads(raw)
                 except json.decoder.JSONDecodeError: self.send(client_socket, "5")
                 
-                if not raw: break
                 print(f"[+] {addr[0]} -> {raw}")
                     
                 if request['action'] == "send":
