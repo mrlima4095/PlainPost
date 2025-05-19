@@ -1,0 +1,17 @@
+Usage: python admin.py [action] [args**]
+
+	Actions:
+
+	register [username] [password] 		Register new user
+	unregister [username]				Delete an user
+	password [username] [new pass]		Change user password
+	role [username] [new role]			Change a user role
+	list								List all users registered
+
+	send [target] [message]				Send a message (as admin)
+	read								Read all mails from server
+	clear [username]					Clear mails from user
+	clear-all							Clear all mails from server
+
+	give-coin [user] [amount]			GIVE amount of coins to user
+	take-coin [user] [amount]			TAKE amount of coins to user
