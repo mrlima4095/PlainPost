@@ -54,12 +54,10 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        while True:
-            try:
-                raw = self.read(client_socket)
-                request = json.loads(raw)
+        try:
+            raw = self.read(client_socket)
+            request = json.loads(raw)
                 
-                if not raw: break
             
                 print(f"[+] {addr[0]} -> {raw}", file="logs.txt")
     
