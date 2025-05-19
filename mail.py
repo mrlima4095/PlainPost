@@ -83,7 +83,7 @@ class Server:
                     status = self.transfer_coins(request['username'], request['to'], request['amount'])
 
                     self.send(client_socket, status)
-                elif request['action'] == "chargepass":
+                elif request['action'] == "changepass":
                     status = self.change_password(request['username'], request['newpass'])
 
                     self.send(client_socket, status)
