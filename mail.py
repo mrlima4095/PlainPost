@@ -27,7 +27,8 @@ class Server:
             CREATE TABLE IF NOT EXISTS users (
                 username TEXT PRIMARY KEY,
                 password TEXT NOT NULL,
-                coins INTEGER DEFAULT 0
+                coins INTEGER DEFAULT 0,
+                role TEXT DEFAULT 'user'
             )
         """)
         self.cursor.execute("""
@@ -95,7 +96,7 @@ class Server:
         if self.cursor.fetchone():
             return "3"
 
-        self.cursor.execute("INSERT INTO users (username, password, coins) VALUES (?, ?, 0)", (username, password))
+        self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (username, password))
         self.db.commit()
         return "0"
     def signoff(self, username):
@@ -125,6 +126,31 @@ class Server:
         self.db.commit()
         return "0"
 
+    def transfer_coins(self, sender, recipient, amount):
+    try:
+        amount = int(amount)
+        if amount <= 0:
+            return "6"
+    except ValueError:
+        return "6"
+
+    # Verifica se o destinatário existe
+    self.cursor.execute("SELECT coins FROM users WHERE username = ?", (recipient,))
+    recipient_row = self.cursor.fetchone()
+    if recipient_row is None:
+        return "4"
+
+    # Verifica o saldo do remetente
+    self.cursor.execute("SELECT coins FROM users WHERE username = ?", (sender,))
+    sender_row = self.cursor.fetchone()
+    if sender_row["coins"] < amount:
+        return "6"
+
+    # Realiza a transferência
+    self.cursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (amount, sender))
+    self.cursor.execute("UPDATE users SET coins = coins + ? WHERE username = ?", (amount, recipient))
+    self.db.commit()
+    return "0"
     # Socket Operations (Read and Write)
     def send(self, client_socket, text): client_socket.sendall(f"{text}\n".encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
