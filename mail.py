@@ -81,6 +81,7 @@ class Server:
                     status = self.transfer_coins(request['username'], request['to'], request['amount'])
 
                     self.send(client_socket, status)
+                
                 elif request['action'] == "signoff": 
                     status = self.signoff(request['username'])
 
@@ -106,6 +107,13 @@ class Server:
     def signoff(self, username):
         self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         self.cursor.execute("DELETE FROM users WHERE username = ?", (username,))
+        self.db.commit()
+        return "0"
+        
+    def change_password(self, username, newpass):
+        if not newpass:
+            return "7"
+        self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (newpass, username))
         self.db.commit()
         return "0"
 
