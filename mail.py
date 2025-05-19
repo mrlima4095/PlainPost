@@ -58,35 +58,33 @@ class Server:
             raw = self.read(client_socket)
             request = json.loads(raw)
                 
-            
-                print(f"[+] {addr[0]} -> {raw}", file="logs.txt")
+            if request['action'] == "signup":
+                status = self.signup(request['username'], request['password'])
     
-                if request['action'] == "signup":
-                    status = self.signup(request['username'], request['password'])
+                return self.send(client_socket, status)
     
-                    return self.send(client_socket, status)
+            if self.auth(request['username'], request['password']):
+                if request['action'] == "send":
+                    status = self.send_mail(request['username'], request['to'], request['content'])
     
-                if self.auth(request['username'], request['password']):
-                    if request['action'] == "send":
-                        status = self.send_mail(request['username'], request['to'], request['content'])
+                    self.send(client_socket, status)
+                elif request['action'] == "read":
+                    status = self.read_mail(request['username'])
     
-                        self.send(client_socket, status)
-                    elif request['action'] == "read":
-                        status = self.read_mail(request['username'])
+                    self.send(client_socket, status)
+                elif request['action'] == "clear": 
+                    status = self.clear(request['username'])
     
-                        self.send(client_socket, status)
-                    elif request['action'] == "clear": 
-                        status = self.clear(request['username'])
+                    self.send(client_socket, status)
+                elif request['action'] == "signoff": 
+                    status = self.signoff(request['username'])
     
-                        self.send(client_socket, status)
-                    elif request['action'] == "signoff": 
-                        status = self.signoff(request['username'])
-    
-                        self.send(client_socket, status)
-                    elif request['action'] == "status": self.send(client_socket, "0")
-                    else: self.send(client_socket, "2")
-                else: self.send(client_socket, "1")
-            except Exception: self.send(client_socket, "5")
+                    self.send(client_socket, status)
+                elif request['action'] == "status": self.send(client_socket, "0")
+                else: self.send(client_socket, "2")
+            else: self.send(client_socket, "1")
+        except Exception: self.send(client_socket, "5")
+        
         client_socket.close()
     def auth(self, username, password):
         self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
