@@ -1,99 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BadMail</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BadMail</title>
 
-    <script type="text/javascript">
-        async function conectar(acao) {
-            const username = localStorage.getItem("username");
-            const password = localStorage.getItem("password");
-            
-            if (!username || !password) { window.location.href = "login.html"; return; }
+  <script type="text/javascript">
+    async function conectar(acao) {
+      const username = localStorage.getItem("username");
+      const password = localStorage.getItem("password");
 
-            const payload = { username: username, password: password, action: acao };
+      if (!username || !password) {
+        window.location.href = "login.html";
+        return;
+      }
 
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const payload = { username, password, action: acao };
 
-                const dados = await resposta.json();
-                return dados.response; 
-            } catch (erro) { return "9"; }
+      try {
+        const resposta = await fetch("https://servidordomal.fun/api/badmail", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const dados = await resposta.json();
+        return dados.response;
+      } catch (erro) {
+        return "9";
+      }
+    }
+
+    async function send() {
+      const username = localStorage.getItem("username");
+      const password = localStorage.getItem("password");
+
+      const target = prompt("Destinatário:");
+      if (!target) return alert("Destinatário não pode estar vazio!");
+      const content = prompt("Mensagem:");
+      if (!content) return alert("Você não pode mandar uma mensagem vazia!");
+
+      const payload = {
+        username,
+        password,
+        action: "send",
+        to: target,
+        content,
+      };
+
+      try {
+        const resposta = await fetch("https://servidordomal.fun/api/badmail", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const dados = await resposta.json();
+
+        if (dados.response === "0") alert("Sua mensagem foi enviada!");
+        else if (dados.response === "4") alert("O destinatário não foi encontrado!");
+        else alert("Erro ao enviar mensagem.");
+      } catch {
+        alert("Erro na conexão.");
+      }
+    }
+
+    async function transfer() {
+      const username = localStorage.getItem("username");
+      const password = localStorage.getItem("password");
+
+      const target = prompt("Destinatário:");
+      if (!target) return alert("Destinatário não pode estar vazio!");
+      const amount = prompt("Quantidade:");
+      if (!amount) return alert("Você precisa informar a quantidade!");
+
+      const payload = {
+        username,
+        password,
+        action: "transfer",
+        to: target,
+        amount,
+      };
+
+      try {
+        const resposta = await fetch("https://servidordomal.fun/api/badmail", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const dados = await resposta.json();
+
+        if (dados.response === "0") alert("Moedas enviadas!");
+        else if (dados.response === "4") alert("O destinatário não foi encontrado!");
+        else alert("Erro ao transferir.");
+      } catch {
+        alert("Erro na conexão.");
+      }
+    }
+
+    async function changepass() {
+      const username = localStorage.getItem("username");
+      const password = localStorage.getItem("password");
+
+      const newpass = prompt("Nova senha:");
+      if (!newpass) return alert("A nova senha não pode estar vazia!");
+
+      const payload = {
+        username,
+        password,
+        action: "changepass",
+        newpass,
+      };
+
+      try {
+        const resposta = await fetch("https://servidordomal.fun/api/badmail", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const dados = await resposta.json();
+
+        if (dados.response === "0") {
+          localStorage.removeItem("username");
+          localStorage.removeItem("password");
+          alert("Senha alterada!");
+          window.location.href = "login.html";
+        } else {
+          alert("Erro ao alterar a senha.");
         }
-        async function send() {
-            target = prompt("Destinatario:"); if (!target) { alert("Destinatario não pode estar vazio!"); return; }
-            content = prompt("Mensagem:"); if (!content) { alert("Você não pode mandar uma mensagem vazia!"); return; }
+      } catch {
+        alert("Erro na conexão.");
+      }
+    }
 
-            const payload = { username: username, password: password, action: "send", to: target, content: content };
+    window.onload = () => {
+      if (!localStorage.getItem("username") || !localStorage.getItem("password")) {
+        window.location.href = "login.html";
+        return;
+      }
 
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      document.getElementById("read").addEventListener("click", async () => {
+        const r = await conectar("read");
+        alert(r);
+      });
 
-                const dados = await resposta.json();
-                
-                if (dados.response === "0") { alert("Sua mensagem foi enviada!"); }  
-                if (dados.response === "4") { alert("O destinatario não foi encontrado!"); }  
-            } catch (erro) { alert("Ocorreu um erro na conexão!"); }
-        }
+      document.getElementById("send").addEventListener("click", send);
 
-        async function transfer() {
-            target = prompt("Destinatario:"); if (!target) { alert("Destinatario não pode estar vazio!"); return; }
-            amount = prompt("Quantidade:"); if (!amount) { alert("Você precisa informar a quantidade de moedas que dejesa enviar!"); return; }
+      document.getElementById("clear").addEventListener("click", async () => {
+        const r = await conectar("clear");
+        if (r === "0") alert("Suas mensagens foram apagadas!");
+        else alert("Ocorreu um erro na conexão!");
+      });
 
-            const payload = { username: username, password: password, action: "transfer", to: target, amount: amount };
+      document.getElementById("transfer").addEventListener("click", transfer);
 
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      document.getElementById("me").addEventListener("click", async () => {
+        const r = await conectar("me");
+        alert(r);
+      });
 
-                const dados = await resposta.json();
-                
-                if (dados.response === "0") { alert("Moedas enviadas!"); }  
-                if (dados.response === "4") { alert("O destinatario não foi encontrado!"); }  
-            } catch (erro) { alert("Ocorreu um erro na conexão!"); }
-        }
+      document.getElementById("changepass").addEventListener("click", changepass);
 
-        async function changepass() {
-            newpass = prompt("Destinatario:"); if (!newpass) { alert("Sua nova senha não pode estar vazia!"); return; }
+      document.getElementById("signout").addEventListener("click", () => {
+        localStorage.removeItem("username");
+        localStorage.removeItem("password");
+        window.location.href = "login.html";
+      });
 
-            const payload = { username: username, password: password, action: "changepass", newpass: newpass };
+      document.getElementById("signoff").addEventListener("click", async () => {
+        const username = localStorage.getItem("username");
+        const password = localStorage.getItem("password");
+        const confirm = window.confirm("Tem certeza que deseja apagar sua conta?");
+        if (!confirm) return;
 
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-
-                const dados = await resposta.json();
-                
-                if (dados.response === "0") { localStorage.removeItem("username"); localStorage.removeItem("password"); alert("Sua senha foi alterada!"); window.location.href = "login.html"; } 
-                else { alert("Ocorreu um erro interno!"); } 
-            } catch (erro) { alert("Ocorreu um erro na conexão!"); }
-        }
-
-        window.onload = () => {
-            if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login.html"; }
-            
-            document.getElementById("read").addEventListener("click", function () { alert(conectar("read")); });
-            document.getElementById("send").addEventListener("click", function () { send(); });
-            document.getElementById("clear").addEventListener("click", function () { if (content("clear") == "0") { alert("Suas mensagens foram apagadas!"); } else { alert("Ocorreu um erro na conexão!"); } });
-            document.getElementById("transfer").addEventListener("click", function () { transfer(); });
-
-            document.getElementById("me").addEventListener("click", function () { alert(conectar("me")); });
-            document.getElementById("changepass").addEventListener("click", function () { changepass(); });
-            document.getElementById("signout").addEventListener("click", function () { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login.html"; });
-            document.getElementById("signoff").addEventListener("click", function () {  });
+        const payload = {
+          username,
+          password,
+          action: "signoff",
         };
-    </script>
+
+        try {
+          const resposta = await fetch("https://servidordomal.fun/api/badmail", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const dados = await resposta.json();
+
+          if (dados.response === "0") {
+            localStorage.clear();
+            alert("Conta apagada com sucesso!");
+            window.location.href = "login.html";
+          } else {
+            alert("Erro ao apagar a conta.");
+          }
+        } catch {
+          alert("Erro na conexão.");
+        }
+      });
+    };
+  </script>
 </head>
 <body>
-    <h2>Ações Principais</h2>
-    <button id="read" type="submit">Ler Mensagens</button>
-    <button id="send" type="submit">Enviar Mensagens</button>
-    <button id="clear" type="submit">Limpar Todas mensagens</button>
-    <button id="transfer" type="submit">Enviar Moedas</button>
-    
-    <h2>Minha Conta</h2>
-    <button id="me" type="submit">Meus Dados</button>
-    <button id="changepass" type="submit">Mudar Senha</button>
-    <button id="signout" type="submit">Encerrar sessão</button>
-    <button id="signoff" type="submit">Apagar Conta</button>
+  <h2>Ações Principais</h2>
+  <button id="read" type="submit">Ler Mensagens</button>
+  <button id="send" type="submit">Enviar Mensagens</button>
+  <button id="clear" type="submit">Limpar Todas mensagens</button>
+  <button id="transfer" type="submit">Enviar Moedas</button>
+
+  <h2>Minha Conta</h2>
+  <button id="me" type="submit">Meus Dados</button>
+  <button id="changepass" type="submit">Mudar Senha</button>
+  <button id="signout" type="submit">Encerrar sessão</button>
+  <button id="signoff" type="submit">Apagar Conta</button>
 </body>
 </html>
