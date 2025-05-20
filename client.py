@@ -76,7 +76,13 @@ class Client:
                     if status == "0": print("[+] Moedas enviadas com sucesso!")
                     elif status == "4": print("[-] Destinatario inexistente!")
                     elif status == "6": print("[-] Voce nao possui saldo suficiente!")
-                elif action == "5": self.clear(), print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"})))
+                elif action == "5": print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"})))
+                elif action == "6":
+                    password = getpass.getpass("[+] New Password: ").strip()
+                    
+                    if not password: 
+                        print("[-] E")
+        
                 
                 else: print("[-] Opção não existe!")
                 
