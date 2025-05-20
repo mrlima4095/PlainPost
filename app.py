@@ -22,7 +22,7 @@ def badmail():
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect(("localhost", TCP_PORT))
+            s.connect(("localhost", 10142))
             s.sendall((json.dumps(payload) + "\n").encode('utf-8'))
             response = s.recv(4096).decode('utf-8').strip()
     except Exception as e:

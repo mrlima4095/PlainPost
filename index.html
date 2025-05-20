@@ -15,7 +15,7 @@
             const payload = { username: username, password: password, action: acao };
 
             try {
-                const resposta = await fetch("http://31.97.20.160:9834/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                const resposta = await fetch("http://31.97.20.160:9834/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
 
                 const dados = await resposta.json();
                 return dados.response; 
@@ -28,7 +28,7 @@
             const payload = { username: username, password: password, action: "send", to: target, content: content };
 
             try {
-                const resposta = await fetch("http://31.97.20.160:9834/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                const resposta = await fetch("http://31.97.20.160:9834/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
 
                 const dados = await resposta.json();
                 
@@ -44,7 +44,7 @@
             const payload = { username: username, password: password, action: "transfer", to: target, amount: amount };
 
             try {
-                const resposta = await fetch("http://31.97.20.160:9834/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                const resposta = await fetch("http://31.97.20.160:9834/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
 
                 const dados = await resposta.json();
                 
