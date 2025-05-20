@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
+import os
 import socket
 import getpass
 
@@ -23,9 +24,18 @@ class Client:
         payload = {"username": self.username, "password": self.password, "action": "status"}
         status = self.request(json.dumps())
 
-        if status == "1": return print("[-] Usuario ou senha incorretos!")
-        else:
-            while True:
-                
+        if status == "1": return print("\n[-] Usuario ou senha incorretos!")
         
+        print(f"\n[+] Você entrou como {self.username}")
+        while True:
+            try: 
+            
+
+
+            except KeyboardInterrupt: self.clear()
+        
+    
+    def clear(self):
+        if os.name == "posix": os.system("clear")
+        else: os.system("cls")
         
