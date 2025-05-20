@@ -17,7 +17,7 @@ def communicate_with_tcp_server(payload):
     except Exception as e:
         return str(e)
 
-@app.route('/badmail'), methods=['POST'])
+@app.route(('/badmail'), methods=['POST'])
 def badmail():
     if not request.is_json:
         return jsonify({"error": "Invalid content type. Must be JSON."}), 400
