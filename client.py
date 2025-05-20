@@ -43,7 +43,6 @@ class Client:
                     self.clear()
                     
                     print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "read"})))
-                    input("\n[!] Pressione ENTER para continuar..."), self.clear()
                 elif action == "2":
                     self.clear()
                     
@@ -57,21 +56,24 @@ class Client:
                     if status == "0": input("[+] Mensagem enviada com sucesso!"), self.clear()
                     elif status == "4": input("[-] Destinatario inexistente!"), self.clear()
                 elif action == "3": 
+                    self.clear()
+                    
                     self.request(json.dumps({"username": self.username, "password": self.password, "action": "clear"}))
                     
                     print("[+] Suas mensagens foram apagadas!")
-                    input("[+] Pressione ENTER para continuar..."), self.clear()
                 elif action == "4":
-                    self.clear(), print("[+] Enviar moedas\n")
+                    self.clear()
+                    
+                    print("[+] Enviar moedas\n")
                     target = input("[+] Destinatario: ").strip()
                     amount = input("[+] Quantidade: ").strip()
 
                     if not target or not message: print("[-] Destinatario ou quantidade estao vazios!"); continue
 
                     status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "transfer", "to": target, "amount": amount}))
-                    if status == "0": input("[+] Moedas enviadas com sucesso!"), self.clear()
-                    elif status == "4": input("[-] Destinatario inexistente!"), self.clear()
-                    elif status == "6": print("[-] Voce nao possui saldo suficiente!")f.clear()
+                    if status == "0": print("[+] Moedas enviadas com sucesso!"), self.clear()
+                    elif status == "4": print("[-] Destinatario inexistente!")
+                    elif status == "6": print("[-] Voce nao possui saldo suficiente!")
                 elif action == "5": self.clear(), print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"})))
                 
                 input("[+] Pressione ENTER para continuar...")
