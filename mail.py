@@ -55,8 +55,6 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y] {addr[0]} joined"))
-
         try: 
             raw = self.read(client_socket)
             request = json.loads(raw)
