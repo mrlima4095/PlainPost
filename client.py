@@ -81,9 +81,12 @@ class Client:
                     password = getpass.getpass("[+] New Password: ").strip()
                     
                     if not password: 
-                        print("[-] E")
-        
-                
+                        print("[-] A senha esta vazia!")
+                    
+                    if self.request(json.dumps({"username": self.username, "password": self.password, "action": "changepass","newpass":password})) == "0":
+                        print("[+] Senha alterada com sucesso!")
+                        self.password = password
+                        
                 else: print("[-] Opção não existe!")
                 
                 input("[+] Pressione ENTER para continuar...")
