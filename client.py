@@ -19,8 +19,8 @@ class Client:
                 status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "signup"})).strip()
 
                 if status == "3": print("[-] Este nome de usuario ja esta em uso!"), sys.exit(0)
-                elif status == "0": self.run()
-            else: self.run()
+                
+        self.run()
             
     def request(self, payload):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
