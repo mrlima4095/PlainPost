@@ -59,10 +59,8 @@ class Server:
 
         try: 
             raw = self.read(client_socket)
-            
-            if not raw: break
             request = json.loads(raw)
-        except json.decoder.JSONDecodeError: self.send(client_socket, "5"); continue
+        except json.decoder.JSONDecodeError: return self.send(client_socket, "5")
 
         if request['action'] == "signup":
             self.cursor.execute("SELECT * FROM users WHERE username = ?", (request['username'],))
