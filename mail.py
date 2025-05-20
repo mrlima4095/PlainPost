@@ -101,7 +101,7 @@ class Server:
             elif request['action'] == "signoff": 
                 status = self.signoff(request['username'])
 
-                self.send(client_socket, status); break
+                self.send(client_socket, status)
             elif request['action'] == "status": self.send(client_socket, "0")
             else: self.send(client_socket, "2")
         else: self.send(client_socket, "1") 
