@@ -41,10 +41,13 @@ class Client:
                 if not action: self.clear()
                 elif action == "1": 
                     self.clear()
+                    
                     print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "read"})))
                     input("\n[!] Pressione ENTER para continuar..."), self.clear()
                 elif action == "2":
-                    self.clear(), print("[+] Enviar mensagem\n")
+                    self.clear()
+                    
+                    print("[+] Enviar mensagem\n")
                     target = input("[+] Destinatario: ").strip()
                     message = input("[+] Mensagem: ").strip()
 
@@ -68,10 +71,12 @@ class Client:
                     status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "transfer", "to": target, "amount": amount}))
                     if status == "0": input("[+] Moedas enviadas com sucesso!"), self.clear()
                     elif status == "4": input("[-] Destinatario inexistente!"), self.clear()
-                    elif status == "6": input("[-] Voce nao possui saldo suficiente!"), self.clear()
-                elif action == "5": print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"}))), input("[+] Pressione ENTER para continuar...") 
+                    elif status == "6": print("[-] Voce nao possui saldo suficiente!")f.clear()
+                elif action == "5": self.clear(), print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"})))
                 
+                input("[+] Pressione ENTER para continuar...")
                 self.clear()
+                
             except KeyboardInterrupt: sys.exit(0)
         
     
