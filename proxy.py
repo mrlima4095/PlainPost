@@ -27,7 +27,6 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.wfile.write(f"Erro ao conectar com TCP: {e}".encode())
             return
 
-        # Responde ao cliente HTTP com o conteúdo vindo do servidor TCP
         self.send_response(200)
         self.send_header("Content-Type", "text/plain; charset=utf-8")
         self.send_header("Content-Length", str(len(response)))
