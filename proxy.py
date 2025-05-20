@@ -15,7 +15,7 @@ def communicate_with_tcp_server(payload):
             response = s.recv(4096).decode('utf-8').strip()
             return response
     except Exception as e:
-        return f"Error: {str(e)}"
+        return str(e)
 
 @app.route('/badmai', methods=['POST'])
 def badmail():
