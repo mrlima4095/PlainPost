@@ -1,41 +1,34 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-
+from flask import Flask, request, jsonify
 import socket
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import json
+
+app = Flask(__name__)
 
 TCP_HOST = '127.0.0.1'
-TCP_PORT = 10143
+TCP_PORT = 10142
 
-class ProxyHandler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        content_length = int(self.headers.get('Content-Length', 0))
-        post_data = self.rfile.read(content_length)
+def communicate_with_tcp_server(payload):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((TCP_HOST, TCP_PORT))
+            s.sendall((json.dumps(payload) + "\n").encode('utf-8'))
+            response = s.recv(4096).decode('utf-8').strip()
+            return response
+    except Exception as e:
+        return f"Error: {str(e)}"
 
-        print(f"[HTTP] Data: {post_data.decode(errors='ignore')}")
+@app.route('/api', methods=['POST'])
+def api():
+    if not request.is_json:
+        return jsonify({"error": "Invalid content type. Must be JSON."}), 400
 
-        try:
-            with socket.create_connection((TCP_HOST, TCP_PORT)) as tcp_sock:
-                tcp_sock.sendall(post_data)
+    payload = request.get_json()
 
-                tcp_sock.settimeout(10)
-                response = tcp_sock.recv(4096)
-                print(f"[TCP] Resposta do servidor TCP: {response.decode(errors='ignore')}")
-        except Exception as e:
-            self.send_response(500)
-            self.end_headers()
-            self.wfile.write(f"Erro ao conectar com TCP: {e}".encode())
-            return
+    if not isinstance(payload, dict):
+        return jsonify({"error": "Invalid JSON payload."}), 400
 
-        self.send_response(200)
-        self.send_header("Content-Type", "text/plain; charset=utf-8")
-        self.send_header("Content-Length", str(len(response)))
-        self.end_headers()
-        self.wfile.write(response)
+    response = communicate_with_tcp_server(payload)
+    return jsonify({"response": response})
 
 if __name__ == '__main__':
-    server_address = ('', 8080)
-    httpd = HTTPServer(server_address, ProxyHandler)
-    print("Servidor proxy HTTP rodando em http://localhost:10143")
-    httpd.serve_forever()
+    app.run(host="0.0.0.0", port=10143)
