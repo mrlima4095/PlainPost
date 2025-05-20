@@ -48,10 +48,11 @@ class Client:
                     message = input("[+] Mensagem: ").strip()
 
                     if not target or not message: print("[-] Destinatario ou mensagem estao vazios!")
+                    else:
 
-                    status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "send", "to": target, "content": message})).strip()
-                    if status == "0": print("[+] Mensagem enviada com sucesso!")
-                    elif status == "4": print("[-] Destinatario inexistente!")
+                        status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "send", "to": target, "content": message})).strip()
+                        if status == "0": print("[+] Mensagem enviada com sucesso!")
+                        elif status == "4": print("[-] Destinatario inexistente!")
                 elif action == "3":
                     self.request(json.dumps({"username": self.username, "password": self.password, "action": "clear"}))
                     
@@ -62,13 +63,15 @@ class Client:
                     target = input("[+] Destinatario: ").strip()
                     amount = input("[+] Quantidade: ").strip()
 
-                    if not target or not message: print("[-] Destinatario ou quantidade estao vazios!"); continue
+                    if not target or not amount: print("[-] Destinatario ou quantidade estao vazios!")
+                    else:
+                        status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "transfer", "to": target, "amount": amount})).strip()
 
-                    status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "transfer", "to": target, "amount": amount})).strip()
-                    if status == "0": print("[+] Moedas enviadas com sucesso!")
-                    elif status == "4": print("[-] Destinatario inexistente!")
-                    elif status == "6": print("[-] Voce nao possui saldo suficiente!")
-                elif action == "5": print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"}))).strip()
+                        if status == "0": print("[+] Moedas enviadas com sucesso!")
+                        elif status == "4": print("[-] Destinatario inexistente!")
+                        elif status == "4": print("[-] Ocorreu um erro!")
+                        elif status == "7": print("[-] Voce nao possui saldo suficiente!")
+                elif action == "5": print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"})).strip())
                 elif action == "6":
                     password = getpass.getpass("[+] New Password: ").strip()
                     
