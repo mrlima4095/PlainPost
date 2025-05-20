@@ -55,7 +55,7 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        status, username = self.auth(client_socket)
+        status, username = self.auth(client_socket, addr)
 
         if status == "0":
             self.send(client_socket, "0")
@@ -68,7 +68,7 @@ class Server:
                     request = json.loads(raw)
                 except json.decoder.JSONDecodeError: self.send(client_socket, "5"); continue
                 
-                print(datetime.now().strftime(f"[%H:%M %d/%m/%Y - {username}] {addr[0]} -> {raw}"), file="logs.txt")
+                print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y - {username}] {addr[0]} -> {raw}"))
                     
                 if request['action'] == "send":
                     status = self.send_mail(username, request['to'], request['content'])
@@ -105,7 +105,9 @@ class Server:
 
         client_socket.close()
 
-    def auth(self, client_socket):
+    def auth(self, client_socket, addr):
+        print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y] {addr[0]} joined"))
+
         try: 
             raw = self.read(client_socket)
             request = json.loads(raw)
