@@ -23,7 +23,7 @@ class Client:
         return s.recv(4096).decode()
         
     def run(self):
-        status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "status"}))
+        status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "status"})).strip()
 
         if status == "1": return print("\n[-] Usuario ou senha incorretos!")
         
@@ -44,7 +44,7 @@ class Client:
                 elif action == "1": 
                     self.clear()
                     
-                    print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "read"})))
+                    print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "read"})).strip())
                 elif action == "2":
                     self.clear()
                     
@@ -54,7 +54,7 @@ class Client:
 
                     if not target or not message: print("[-] Destinatario ou mensagem estao vazios!"); continue
 
-                    status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "send", "to": target, "content": message}))
+                    status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "send", "to": target, "content": message})).strip()
                     if status == "0": print("[+] Mensagem enviada com sucesso!")
                     elif status == "4": print("[-] Destinatario inexistente!")
                 elif action == "3": 
@@ -72,7 +72,7 @@ class Client:
 
                     if not target or not message: print("[-] Destinatario ou quantidade estao vazios!"); continue
 
-                    status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "transfer", "to": target, "amount": amount}))
+                    status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "transfer", "to": target, "amount": amount})).strip()
                     if status == "0": print("[+] Moedas enviadas com sucesso!")
                     elif status == "4": print("[-] Destinatario inexistente!")
                     elif status == "6": print("[-] Voce nao possui saldo suficiente!")
