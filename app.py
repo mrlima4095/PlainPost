@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import socket
 import json
 
 app = Flask(__name__)
+CORS(app)
 
 TCP_HOST = '0.0.0.0'
 TCP_PORT = 10142
