@@ -1,18 +1,20 @@
-HTTP/1.1 200 OK
-Content-Type: text/html
-Connection: close
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BadMail</title>
-    
 </head>
 <body>
-    <h1>BadMail</h1>
-    
+    <h2>Login</h2>
+    <form action="/login" method="post">
+        <label for="email">ID:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
 
+        <label for="senha">Senha:</label><br>
+        <input type="password" id="senha" name="senha" required><br><br>
+
+        <button type="submit">Entrar</button>
+    </form>
 </body>
 </html>
