@@ -4,36 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BadMail</title>
+
+    <script type="text/javascript">
+        async function conectar(acao) {
+            const username = localStorage.getItem("username");
+            const password = localStorage.getItem("password");
+            
+            if (!username || !password) { window.location.href = "login.html"; return; }
+
+            const payload = { username: username, password: password, action: acao };
+
+            try {
+                const resposta = await fetch("http://localhost:10143/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+
+                const dados = await resposta.json();
+                return dados.response; 
+            } catch (erro) { return "9"; }
+        }
+        async function send() {
+            target = prompt("Destinatario:"); if (!target) { alert("Destinatario não pode estar vazio!"); return; }
+            content = prompt("Mensagem:"); if (!content) { alert("Você não pode mandar uma mensagem vazia!"); return; }
+
+            const payload = { username: username, password: password, action: "send", to: target, content: content };
+
+            try {
+                const resposta = await fetch("http://localhost:10143/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+
+                const dados = await resposta.json();
+                
+                if (dados.response === "0") { alert("Sua mensagem foi enviada!"); }  
+                if (dados.response === "4") { alert("O destinatario não foi encontrado!"); }  
+            } catch (erro) { alert("Ocorreu um erro na conexão!"); }
+        }
+
+        async function transfer() {
+            target = prompt("Destinatario:"); if (!target) { alert("Destinatario não pode estar vazio!"); return; }
+            amount = prompt("Quantidade:"); if (!amount) { alert("Você precisa informar a quantidade de moedas que dejesa enviar!"); return; }
+
+            const payload = { username: username, password: password, action: "transfer", to: target, amount: amount };
+
+            try {
+                const resposta = await fetch("http://localhost:10143/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+
+                const dados = await resposta.json();
+                
+                if (dados.response === "0") { alert("Moedas enviadas!"); }  
+                if (dados.response === "4") { alert("O destinatario não foi encontrado!"); }  
+            } catch (erro) { alert("Ocorreu um erro na conexão!"); }
+        }
+
+        window.onload = () => {
+            if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login.html"; return; }
+            
+            document.getElementById("read").addEventListener("click", function () { alert(conectar("read")); });
+            document.getElementById("send").addEventListener("click", function () { send(); });
+            document.getElementById("clear").addEventListener("click", function () { if (content("clear") == "0") { alert("Suas mensagens foram apagadas!"); } else { alert("Ocorreu um erro na conexão!"); } });
+            document.getElementById("transfer").addEventListener("click", function () { transfer(); });
+
+            document.getElementById("me").addEventListener("click", function () { read("read"); });
+            document.getElementById("changepass").addEventListener("click", function () { read("read"); });
+            document.getElementById("signout").addEventListener("click", function () { read("read"); });
+            document.getElementById("signoff").addEventListener("click", function () { read("read"); });
+        };
+    </script>
 </head>
 <body>
     <h2>Ações Principais</h2>
-    <form action="/ler-email" method="get">
-        <button type="submit">Ler Mensagens</button>
-    </form>
-
-    <form action="/enviar-email" method="get">
-        <button type="submit">Enviar Mensagens</button>
-    </form>
-
-    <form action="/limpar-emails" method="post">
-        <button type="submit">Limpar Todas mensagens</button>
-    </form>
-
-    <form action="/enviar-moedas" method="get">
-        <button type="submit">Enviar Moedas</button>
-    </form>
-
-    <h2>Minha Conta</h2>
-    <form action="/meus-dados" method="get">
-        <button type="submit">Meus Dados</button>
-    </form>
+    <button id="read" type="submit">Ler Mensagens</button>
+    <button id="send" type="submit">Enviar Mensagens</button>
+    <button id="clear" type="submit">Limpar Todas mensagens</button>
+    <button id="transfer" type="submit">Enviar Moedas</button>
     
-    <form action="/mudar-senha" method="get">
-        <button type="submit">Mudar Senha</button>
-    </form>
-
-    <form action="/apagar-conta" method="post">
-        <button type="submit">Apagar Conta</button>
-    </form>
+    <h2>Minha Conta</h2>
+    <button id="me" type="submit">Meus Dados</button>
+    <button id="changepass" type="submit">Mudar Senha</button>
+    <button id="signout" type="submit">Mudar Senha</button>
+    <button id="signoff" type="submit">Apagar Conta</button>
 </body>
 </html>
