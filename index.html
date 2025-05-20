@@ -54,7 +54,7 @@
         }
 
         window.onload = () => {
-            if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login.html"; return; }
+            if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login.html"; }
             
             document.getElementById("read").addEventListener("click", function () { alert(conectar("read")); });
             document.getElementById("send").addEventListener("click", function () { send(); });
@@ -63,8 +63,8 @@
 
             document.getElementById("me").addEventListener("click", function () { read("read"); });
             document.getElementById("changepass").addEventListener("click", function () { read("read"); });
-            document.getElementById("signout").addEventListener("click", function () { read("read"); });
-            document.getElementById("signoff").addEventListener("click", function () { read("read"); });
+            document.getElementById("signout").addEventListener("click", function () { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login.html"; });
+            document.getElementById("signoff").addEventListener("click", function () {  });
         };
     </script>
 </head>
@@ -78,7 +78,7 @@
     <h2>Minha Conta</h2>
     <button id="me" type="submit">Meus Dados</button>
     <button id="changepass" type="submit">Mudar Senha</button>
-    <button id="signout" type="submit">Mudar Senha</button>
+    <button id="signout" type="submit">Encerrar sessão</button>
     <button id="signoff" type="submit">Apagar Conta</button>
 </body>
 </html>
