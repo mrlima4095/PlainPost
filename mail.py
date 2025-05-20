@@ -55,78 +55,65 @@ class Server:
                 client_thread.start()
 
     def handle_client(self, client_socket, addr):
-        status, username = self.auth(client_socket, addr)
-
-        if status == "0":
-            self.send(client_socket, "0")
-            
-            while True:
-                try: 
-                    raw = self.read(client_socket)
-                    
-                    if not raw: break
-                    request = json.loads(raw)
-                except json.decoder.JSONDecodeError: self.send(client_socket, "5"); continue
-                
-                print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y - {username}] {addr[0]} -> {raw}"))
-                    
-                if request['action'] == "send":
-                    status = self.send_mail(username, request['to'], request['content'])
-
-                    self.send(client_socket, status)
-                elif request['action'] == "read":
-                    status = self.read_mail(username)
-
-                    self.send(client_socket, status)
-                elif request['action'] == "clear": 
-                    status = self.clear(username)
-
-                    self.send(client_socket, status)
-                elif request['action'] == "transfer":
-                    status = self.transfer_coins(username, request['to'], request['amount'])
-
-                    self.send(client_socket, status)
-                elif request['action'] == "changepass":
-                    status = self.change_password(username, request['newpass'])
-
-                    self.send(client_socket, status)
-                elif request['action'] == "me":
-                    status = self.show_info(username)
-
-                    self.send(client_socket, status)
-                elif request['action'] == "signoff": 
-                    status = self.signoff(username)
-
-                    self.send(client_socket, status); break
-                elif request['action'] == "signup": self.send(client_socket, "9")
-                elif request['action'] == "status": self.send(client_socket, "0")
-                else: self.send(client_socket, "2")
-        elif status == "1": self.send(client_socket, "1") 
-
-        client_socket.close()
-
-    def auth(self, client_socket, addr):
         print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y] {addr[0]} joined"))
 
         try: 
             raw = self.read(client_socket)
+            
+            if not raw: break
             request = json.loads(raw)
-        except json.decoder.JSONDecodeError: return ("5", self.send(client_socket, "5"))
-                
-        if 'action' in request and request['action'] == "signup":
+        except json.decoder.JSONDecodeError: self.send(client_socket, "5"); continue
+
+        if request['action'] == "signup":
             self.cursor.execute("SELECT * FROM users WHERE username = ?", (request['username'],))
             if self.cursor.fetchone():
-                self.send(client_socket, "3")
-
-                return ("3", self.send(client_socket, "3"))
+                return self.send(client_socket, "3")
 
             self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (request['username'], request['password']))
             self.db.commit()
-            return ("0", request['username'])
-        elif 'action' in request: return ("9", self.send(client_socket, "9"))
-        
+            return self.send(client_socket, "3")
+
+        if self.auth(request):            
+            print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y - {request['username']}] {addr[0]} -> {raw}"))
+                
+            if request['action'] == "send":
+                status = self.send_mail(request['username'], request['to'], request['content'])
+
+                self.send(client_socket, status)
+            elif request['action'] == "read":
+                status = self.read_mail(request['username'])
+
+                self.send(client_socket, status)
+            elif request['action'] == "clear": 
+                status = self.clear(request['username'])
+
+                self.send(client_socket, status)
+            elif request['action'] == "transfer":
+                status = self.transfer_coins(request['username'], request['to'], request['amount'])
+
+                self.send(client_socket, status)
+            elif request['action'] == "changepass":
+                status = self.change_password(request['username'], request['newpass'])
+
+                self.send(client_socket, status)
+            elif request['action'] == "me":
+                status = self.show_info(request['username'])
+
+                self.send(client_socket, status)
+            elif request['action'] == "signoff": 
+                status = self.signoff(request['username'])
+
+                self.send(client_socket, status); break
+            elif request['action'] == "signup": self.send(client_socket, "9")
+            elif request['action'] == "status": self.send(client_socket, "0")
+            else: self.send(client_socket, "2")
+        else: self.send(client_socket, "1") 
+
+        client_socket.close()
+
+    def auth(self, request):
         self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (request['username'], request['password']))
-        return ("0" if self.cursor.fetchone() is not None else "1", request['username'])
+        return self.cursor.fetchone() is not None
 
     def show_info(self, username):
         self.cursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
