@@ -52,6 +52,7 @@ class Server:
             while True:
                 client_socket, addr = server_socket.accept()
                 client_thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
+                client_socket.start()
 
     def handle_client(self, client_socket, addr):
         print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y] {addr[0]} joined"))
@@ -59,7 +60,7 @@ class Server:
         try: 
             raw = self.read(client_socket)
             request = json.loads(raw)
-        except json.decoder.JSONDecodeError: return self.send(client_socket, "5"), client_socket.close()
+        except json.decoder.JSONDecodeError: return self.send(client_socket, "5")
 
         if not 'action' in request:
             return self.send(client_socket, "5")
