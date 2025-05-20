@@ -59,7 +59,7 @@ class Server:
         try: 
             raw = self.read(client_socket)
             request = json.loads(raw)
-        except json.decoder.JSONDecodeError: return self.send(client_socket, "5")
+        except json.decoder.JSONDecodeError: return self.send(client_socket, "5"), client_socket.close()
 
         if not 'action' in request:
             return self.send(client_socket, "5")
