@@ -21,16 +21,36 @@ class Client:
         return s.recv(4096).decode()
         
     def run(self):
-        payload = {"username": self.username, "password": self.password, "action": "status"}
-        status = self.request(json.dumps())
+        status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "status"}))
 
         if status == "1": return print("\n[-] Usuario ou senha incorretos!")
         
         print(f"\n[+] Você entrou como {self.username}")
         while True:
-            try: 
-            
+            try:   
+                print("[+] Opções")
+                print("[1] Ler mails     [5] Meus dados")
+                print("[2] Enviar mails  [6] Trocar senha")
+                print("[3] Limpar mails  [7] Apagar conta")
+                print("[4] Enviar moedas [8] Sair")
 
+                action = input("[+] ").strip()
+
+                if not action: slef.clear()
+                elif action == "1": 
+                    print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "read"})))
+                    input("\n\n[!] Pressione ENTER para continuar..."), self.clear()
+                elif action == "2":
+                    self.clear(), print("[+] Enviar mensagem\n")
+                    target = input("[+] Destinatario: ").strip()
+                    message = input("[+] Mensagem: ").strip()
+
+                    if not target or not message: print("[-] Destinatario ou mensagem estao vazios!"); continue
+
+                    status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "send", "to": target, "content": message}))
+                    if status == "0": input("[+] Mensagem enviada com sucesso!"), self.clear()
+                    elif status == "4": input("[-] Destinatario inexistente!"), self.clear()
+                    
 
             except KeyboardInterrupt: self.clear()
         
