@@ -6,7 +6,7 @@ import socket
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 TCP_HOST = '127.0.0.1'
-TCP_PORT = 10142
+TCP_PORT = 10143
 
 class ProxyHandler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -37,5 +37,5 @@ class ProxyHandler(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     server_address = ('', 8080)
     httpd = HTTPServer(server_address, ProxyHandler)
-    print("Servidor proxy HTTP rodando em http://localhost:8080")
+    print("Servidor proxy HTTP rodando em http://localhost:10143")
     httpd.serve_forever()
