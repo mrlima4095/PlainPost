@@ -4,7 +4,7 @@ import json
 
 app = Flask(__name__)
 
-TCP_HOST = '127.0.0.1'
+TCP_HOST = '0.0.0.0'
 TCP_PORT = 10142
 
 def communicate_with_tcp_server(payload):
@@ -17,7 +17,7 @@ def communicate_with_tcp_server(payload):
     except Exception as e:
         return str(e)
 
-@app.route('/badmai', methods=['POST'])
+@app.route('/badmail'), methods=['POST'])
 def badmail():
     if not request.is_json:
         return jsonify({"error": "Invalid content type. Must be JSON."}), 400
