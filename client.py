@@ -14,7 +14,14 @@ class Client:
         self.password = getpass.getpass("Password: ").strip()
         
         if not self.username or not self.password: return print("[-] Usuario ou senha estão vazios!")
-        else: self.run()
+        else: 
+            if len(sys.argv) == 2 and sys.argv[1] == "signup":
+                status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "signup"})).strip()
+
+                if status == "3": print("[-] Este nome de usuario ja esta em uso!"), sys.exit(0)
+                elif status == "0": self.run()
+            else: self.run()
+            
     def request(self, payload):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('31.97.20.160', 10142))
