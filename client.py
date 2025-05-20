@@ -38,10 +38,11 @@ class Client:
 
                 action = input("[+] ").strip()
 
-                if not action: slef.clear()
+                if not action: self.clear()
                 elif action == "1": 
+                    self.clear()
                     print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "read"})))
-                    input("\n\n[!] Pressione ENTER para continuar..."), self.clear()
+                    input("\n[!] Pressione ENTER para continuar..."), self.clear()
                 elif action == "2":
                     self.clear(), print("[+] Enviar mensagem\n")
                     target = input("[+] Destinatario: ").strip()
