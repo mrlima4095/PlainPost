@@ -71,7 +71,7 @@ class Server:
 
             self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (request['username'], request['password']))
             self.db.commit()
-            return self.send(client_socket, "0")
+            return self.send(client_socket, "3")
 
         if self.auth(request):            
             print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y - {request['username']}] {addr[0]} -> {raw}"))
