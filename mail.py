@@ -52,7 +52,7 @@ class Server:
             while True:
                 client_socket, addr = server_socket.accept()
                 client_thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
-                client_socket.start()
+                client_thread.start()
 
     def handle_client(self, client_socket, addr):
         print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y] {addr[0]} joined"))
@@ -72,7 +72,7 @@ class Server:
 
             self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (request['username'], request['password']))
             self.db.commit()
-            return self.send(client_socket, "3")
+            return self.send(client_socket, "0")
 
         if self.auth(request):            
             print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y - {request['username']}] {addr[0]} -> {raw}"))
