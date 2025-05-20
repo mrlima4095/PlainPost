@@ -5,30 +5,27 @@
 import socket
 import getpass
 
-HOST = '31.97.20.160'
-PORT = 10142
-
-USERNAME = input("User: ")
-PASSWORD = input("Password: ")
-
-    
-    
 class Client:
     def __init__(self):
-        username = input("Username: ").strip()
-        password = getpass.getpass("Password: ").strip()
+        self.username = input("Username: ").strip()
+        self.password = getpass.getpass("Password: ").strip()
         
-        if not username or not password: return print("[-] Usuario ou senha estão vazios!")
+        if not self.username or not self.password: return print("[-] Usuario ou senha estão vazios!")
         else: self.run()
     def request(self, payload)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((HOST, PORT))
+        s.connect(('31.97.20.160', 10142))
             
         s.sendall(payload.encode())
         return s.recv(4096).decode()
         
     def run(self):
-        payload = 
+        payload = {"username": self.username, "password": self.password, "action": "status"}
         status = self.request(json.dumps())
+
+        if status == "1": return print("[-] Usuario ou senha incorretos!")
+        else:
+            while True:
+                
         
         
