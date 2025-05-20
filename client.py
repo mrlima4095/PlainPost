@@ -68,8 +68,9 @@ class Client:
                     elif status == "4": input("[-] Destinatario inexistente!"), self.clear()
                     elif status == "6": input("[-] Voce nao possui saldo suficiente!"), self.clear()
                 elif action == "5": print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"}))), input("[+] Pressione ENTER para continuar...") 
-
-            except KeyboardInterrupt: self.clear()
+                
+                self.clear()
+            except KeyboardInterrupt: sys.exit(0)
         
     
     def clear(self):
