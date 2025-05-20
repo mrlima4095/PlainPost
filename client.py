@@ -38,7 +38,9 @@ class Client:
 
                 action = input("[+] ").strip()
 
-                if not action: self.clear()
+                self.clear()
+
+                if not action: continue 
                 elif action == "1": 
                     self.clear()
                     
@@ -75,6 +77,8 @@ class Client:
                     elif status == "4": print("[-] Destinatario inexistente!")
                     elif status == "6": print("[-] Voce nao possui saldo suficiente!")
                 elif action == "5": self.clear(), print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"})))
+                
+                else: print("[-] Opção não existe!")
                 
                 input("[+] Pressione ENTER para continuar...")
                 self.clear()
