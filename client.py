@@ -55,8 +55,8 @@ class Client:
                     if not target or not message: print("[-] Destinatario ou mensagem estao vazios!"); continue
 
                     status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "send", "to": target, "content": message}))
-                    if status == "0": input("[+] Mensagem enviada com sucesso!"), self.clear()
-                    elif status == "4": input("[-] Destinatario inexistente!"), self.clear()
+                    if status == "0": print("[+] Mensagem enviada com sucesso!")
+                    elif status == "4": print("[-] Destinatario inexistente!")
                 elif action == "3": 
                     self.clear()
                     
@@ -73,7 +73,7 @@ class Client:
                     if not target or not message: print("[-] Destinatario ou quantidade estao vazios!"); continue
 
                     status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "transfer", "to": target, "amount": amount}))
-                    if status == "0": print("[+] Moedas enviadas com sucesso!"), self.clear()
+                    if status == "0": print("[+] Moedas enviadas com sucesso!")
                     elif status == "4": print("[-] Destinatario inexistente!")
                     elif status == "6": print("[-] Voce nao possui saldo suficiente!")
                 elif action == "5": self.clear(), print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"})))
