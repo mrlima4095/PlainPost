@@ -95,16 +95,16 @@ class Server:
                 status = self.change_password(request['username'], request['newpass'])
 
                 self.send(client_socket, status)
+            elif request['action'] == "search":
+                status = self.show_info(request['user'])
+
+                self.send(client_socket, status)
             elif request['action'] == "me":
                 status = self.show_info(request['username'])
 
                 self.send(client_socket, status)
             elif request['action'] == "coins": 
                 status = self.show_coins(request['username'])
-
-                self.send(client_socket, status)
-            elif request['action'] == "helpadm":
-                status = self.send_mail(request['username'], "admin", request['content'])
 
                 self.send(client_socket, status)
             elif request['action'] == "signoff": 
@@ -193,7 +193,6 @@ class Server:
         
         return "0"
 
-    
     # Socket Operations (Read and Write)
     def send(self, client_socket, text): client_socket.sendall(f"{text}\n".encode('utf-8'))
     def read(self, client_socket): return client_socket.recv(4095).decode('utf-8').strip()
