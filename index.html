@@ -134,18 +134,7 @@
             body: JSON.stringify(payload),
             });
 
-            const dados = await resposta.json();
-
-            if (dados.response === "0") {
-            localStorage.clear();
-            alert("Conta apagada com sucesso!");
-            window.location.href = "login.html";
-            } else {
-            alert("Erro ao apagar a conta.");
-            }
-            } catch {
-            alert("Erro na conexão.");
-            }
+            const dados = await resposta.json(); if (dados.response === "0") { localStorage.clear(); alert("Conta apagada com sucesso!"); window.location.href = "login.html"; } else { alert("Erro ao apagar a conta."); } } catch { alert("Erro na conexão."); }
             });
         };
     </script>
