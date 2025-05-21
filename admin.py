@@ -78,7 +78,7 @@ class AdminPanel:
     def list_all_mails(self):
         self.cursor.execute("SELECT * FROM mails")
         for mail in self.cursor.fetchall():
-            if len(sys.argv) == 3 and sys.arv[3] == mail['recipient']:
+            if len(sys.argv) == 3 and sys.argv[3] == mail['recipient']:
                 print(mail['content'])
 
             else:  
