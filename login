@@ -68,20 +68,17 @@
     <h2>Login</h2>
     <p>Não use seu nome real como usuario nem use suas senhas reais aqui!</p>
     <form>
+        <label for="email">ID:</label><br />
+        <input type="email" id="email" name="email" required /><br /><br />
+
+        <label for="senha">Senha:</label><br />
+        <input type="password" id="senha" name="senha" required /><br /><br />
+        
         <form>
-            <label for="email">ID:</label><br />
-            <input type="email" id="email" name="email" required /><br /><br />
+            <button type="submit">Entrar</button>
+            <button type="submit">Registrar-se</button>
 
         </form>
-
-        <form>
-            <label for="senha">Senha:</label><br />
-            <input type="password" id="senha" name="senha" required /><br /><br />
-
-        </form>
-
-        <button type="submit">Entrar</button>
-        <button type="submit">Registrar-se</button>
     </form>
 </body>
 </html>
