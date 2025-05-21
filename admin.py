@@ -42,7 +42,7 @@ class AdminPanel:
 
     # User payloads
     def register(self, username, password):
-        self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (username, password))
+        self.cursor.execute("INSERT INTO users (username, password, coins, role, bio) VALUES (?, ?, 0, 'user', 'A BadMail user')", (username, password))
         self.db.commit()
         print(f"[+] User '{username}' created.")
     def unregister(self, username):
