@@ -25,15 +25,21 @@ class Client:
             
     def request(self, payload):
         if "--proxy" in sys.argv:
-            request = requests.post("https://servidordomal.fun/api/mail")
-
+            try:
+                response = requests.post(
+                    "https://servidordomal.fun/api/mail",
+                    json=json.loads(payload)
+                )
+                return response.json().get('response', '')
+            except Exception as e:
+                return "9"
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('31.97.20.160', 10142))
             
         s.sendall(payload.encode())
         return s.recv(4096).decode()
-        
+
     def run(self):
         status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "status"})).strip()
 
