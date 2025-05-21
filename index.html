@@ -66,24 +66,6 @@
             } catch { alert("Erro na conexão."); }
         }
         
-        async function changebio() {
-            const username = localStorage.getItem("username");
-            const password = localStorage.getItem("password");
-
-            const content = prompt("Biografia:");
-            if (!content) return alert("A biografia não pode estar vazia!");
-
-            const payload = { username, password, action: "changebio", content, };
-
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
-                const dados = await resposta.json();
-
-                if (dados.response === "0") { alert("Biografia atualizada!"); } 
-                else { alert("Erro ao atualizar a biografia."); }
-            } catch { alert("Erro na conexão."); }
-        }
-
         async function changepass() {
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
@@ -112,7 +94,6 @@
 
             document.getElementById("me").addEventListener("click", async () => { const r = await conectar("me"); alert(r); });
             document.getElementById("coins").addEventListener("click", async () => { const r = await conectar("coins"); alert(r); });
-            document.getElementById("changebio").addEventListener("click", changebio); 
             document.getElementById("changepass").addEventListener("click", changepass); 
             document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login.html"; });
             document.getElementById("signoff").addEventListener("click", async () => { 
