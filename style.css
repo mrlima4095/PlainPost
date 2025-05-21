@@ -23,7 +23,6 @@ body {
     text-align: center;
 }
 
-
 #conteiner h2 {
     margin-bottom: 10px;
     color: #333;
@@ -33,6 +32,12 @@ body {
     margin-bottom: 20px;
     font-size: 0.9em;
     color: #666;
+}
+
+#coteiner > button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
 }
 
 form {
