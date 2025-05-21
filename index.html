@@ -10,7 +10,7 @@
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
 
-            if (!username || !password) { window.location.href = "login.html"; return; }
+            if (!username || !password) { window.location.href = "login"; return; }
 
             const payload = { username, password, action: acao };
 
@@ -85,7 +85,7 @@
         }
 
         window.onload = () => {
-            if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login.html"; return; }
+            if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login"; return; }
 
             document.getElementById("read").addEventListener("click", async () => { const r = await conectar("read"); alert(r); });
             document.getElementById("send").addEventListener("click", send); 
@@ -95,7 +95,7 @@
             document.getElementById("me").addEventListener("click", async () => { const r = await conectar("me"); alert(r); });
             document.getElementById("coins").addEventListener("click", async () => { const r = await conectar("coins"); alert(r); });
             document.getElementById("changepass").addEventListener("click", changepass); 
-            document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login.html"; });
+            document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login"; });
             document.getElementById("signoff").addEventListener("click", async () => { 
                 const username = localStorage.getItem("username"); 
                 const password = localStorage.getItem("password"); 
@@ -108,7 +108,7 @@
             try {
                 const resposta = await fetch("https://servidordomal.fun/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
                 const dados = await resposta.json(); 
-                if (dados.response === "0") { localStorage.clear(); alert("Conta apagada com sucesso!"); window.location.href = "login.html"; } 
+                if (dados.response === "0") { localStorage.clear(); alert("Conta apagada com sucesso!"); window.location.href = "login"; } 
                 else { alert("Erro ao apagar a conta."); } 
             } catch { alert("Erro na conexão."); }
             });
