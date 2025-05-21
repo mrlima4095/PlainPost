@@ -68,7 +68,7 @@
             const amount = prompt("Quantidade:").trim(); if (!amount) return alert("Você precisa informar a quantidade!");
 
             const confirm = window.confirm("Tem certeza que deseja enviar " + amount + " moedas para " + target + "?");
-            if (!confirm) return;
+            if (!confirm) alert("Transferência cancelada!"); return;
 
             const payload = { username, password, action: "transfer", to: target, amount, };
 
