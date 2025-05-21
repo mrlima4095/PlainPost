@@ -79,30 +79,19 @@
             } catch { alert("Erro na conexão."); }
         }
 
-        async function changepass() {
-            const username = localStorage.getItem("username");
-            const password = localStorage.getItem("password");
-
-            const newpass = prompt("Nova senha:").trim();
-            if (!newpass) return alert("A nova senha não pode estar vazia!");
-
-            const payload = { username, password, action: "changepass", newpass, };
-
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
-                const dados = await resposta.json();
-
-                if (dados.response === "0") { localStorage.removeItem("username"); localStorage.removeItem("password"); alert("Senha alterada!"); window.location.href = "login"; } 
-                else { alert("Erro ao alterar a senha."); }
-            } catch { alert("Erro na conexão."); }
-        }
-
         window.onload = () => {
             if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login"; return; }
 
             document.getElementById("read").addEventListener("click", async () => { const r = await conectar("read"); alert(r); });
             document.getElementById("send").addEventListener("click", send); 
-            document.getElementById("clear").addEventListener("click", async () => { const r = await conectar("clear"); if (r === "0") alert("Suas mensagens foram apagadas!"); else alert("Ocorreu um erro na conexão!"); });
+            document.getElementById("clear").addEventListener("click", async () => { 
+                const confirm = window.confirm("Tem certeza que deseja limpar suas mensagens?");
+                if (!confirm) return;
+
+                const r = await conectar("clear"); 
+
+                if (r === "0") alert("Suas mensagens foram apagadas!"); 
+                else alert("Ocorreu um erro na conexão!"); });
             document.getElementById("transfer").addEventListener("click", transfer);
             document.getElementById("search").addEventListener("click", search);
 
