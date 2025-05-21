@@ -1,3 +1,3 @@
-# BadMail
+# PlainPost
 
 https://servidordomal.fun/mail/
