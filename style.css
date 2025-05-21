@@ -25,6 +25,12 @@ body {
     text-align: center;
 }
 
+#coteiner > button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+}
+
 /* Títulos */
 #coteiner h2 {
     margin-bottom: 10px;
