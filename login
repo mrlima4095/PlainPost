@@ -73,12 +73,9 @@
 
         <label for="senha">Senha:</label><br />
         <input type="password" id="senha" name="senha" required /><br /><br />
-        
-        <form>
-            <button type="submit">Entrar</button>
-            <button type="submit">Registrar-se</button>
-
-        </form>
+          
+        <button type="submit">Entrar</button>
+        <button type="submit">Registrar-se</button>
     </form>
 </body>
 </html>
