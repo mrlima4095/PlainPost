@@ -21,6 +21,7 @@ class AdminPanel:
             elif args[1] == "unregister": panel.unregister(args[2])
             elif args[1] ==  "password": panel.changepass(args[2], args[3])
             elif args[1] ==  "role": panel.changerole(args[2], args[3])
+            elif args[1] ==  "bio": panel.changebio(args[2], args[3])
             elif args[1] ==  "list": panel.list_users()
 
             elif args[1] == "send": panel.send(args[2], ' '.join(args[3:]))
@@ -57,10 +58,14 @@ class AdminPanel:
         self.cursor.execute("UPDATE users SET role = ? WHERE username = ?", (role, username))
         self.db.commit()
         print(f"[+] User '{username}' role changed to '{role}'.")
+    def changebio(self, username, content):
+        self.cursor.execute("UPDATE users SET bio = ? WHERE username = ?", (content, username))
+        self.db.commit()
+        print(f"[+] Biography for '{username}' changed.")
     def list_users(self):
-        self.cursor.execute("SELECT username, role, coins FROM users")
+        self.cursor.execute("SELECT username, role, coins, biography FROM users")
         for row in self.cursor.fetchall():
-            print(f"[{row['role']}] {row['username']} (Coins: {row['coins']})")
+            print(f"[{row['role']}] {row['username']} (Coins: {row['coins']}) - {row['biography']}")
         
     # Mails
     def send(self, target, content):

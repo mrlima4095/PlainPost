@@ -65,6 +65,24 @@
                 else alert("Erro ao transferir.");
             } catch { alert("Erro na conexão."); }
         }
+        
+        async function changebio() {
+            const username = localStorage.getItem("username");
+            const password = localStorage.getItem("password");
+
+            const content = prompt("Biografia:");
+            if (!content) return alert("A biografia não pode estar vazia!");
+
+            const payload = { username, password, action: "changebio", content, };
+
+            try {
+                const resposta = await fetch("https://servidordomal.fun/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
+                const dados = await resposta.json();
+
+                if (dados.response === "0") { alert("Biografia atualizada!"); } 
+                else { alert("Erro ao atualizar a biografia."); }
+            } catch { alert("Erro na conexão."); }
+        }
 
         async function changepass() {
             const username = localStorage.getItem("username");
@@ -87,54 +105,31 @@
         window.onload = () => {
             if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login.html"; return; }
 
-            document.getElementById("read").addEventListener("click", async () => {
-            const r = await conectar("read");
-            alert(r);
-            });
-
-            document.getElementById("send").addEventListener("click", send);
-
-            document.getElementById("clear").addEventListener("click", async () => {
-            const r = await conectar("clear");
-            if (r === "0") alert("Suas mensagens foram apagadas!");
-            else alert("Ocorreu um erro na conexão!");
-            });
-
+            document.getElementById("read").addEventListener("click", async () => { const r = await conectar("read"); alert(r); });
+            document.getElementById("send").addEventListener("click", send); 
+            document.getElementById("clear").addEventListener("click", async () => { const r = await conectar("clear"); if (r === "0") alert("Suas mensagens foram apagadas!"); else alert("Ocorreu um erro na conexão!"); });
             document.getElementById("transfer").addEventListener("click", transfer);
 
-            document.getElementById("me").addEventListener("click", async () => {
-            const r = await conectar("me");
-            alert(r);
-            });
+            document.getElementById("me").addEventListener("click", async () => { const r = await conectar("me"); alert(r); });
+            document.getElementById("coins").addEventListener("click", async () => { const r = await conectar("coins"); alert(r); });
+            document.getElementById("changebio").addEventListener("click", changebio); 
+            document.getElementById("changepass").addEventListener("click", changepass); 
+            document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login.html"; });
+            document.getElementById("signoff").addEventListener("click", async () => { 
+                const username = localStorage.getItem("username"); 
+                const password = localStorage.getItem("password"); 
 
-            document.getElementById("changepass").addEventListener("click", changepass);
+                const confirm = window.confirm("Tem certeza que deseja apagar sua conta?");
+                if (!confirm) return;
 
-            document.getElementById("signout").addEventListener("click", () => {
-            localStorage.removeItem("username");
-            localStorage.removeItem("password");
-            window.location.href = "login.html";
-            });
-
-            document.getElementById("signoff").addEventListener("click", async () => {
-            const username = localStorage.getItem("username");
-            const password = localStorage.getItem("password");
-            const confirm = window.confirm("Tem certeza que deseja apagar sua conta?");
-            if (!confirm) return;
-
-            const payload = {
-            username,
-            password,
-            action: "signoff",
-            };
+                const payload = { username, password, action: "signoff", };
 
             try {
-            const resposta = await fetch("https://servidordomal.fun/api/badmail", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-            });
-
-            const dados = await resposta.json(); if (dados.response === "0") { localStorage.clear(); alert("Conta apagada com sucesso!"); window.location.href = "login.html"; } else { alert("Erro ao apagar a conta."); } } catch { alert("Erro na conexão."); }
+                const resposta = await fetch("https://servidordomal.fun/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
+                const dados = await resposta.json(); 
+                if (dados.response === "0") { localStorage.clear(); alert("Conta apagada com sucesso!"); window.location.href = "login.html"; } 
+                else { alert("Erro ao apagar a conta."); } 
+            } catch { alert("Erro na conexão."); }
             });
         };
     </script>
@@ -148,6 +143,8 @@
 
     <h2>Minha Conta</h2>
     <button id="me" type="submit">Meus Dados</button>
+    <button id="coins" type="submit">Meu Saldo</button>
+    <button id="changebio" type="submit">Alterar Biografia</button>
     <button id="changepass" type="submit">Mudar Senha</button>
     <button id="signout" type="submit">Encerrar sessão</button>
     <button id="signoff" type="submit">Apagar Conta</button>
