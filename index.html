@@ -46,6 +46,22 @@
                 else alert("Erro ao enviar mensagem.");
             } catch { alert("Erro na conexão."); }
         }
+        async function search() {
+            const username = localStorage.getItem("username");
+            const password = localStorage.getItem("password");
+
+            const user = prompt("Quem deseja procurar?"); if (!user) return alert("Insira um nome de usuario!");
+
+            const payload = { username, password, action: "search", user, };
+
+            try {
+                const resposta = await fetch("https://servidordomal.fun/api/badmail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
+                const dados = await resposta.json();
+
+                if (dados.response === "4") alert("O usuario não foi encontrado!");
+                else alert(dados.response);
+            } catch { alert("Erro na conexão."); }
+        }
 
         async function transfer() {
             const username = localStorage.getItem("username");
@@ -97,7 +113,7 @@
             document.getElementById("changepass").addEventListener("click", changepass); 
             document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login"; });
             document.getElementById("signoff").addEventListener("click", async () => { 
-                const username = localStorage.getItem("username"); 
+                const username =  .getItem("username"); 
                 const password = localStorage.getItem("password"); 
 
                 const confirm = window.confirm("Tem certeza que deseja apagar sua conta?");
@@ -121,6 +137,7 @@
     <button id="send" type="submit">Enviar Mensagens</button>
     <button id="clear" type="submit">Limpar Todas mensagens</button>
     <button id="transfer" type="submit">Enviar Moedas</button>
+    <button id="search" type="submit">Procurar</button>
 
     <h2>Minha Conta</h2>
     <button id="me" type="submit">Meus Dados</button>
