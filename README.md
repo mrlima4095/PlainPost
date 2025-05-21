@@ -1,2 +1,3 @@
 # BadMail
-A TCP Mail Server for Educational propuses
+
+https://servidordomal.fun/mail/
