@@ -78,6 +78,8 @@
 
                 if (dados.response === "0") alert("Moedas enviadas!");
                 else if (dados.response === "4") alert("O destinatário não foi encontrado!");
+                else if (dados.response === "7") alert("Ocorreu um erro!")
+                else if (dados.response === "7") alert("Saldo insuficiente!")
                 else alert("Erro ao transferir.");
             } catch { alert("Erro na conexão."); }
         }
