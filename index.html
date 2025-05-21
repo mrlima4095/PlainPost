@@ -114,7 +114,7 @@
             document.getElementById("changepass").addEventListener("click", changepass); 
             document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login"; });
             document.getElementById("signoff").addEventListener("click", async () => { 
-                const username =  .getItem("username"); 
+                const username = localStorage.getItem("username"); 
                 const password = localStorage.getItem("password"); 
 
                 const confirm = window.confirm("Tem certeza que deseja apagar sua conta?");
