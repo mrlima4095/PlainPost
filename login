@@ -34,7 +34,7 @@
                 if (dados.response === "0") {
                     localStorage.setItem("username", email);
                     localStorage.setItem("password", senha);
-                    window.location.href = "/"; 
+                    window.location.href = "/mail"; 
                 } 
                 else if (dados.response === "1") { alert("Usuário ou senha incorretos!"); } 
                 else if (dados.response === "3") { alert("Nome de usuário já está em uso!"); }
