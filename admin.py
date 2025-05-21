@@ -78,7 +78,11 @@ class AdminPanel:
     def list_all_mails(self):
         self.cursor.execute("SELECT * FROM mails")
         for mail in self.cursor.fetchall():
-            print(f"{mail['recipient']} -> {mail['content']}")
+            if len(sys.argv) == 3 and sys.arv[3] == mail['recipient']:
+                print(mail['content'])
+
+            else:  
+                print(f"At: {mail['recipient']} -> {mail['content']}")
     def clear(self, username):
         self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         self.db.commit()
