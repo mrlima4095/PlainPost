@@ -6,5 +6,5 @@
 5   malformed request
 6   invalid amount coins
 7   not enough coins
-8   invalid new password/ bio
+8   invalid new password
 9   web proxy error
