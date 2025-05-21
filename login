@@ -39,19 +39,21 @@
     </script>
 </head>
 <body>
-    <header>
-        <h2>Login</h2>
-        <p>Não use seu nome real como usuario nem use suas senhas reais aqui!</p>
-    </header>
-    <form>
-        <label for="email">ID:</label><br />
-        <input type="user" id="email" name="email" required /><br /><br />
+    <div id="coteiner">
+        <header>
+            <h2>Login</h2>
+            <p>Não use seu nome real como usuario nem use suas senhas reais aqui!</p>
+        </header>
+        <form>
+            <label for="email">ID:</label><br />
+            <input type="user" id="email" name="email" required /><br /><br />
 
-        <label for="senha">Senha:</label><br />
-        <input type="password" id="senha" name="senha" required /><br /><br />
+            <label for="senha">Senha:</label><br />
+            <input type="password" id="senha" name="senha" required /><br /><br />
 
-        <button type="submit">Entrar</button>
-        <button type="submit">Registrar-se</button>
-    </form>
+            <button type="submit">Entrar</button>
+            <button type="submit">Registrar-se</button>
+        </form>
+    </div>
 </body>
 </html>
