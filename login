@@ -12,7 +12,7 @@
     <p>Não use seu nome real como usuario nem use suas senhas reais aqui!</p>
     <form>
         <label for="email">ID:</label><br />
-        <input type="email" id="email" name="email" required /><br /><br />
+        <input type="user" id="email" name="email" required /><br /><br />
 
         <label for="senha">Senha:</label><br />
         <input type="password" id="senha" name="senha" required /><br /><br />
