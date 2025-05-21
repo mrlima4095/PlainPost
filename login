@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>PlainPost - Login</title>
     
+    <link rel="stylesheet" href="style.css">
     <script type="text/javascript">
         async function autenticar(acao) {
             const email = document.getElementById("email").value.trim();
