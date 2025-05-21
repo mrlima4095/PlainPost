@@ -29,6 +29,7 @@ class Server:
                 password TEXT NOT NULL,
                 coins INTEGER DEFAULT 0,
                 role TEXT DEFAULT 'user'
+                biography TEXT DEFAULT 'A BadMail user'
             )
         """)
         self.cursor.execute("""
@@ -91,12 +92,24 @@ class Server:
                 status = self.transfer_coins(request['username'], request['to'], request['amount'])
 
                 self.send(client_socket, status)
+            elif request['action'] == "changebio":
+                status = self.change_biography(request['username'], request['content'])
+
+                self.send(client_socket, status)
             elif request['action'] == "changepass":
                 status = self.change_password(request['username'], request['newpass'])
 
                 self.send(client_socket, status)
             elif request['action'] == "me":
                 status = self.show_info(request['username'])
+
+                self.send(client_socket, status)
+            elif request['action'] == "coins": 
+                status = self.show_coins(request['username'])
+
+                self.send(client_socket, status)
+            elif request['action'] == "helpadm":
+                status = self.send_mail(request['username'], "admin", request['content'])
 
                 self.send(client_socket, status)
             elif request['action'] == "signoff": 
@@ -114,9 +127,14 @@ class Server:
         return self.cursor.fetchone() is not None
 
     def show_info(self, username):
-        self.cursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
+        self.cursor.execute("SELECT role, biography FROM users WHERE username = ?", (username,))
         row = self.cursor.fetchone()
-        if row: return f"[{row['role']}] {username} (Coins: {row['coins']})"
+        if row: return f"[{row['role']}] {username}\n{row['biography']}"
+        else: return "4"
+    def show_coins(self, username):
+        self.cursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
+        row = self.cursor.fetchone()
+        if row: return row['coins']
         else: return "4"
 
     # User auth tools
@@ -132,6 +150,15 @@ class Server:
         self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (newpass, username))
         self.db.commit()
         return "0"
+
+    def change_biography(self, username, content): 
+        if not content:
+            return "8"
+
+        self.cursor.execute("UPDATE users SET biography = ? WHERE username = ?", (biography, username))
+        self.db.commit()
+        return "0"
+
 
     # Mail Tools
     def send_mail(self, sender, target, content):
