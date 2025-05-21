@@ -107,6 +107,7 @@
             document.getElementById("send").addEventListener("click", send); 
             document.getElementById("clear").addEventListener("click", async () => { const r = await conectar("clear"); if (r === "0") alert("Suas mensagens foram apagadas!"); else alert("Ocorreu um erro na conexão!"); });
             document.getElementById("transfer").addEventListener("click", transfer);
+            document.getElementById("search").addEventListener("click", search);
 
             document.getElementById("me").addEventListener("click", async () => { const r = await conectar("me"); alert(r); });
             document.getElementById("coins").addEventListener("click", async () => { const r = await conectar("coins"); alert(r); });
