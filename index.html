@@ -135,6 +135,7 @@
             document.getElementById("read").addEventListener("click", async () => {
                 const r = await conectar("read");
                 Swal.fire({ icon: "info", title: "Mensagens", html: dados.response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), });
+                Swal.fire('Mensagens', r, 'info');
 
             });
             document.getElementById("send").addEventListener("click", send);
