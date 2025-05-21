@@ -39,7 +39,7 @@
     </script>
 </head>
 <body>
-    <div id="coteiner">
+    <div id="conteiner">
         <header>
             <h2>Login</h2>
             <p>Não use seu nome real como usuario nem use suas senhas reais aqui!</p>
