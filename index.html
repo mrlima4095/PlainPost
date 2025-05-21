@@ -28,8 +28,8 @@
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
 
-            const target = prompt("Destinatário:"); if (!target) return alert("Destinatário não pode estar vazio!");
-            const content = prompt("Mensagem:"); if (!content) return alert("Você não pode mandar uma mensagem vazia!");
+            const target = prompt("Destinatário:").trim(); if (!target) return alert("Destinatário não pode estar vazio!");
+            const content = prompt("Mensagem:").trim(); if (!content) return alert("Você não pode mandar uma mensagem vazia!");
 
             const payload = { username, password, action: "send", to: target, content, };
 
@@ -46,7 +46,7 @@
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
 
-            const user = prompt("Quem deseja procurar?"); if (!user) return alert("Insira um nome de usuario!");
+            const user = prompt("Quem deseja procurar?").trim(); if (!user) return alert("Insira um nome de usuario!");
 
             const payload = { username, password, action: "search", user, };
 
@@ -63,8 +63,8 @@
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
 
-            const target = prompt("Destinatário:"); if (!target) return alert("Destinatário não pode estar vazio!");
-            const amount = prompt("Quantidade:"); if (!amount) return alert("Você precisa informar a quantidade!");
+            const target = prompt("Destinatário:").trim(); if (!target) return alert("Destinatário não pode estar vazio!");
+            const amount = prompt("Quantidade:").trim(); if (!amount) return alert("Você precisa informar a quantidade!");
 
             const payload = { username, password, action: "transfer", to: target, amount, };
 
@@ -82,7 +82,7 @@
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
 
-            const newpass = prompt("Nova senha:");
+            const newpass = prompt("Nova senha:").trim();
             if (!newpass) return alert("A nova senha não pode estar vazia!");
 
             const payload = { username, password, action: "changepass", newpass, };
