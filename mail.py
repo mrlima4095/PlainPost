@@ -29,7 +29,6 @@ class Server:
                 password TEXT NOT NULL,
                 coins INTEGER DEFAULT 0,
                 role TEXT DEFAULT 'user',
-                biography TEXT DEFAULT 'A BadMail user'
             )
         """)
         self.cursor.execute("""
