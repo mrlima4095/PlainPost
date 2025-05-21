@@ -22,7 +22,7 @@
             };
 
             try {
-                const resposta = await fetch("https://servidordomal.fun/api/badmail", {
+                const resposta = await fetch("https://servidordomal.fun/api/mail", {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json"
