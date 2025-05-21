@@ -42,7 +42,7 @@ class AdminPanel:
 
     # User payloads
     def register(self, username, password):
-        self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user', 'A BadMail user')", (username, password))
+        self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (username, password))
         self.db.commit()
         print(f"[+] User '{username}' created.")
     def unregister(self, username):
@@ -58,10 +58,6 @@ class AdminPanel:
         self.cursor.execute("UPDATE users SET role = ? WHERE username = ?", (role, username))
         self.db.commit()
         print(f"[+] User '{username}' role changed to '{role}'.")
-    def changebio(self, username, content):
-        self.cursor.execute("UPDATE users SET bio = ? WHERE username = ?", (content, username))
-        self.db.commit()
-        print(f"[+] Biography for '{username}' changed.")
     def list_users(self):
         self.cursor.execute("SELECT username, role, coins, biography FROM users")
         for row in self.cursor.fetchall():
