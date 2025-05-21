@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PlainPost</title>
+
+
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript">
+        window.onload = () => {
+            if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login"; return; }
+
+            document.getElementById("back").addEventListener("click", async() => { window.location.href = "/mail"; return; }); 
+            document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login"; });
+            document.getElementById("signoff").addEventListener("click", async () => { 
+                const username = localStorage.getItem("username"); 
+                const password = localStorage.getItem("password"); 
+
+                const confirm = window.confirm("Tem certeza que deseja apagar sua conta?");
+                if (!confirm) return;
+
+                const payload = { username, password, action: "signoff", };
+
+            try {
+                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
+                const dados = await resposta.json(); 
+                if (dados.response === "0") { localStorage.clear(); alert("Conta apagada com sucesso!"); window.location.href = "login"; } 
+                else { alert("Erro ao apagar a conta."); } 
+            } catch { alert("Erro na conexão."); }
+            });
+        };
+    </script>
+</head>
+<body>
+    <div id="conteiner">
+        <h2>Ações de Segurança</h2>
+        <button id="back" type="submit">Retornar</button>
+        <button id="signout" type="submit">Encerrar sessão</button>
+        <button id="signoff" type="submit">Apagar Conta</button>
+    <div>
+</body>
+</html>
