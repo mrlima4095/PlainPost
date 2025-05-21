@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>BadMail - Login</title>
     
-    <script>
+    <script type="text/javascript">
         async function autenticar(acao) {
             const email = document.getElementById("email").value.trim();
             const senha = document.getElementById("senha").value.trim();
