@@ -11,7 +11,7 @@
         window.onload = () => {
             if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login"; return; }
 
-            document.getElementById("back").addEventListener("click", async() => { window.location.href = "/mail"; return; }); 
+            document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; });
             document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login"; });
             document.getElementById("signoff").addEventListener("click", async () => { 
                 const username = localStorage.getItem("username"); 
