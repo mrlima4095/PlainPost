@@ -59,9 +59,9 @@ class AdminPanel:
         self.db.commit()
         print(f"[+] User '{username}' role changed to '{role}'.")
     def list_users(self):
-        self.cursor.execute("SELECT username, role, coins, biography FROM users")
+        self.cursor.execute("SELECT username, role, coins FROM users")
         for row in self.cursor.fetchall():
-            print(f"[{row['role']}] {row['username']} (Coins: {row['coins']}) - {row['biography']}")
+            print(f"[{row['role']}] {row['username']} (Coins: {row['coins']})")
         
     # Mails
     def send(self, target, content):
