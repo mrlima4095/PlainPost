@@ -28,7 +28,7 @@ class Server:
                 username TEXT PRIMARY KEY,
                 password TEXT NOT NULL,
                 coins INTEGER DEFAULT 0,
-                role TEXT DEFAULT 'user',
+                role TEXT DEFAULT 'user'
             )
         """)
         self.cursor.execute("""
