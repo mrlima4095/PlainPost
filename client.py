@@ -13,7 +13,7 @@ class Client:
     def __init__(self):
         self.username = input("Username: ").strip()
         self.password = getpass.getpass("Password: ").strip()
-        
+
         if not self.username or not self.password: return print("[-] Usuario ou senha estão vazios!")
         else: 
             if len(sys.argv) == 2 and sys.argv[1] == "signup":
