@@ -70,3 +70,38 @@ button:hover {
 #conteiner h2 + button {
     margin-top: 10px;
 }
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #eee;
+    }
+
+    #conteiner {
+        background-color: #1e1e1e;
+        box-shadow: 0px 5px 20px rgba(255, 255, 255, 0.05);
+    }
+
+    #conteiner h2 {
+        color: #eee;
+    }
+
+    #conteiner p {
+        color: #bbb;
+    }
+
+    input[type="user"],
+    input[type="password"] {
+        background-color: #2a2a2a;
+        color: #eee;
+        border: 1px solid #444;
+    }
+
+    button {
+        background-color: #2d7fd6;
+    }
+
+    button:hover {
+        background-color: #2567b0;
+    }
+}
