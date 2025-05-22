@@ -90,7 +90,7 @@ class Client:
                 elif action == "5": print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"})).strip())
                 elif action == "6":
                     password = getpass.getpass("[+] New Password: ").strip()
-                    
+    
                     if not password: 
                         print("[-] A senha esta vazia!")
                     
