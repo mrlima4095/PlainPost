@@ -22,7 +22,7 @@ class Client:
                 if status == "3": print("[-] Este nome de usuario ja esta em uso!"), sys.exit(0)
                 
         self.run()
-            
+
     def request(self, payload):
         if "--proxy" in sys.argv:
             try:
