@@ -103,7 +103,7 @@ class Client:
                     if status == "0": print("[!] Sua conta foi deletada!"); break
                 elif action == "8": break
                 else: print("[-] Opção não existe!")
-                
+
                 input("[+] Pressione ENTER para continuar...")
                 self.clear()
                 
