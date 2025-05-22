@@ -94,9 +94,7 @@
                 else if (dados.response === "6") Swal.fire('Erro', 'A quantia de moedas a ser enviada é inválida!', 'error');
                 else if (dados.response === "7") Swal.fire('Erro', 'Saldo insuficiente!', 'error');
                 else Swal.fire('Erro', 'Erro ao transferir.', 'error');
-            } catch {
-                Swal.fire('Erro', 'Erro na conexão.', 'error');
-            }
+            } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
         }
 
         window.onload = () => {
