@@ -62,7 +62,7 @@ class AdminPanel:
         self.cursor.execute("SELECT username, role, coins FROM users")
         for row in self.cursor.fetchall():
             print(f"[{row['role']}] {row['username']} (Coins: {row['coins']})")
-        
+
     # Mails
     def send(self, target, content):
         self.cursor.execute("SELECT * FROM users WHERE username = ?", (target,))
