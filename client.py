@@ -108,8 +108,8 @@ class Client:
                 self.clear()
 
             except KeyboardInterrupt: sys.exit(0)
-        
-    
+
+
     def clear(self):
         if os.name == "posix": os.system("clear")
         else: os.system("cls")
