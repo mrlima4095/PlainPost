@@ -106,7 +106,7 @@ class Client:
 
                 input("[+] Pressione ENTER para continuar...")
                 self.clear()
-                
+
             except KeyboardInterrupt: sys.exit(0)
         
     
