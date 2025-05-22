@@ -6,27 +6,28 @@
     <title>PlainPost - Login</title>
     
     <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
         async function autenticar(acao) {
             const email = document.getElementById("email").value.trim();
             const senha = document.getElementById("senha").value.trim();
 
-            if (!email || !senha) { alert("Preencha todos os campos."); return; }
+            if (!email || !senha) { Swal.fire("Campos obrigatórios", "Preencha todos os campos.", "warning"); return; }
 
-            const payload = { username: email, password: senha, action: acao, };
+            const payload = { username: email, password: senha, action: acao };
 
             try {
                 const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
                 const dados = await resposta.json();
 
                 if (dados.response === "0") { localStorage.setItem("username", email); localStorage.setItem("password", senha); window.location.href = "/mail"; } 
-                else if (dados.response === "1") { alert("Usuário ou senha incorretos!"); } 
-                else if (dados.response === "3") { alert("Nome de usuário já está em uso!"); }
-                else if (dados.response === "9") { alert("Ocorreu um erro interno!"); } 
-                else { alert(dados.response); }
-                
+                else if (dados.response === "1") { Swal.fire("Erro", "Usuário ou senha incorretos!", "error"); } 
+                else if (dados.response === "3") { Swal.fire("Erro", "Nome de usuário já está em uso!", "error"); } 
+                else if (dados.response === "9") { Swal.fire("Erro", "Ocorreu um erro interno!", "error"); } 
+                else { Swal.fire("Resposta inesperada", dados.response, "info"); }
 
-            } catch (erro) { alert("Erro na conexão com o servidor."); }
+            } catch (erro) { Swal.fire("Erro", "Erro na conexão com o servidor.", "error"); }
         }
 
         window.onload = () => {
@@ -37,6 +38,7 @@
             botoes[1].addEventListener("click", function (event) { event.preventDefault(); autenticar("signup"); });
         };
     </script>
+
 </head>
 <body>
     <div id="conteiner">
