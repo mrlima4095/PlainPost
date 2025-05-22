@@ -34,7 +34,7 @@ class Client:
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('31.97.20.160', 10142))
-            
+
         s.sendall(payload.encode())
         return s.recv(4096).decode()
 
