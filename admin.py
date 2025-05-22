@@ -83,7 +83,7 @@ class AdminPanel:
                 if sys.argv[2] == mail['recipient']:
                     print(mail['content'])
 
-            else:  
+            else:
                 print(f"At: {mail['recipient']} -> {mail['content']}")
     def clear(self, username):
         self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
