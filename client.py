@@ -71,7 +71,7 @@ class Client:
                         elif status == "4": print("[-] Destinatario inexistente!")
                 elif action == "3":
                     self.request(json.dumps({"username": self.username, "password": self.password, "action": "clear"}))
-                    
+
                     if status == "0": print("[+] Suas mensagens foram apagadas!")
                     else: print("[-] Ocorreu um erro ao apagar suas mensagens!")
                 elif action == "4":
