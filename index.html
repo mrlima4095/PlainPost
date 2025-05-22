@@ -106,7 +106,7 @@
             document.getElementById("send").addEventListener("click", send);
             document.getElementById("clear").addEventListener("click", async () => {
                 const confirm = await Swal.fire({ title: 'Tem certeza?', text: 'Tem certeza que deseja limpar suas mensagens?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Cancelar' });
-                if (!confirm.isConfirmed) return;
+                if (!confirm.isConfirmed) { return;
 
                 const r = await conectar("clear"); 
                 if (r === "0") Swal.fire('Sucesso', 'Suas mensagens foram apagadas!', 'success'); else Swal.fire('Erro', 'Ocorreu um erro na conexão!', 'error'); });
