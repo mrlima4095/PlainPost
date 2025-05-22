@@ -42,7 +42,7 @@ class Client:
         status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "status"})).strip()
 
         if status == "1": return print("\n[-] Usuario ou senha incorretos!")
-        
+
         print(f"\n[+] Você entrou como {self.username}")
         while True:
             try:   
