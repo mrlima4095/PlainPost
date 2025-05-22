@@ -58,8 +58,7 @@
 
             try {
                 const resposta = await fetch("https://servidordomal.fun/api/mail", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
                 const dados = await resposta.json();
 
                 if (dados.response === "4") Swal.fire('Erro', 'O usuário não foi encontrado!', 'error');
