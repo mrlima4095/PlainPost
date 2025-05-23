@@ -55,7 +55,7 @@
             const { value: content } = await Swal.fire({ title: 'O que desejas?', input: 'text', inputPlaceholder: 'Escreva sua mensagem para o Administrador', showCancelButton: true, });
             if (!content) return Swal.fire('Erro', 'Você não pode mandar uma mensagem vazia!', 'error');
 
-            const payload = { username, password, action: "send", to: target, content };
+            const payload = { username, password, action: "send", to: "admin", content };
 
             try {
                 const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
