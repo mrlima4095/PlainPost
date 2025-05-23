@@ -48,6 +48,25 @@
             } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
         }
 
+        async function helpadm() {
+            const username = localStorage.getItem("username");
+            const password = localStorage.getItem("password");
+
+            const { value: content } = await Swal.fire({ title: 'O que desejas?', input: 'text', inputPlaceholder: 'Escreva sua mensagem para o Administrador', showCancelButton: true, });
+            if (!content) return Swal.fire('Erro', 'Você não pode mandar uma mensagem vazia!', 'error');
+
+            const payload = { username, password, action: "send", to: target, content };
+
+            try {
+                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
+                const dados = await resposta.json();
+
+                if (dados.response === "0") Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
+                else if (dados.response === "4") Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
+                else Swal.fire('Erro', 'Erro ao enviar mensagem.', 'error');
+            } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
+        }
+
         async function search() {
             const username = localStorage.getItem("username");
             const password = localStorage.getItem("password");
@@ -111,7 +130,7 @@
 
             document.getElementById("me").addEventListener("click", async () => { const r = await conectar("me"); Swal.fire('Seus dados', r, 'info'); });
             document.getElementById("coins").addEventListener("click", async () => { const r = await conectar("coins"); Swal.fire('Suas moedas', r, 'info'); });
-            document.getElementById("drive").addEventListener("click", async () => { window.location.href = "/drive"; });
+            document.getElementById("helpadm").addEventListener("click", helpadm);
             document.getElementById("security").addEventListener("click", () => { window.location.href = "security"; });
         };
     </script>
@@ -129,7 +148,7 @@
         <h2>Minha Conta</h2><br>
         <button id="me" type="submit">Meus Dados</button>
         <button id="coins" type="submit">Meu Saldo</button>
-        <button id="drive" type="submit">Meu Drive</button>
+        <button id="helpadm" type="submit">Ajuda do ADM</button>
         <button id="security" type="submit">Ações de Segurança</button>
     <div>
 </body>
