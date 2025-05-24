@@ -133,7 +133,7 @@ class Server:
                 self.send(client_socket, ",".join(roles) if roles else "No roles")
 
             elif request['action'] == "changerole":
-                new_role = request['role'].strip().lower()
+                new_role = request['role'].strip()
                 if not new_role:
                     return self.send(client_socket, "8")
 
@@ -145,7 +145,7 @@ class Server:
                 self.db.commit()
                 self.send(client_socket, "0")
             elif request['action'] == "buyrole":
-                role = request["role"].strip().lower()
+                role = request["role"].strip()
                 if not role:
                     return self.send(client_socket, "8")
 
