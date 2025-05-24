@@ -95,20 +95,20 @@ class Server:
             print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y - {request['username']}] {addr[0]} -> {raw}"))
                 
             if request['action'] == "send":
-                self.cursor.execute("SELECT * FROM users WHERE username = ?", (target,))
+                self.cursor.execute("SELECT * FROM users WHERE username = ?", (request['to'],))
                 if self.cursor.fetchone() is None: self.send(client_socket, "4")
 
                 timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
                 full_content = f"[{timestamp} - {sender}] {content}"
                 self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
-                                    (target, sender, full_content, timestamp))
+                                    (request['to'], request['username'], full_content, timestamp))
                 self.db.commit(), self.send(client_socket, "0")
             elif request['action'] == "read":
-                self.cursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
+                self.cursor.execute("SELECT content FROM mails WHERE recipient = ?", (request['username'],))
                 mails = [row["content"] for row in self.cursor.fetchall()]
-                self.send(client_socket, '\n'.join(mails) if mails else "No messages" )
+                self.send(client_socket, '\n'.join(mails) if mails else "No messages")
             elif request['action'] == "clear": 
-                self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
+                self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (request['username'],))
                 self.db.commit(), self.send(client_socket, "0")
             elif request['action'] == "transfer":
                 status = self.transfer_coins(request['username'], request['to'], request['amount'])
@@ -117,7 +117,7 @@ class Server:
             elif request['action'] == "changepass":
                 if not newpass: return "8"
 
-                self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (newpass, username))
+                self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (request['newpass'], request['username']))
                 self.db.commit(), self.send(client_socket, "0")
             elif request['action'] == "search":
                 status = self.show_info(request['user'])
@@ -133,30 +133,28 @@ class Server:
                 self.send(client_socket, ",".join(roles) if roles else "No roles")
 
             elif request['action'] == "changerole":
-                new_role = request['role'].strip()
-                if not new_role:
+                if not request['role']:
                     return self.send(client_socket, "8")
 
-                self.cursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (request['username'], new_role))
+                self.cursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (request['username'], request['role']))
                 if self.cursor.fetchone() is None:
                     return self.send(client_socket, "4")
 
-                self.cursor.execute("UPDATE users SET role = ? WHERE username = ?", (new_role, request['username']))
+                self.cursor.execute("UPDATE users SET role = ? WHERE username = ?", (request['role'], request['username']))
                 self.db.commit()
                 self.send(client_socket, "0")
             elif request['action'] == "buyrole":
-                role = request["role"].strip()
-                if not role:
+                if not request['role']:
                     return self.send(client_socket, "8")
 
-                self.cursor.execute("SELECT price FROM roles WHERE role = ?", (role,))
+                self.cursor.execute("SELECT price FROM roles WHERE role = ?", (request['role'],))
                 role_row = self.cursor.fetchone()
                 if role_row is None:
                     return self.send(client_socket, "4")
 
                 price = role_row['price']
 
-                self.cursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (request['username'], role))
+                self.cursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (request['username'], request['role']))
                 if self.cursor.fetchone():
                     return self.send(client_socket, "T")
 
@@ -165,7 +163,7 @@ class Server:
                 if user_row["coins"] < price:
                     return self.send(client_socket, "7")
 
-                self.cursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (request['username'], role))
+                self.cursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (request['username'], request['role']))
                 self.cursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (price, request['username']))
                 self.db.commit()
 
@@ -175,7 +173,7 @@ class Server:
                 roles = [f"{row['role']}:{row['price']}" for row in self.cursor.fetchall()]
                 self.send(client_socket, "|".join(roles) if roles else "No roles")
             elif request['action'] == "coins": 
-                self.cursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
+                self.cursor.execute("SELECT coins FROM users WHERE username = ?", (request['username'],))
                 row = self.cursor.fetchone()
                 if row: self.send(client_socket, row['coins'])
                 else: self.send(client_socket, "4")
