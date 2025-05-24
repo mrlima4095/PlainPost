@@ -31,6 +31,23 @@ class Server:
                 role TEXT DEFAULT 'user'
             )
         """)
+        
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS user_roles (
+                username TEXT,
+                role TEXT,
+                PRIMARY KEY(username, role),
+                FOREIGN KEY(username) REFERENCES users(username)
+            )
+        """)
+
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS roles (
+                role TEXT PRIMARY KEY,
+                price INTEGER NOT NULL
+            )
+        """)
+
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS mails (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,7 +58,9 @@ class Server:
                 FOREIGN KEY(recipient) REFERENCES users(username)
             )
         """)
+        
         self.db.commit()
+
 
     def start(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
@@ -76,25 +95,30 @@ class Server:
             print(datetime.now().strftime(f"[+] [%H:%M %d/%m/%Y - {request['username']}] {addr[0]} -> {raw}"))
                 
             if request['action'] == "send":
-                status = self.send_mail(request['username'], request['to'], request['content'])
+                self.cursor.execute("SELECT * FROM users WHERE username = ?", (target,))
+                if self.cursor.fetchone() is None: self.send(client_socket, "4")
 
-                self.send(client_socket, status)
+                timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
+                full_content = f"[{timestamp} - {sender}] {content}"
+                self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
+                                    (target, sender, full_content, timestamp))
+                self.db.commit(), self.send(client_socket, "0")
             elif request['action'] == "read":
-                status = self.read_mail(request['username'])
-
-                self.send(client_socket, status)
+                self.cursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
+                mails = [row["content"] for row in self.cursor.fetchall()]
+                self.send(client_socket, '\n'.join(mails) if mails else "No messages" )
             elif request['action'] == "clear": 
-                status = self.clear(request['username'])
-
-                self.send(client_socket, status)
+                self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
+                self.db.commit(), self.send(client_socket, "0")
             elif request['action'] == "transfer":
                 status = self.transfer_coins(request['username'], request['to'], request['amount'])
 
                 self.send(client_socket, status)
             elif request['action'] == "changepass":
-                status = self.change_password(request['username'], request['newpass'])
+                if not newpass: return "8"
 
-                self.send(client_socket, status)
+                self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (newpass, username))
+                self.db.commit(), self.send(client_socket, "0")
             elif request['action'] == "search":
                 status = self.show_info(request['user'])
 
@@ -103,14 +127,58 @@ class Server:
                 status = self.show_info(request['username'])
 
                 self.send(client_socket, status)
+            elif request['action'] == "roles":
+                self.cursor.execute("SELECT role FROM user_roles WHERE username = ?", (request['username'],))
+                roles = [row['role'] for row in self.cursor.fetchall()]
+                self.send(client_socket, ",".join(roles) if roles else "No roles")
+
+            elif request['action'] == "changerole":
+                new_role = request['role'].strip().lower()
+                if not new_role:
+                    return self.send(client_socket, "8")
+
+                self.cursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (request['username'], new_role))
+                if self.cursor.fetchone() is None:
+                    return self.send(client_socket, "4")
+
+                self.cursor.execute("UPDATE users SET role = ? WHERE username = ?", (new_role, request['username']))
+                self.db.commit()
+                self.send(client_socket, "0")
+            elif request['action'] == "buyrole":
+                role = request["role"].strip().lower()
+                if not role:
+                    return self.send(client_socket, "8")
+
+                self.cursor.execute("SELECT price FROM roles WHERE role = ?", (role,))
+                role_row = self.cursor.fetchone()
+                if role_row is None:
+                    return self.send(client_socket, "4")
+
+                price = role_row['price']
+
+                self.cursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (request['username'], role))
+                if self.cursor.fetchone():
+                    return self.send(client_socket, "T")
+
+                self.cursor.execute("SELECT coins FROM users WHERE username = ?", (request['username'],))
+                user_row = self.cursor.fetchone()
+                if user_row["coins"] < price:
+                    return self.send(client_socket, "7")
+
+                self.cursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (request['username'], role))
+                self.cursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (price, request['username']))
+                self.db.commit()
+
+                self.send(client_socket, "0")
             elif request['action'] == "coins": 
-                status = self.show_coins(request['username'])
-
-                self.send(client_socket, status)
+                self.cursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
+                row = self.cursor.fetchone()
+                if row: self.send(client_socket, row['coins'])
+                else: self.send(client_socket, "4")
             elif request['action'] == "signoff": 
-                status = self.signoff(request['username'])
-
-                self.send(client_socket, status)
+                self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
+                self.cursor.execute("DELETE FROM users WHERE username = ?", (username,))
+                self.db.commit(), self.send(client_socket, "0")
             elif request['action'] == "status": self.send(client_socket, "0")
             else: self.send(client_socket, "2")
         else: self.send(client_socket, "1") 
@@ -120,55 +188,13 @@ class Server:
     def auth(self, request):
         self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (request['username'], request['password']))
         return self.cursor.fetchone() is not None
-
     def show_info(self, username):
         self.cursor.execute("SELECT role FROM users WHERE username = ?", (username,))
         row = self.cursor.fetchone()
         if row: return f"[{row['role']}] {username}"
         else: return "4"
-    def show_coins(self, username):
-        self.cursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
-        row = self.cursor.fetchone()
-        if row: return row['coins']
-        else: return "4"
-
-    # User auth tools
-    def signoff(self, username):
-        self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
-        self.cursor.execute("DELETE FROM users WHERE username = ?", (username,))
-        self.db.commit()
-        return "0"
-    def change_password(self, username, newpass):
-        if not newpass:
-            return "8"
-
-        self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (newpass, username))
-        self.db.commit()
-        return "0"
-
-
-    # Mail Tools
-    def send_mail(self, sender, target, content):
-        self.cursor.execute("SELECT * FROM users WHERE username = ?", (target,))
-        if self.cursor.fetchone() is None:
-            return "4"
-
-        timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
-        full_content = f"[{timestamp} - {sender}] {content}"
-        self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
-                            (target, sender, full_content, timestamp))
-        self.db.commit()
-        return "0"
-    def read_mail(self, username):
-        self.cursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
-        mails = [row["content"] for row in self.cursor.fetchall()]
-        return '\n'.join(mails) if mails else "No messages"
-
-    def clear(self, username):
-        self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
-        self.db.commit()
-        return "0"
-
+     
+    # Economy System
     def transfer_coins(self, sender, recipient, amount):
         try:
             amount = int(amount)
@@ -192,6 +218,7 @@ class Server:
         self.db.commit()
         
         return "0"
+
 
     # Socket Operations (Read and Write)
     def send(self, client_socket, text): client_socket.sendall(f"{text}\n".encode('utf-8'))
