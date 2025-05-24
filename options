@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PlainPost</title>
+
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript">
+        window.onload = () => { document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail/login"; }); };
+    </script>
+</head>
+<body>
+    <div id="conteiner">
+        <h2>Ações de Segurança</h2>
+        <button id="back" type="submit">Retornar</button>
+        <button id="changetag" type="submit">Trocar TAG</button>
+        <button id="buytag" type="submit">Comprar TAG</button>
+    <div>
+</body>
+</html>

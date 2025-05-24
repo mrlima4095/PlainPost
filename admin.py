@@ -19,18 +19,23 @@ class AdminPanel:
         try:
             if args[1] == "register": panel.register(args[2], args[3])
             elif args[1] == "unregister": panel.unregister(args[2])
-            elif args[1] ==  "password": panel.changepass(args[2], args[3])
-            elif args[1] ==  "role": panel.changerole(args[2], args[3])
-            elif args[1] ==  "bio": panel.changebio(args[2], args[3])
-            elif args[1] ==  "list": panel.list_users()
+            elif args[1] == "password": panel.changepass(args[2], args[3])
+            elif args[1] == "give-role": panel.give_role(args[2], args[3])
+            elif args[1] == "take-role": panel.take_role(args[2], args[3])
+            elif args[1] == "role": panel.changerole(args[2], args[3])
+            elif args[1] == "list": panel.list_users()
 
             elif args[1] == "send": panel.send(args[2], ' '.join(args[3:]))
-            elif args[1] ==  "read": panel.list_all_mails()
-            elif args[1] ==  "clear": panel.clear(args[2])
-            elif args[1] ==  "clear-all": panel.clear_all()
+            elif args[1] == "read": panel.list_all_mails()
+            elif args[1] == "clear": panel.clear(args[2])
+            elif args[1] == "clear-all": panel.clear_all()
 
-            elif args[1] ==  "give-coin": panel.give_coins(args[2], int(args[3]))
-            elif args[1] ==  "take-coin": panel.take_coins(args[2], int(args[3]))
+            elif args[1] == "give-coin": panel.give_coins(args[2], int(args[3]))
+            elif args[1] == "take-coin": panel.take_coins(args[2], int(args[3]))
+
+            elif args[1] == "add-buy-role": panel.add_buyable_role(args[2], int(args[3]))
+            elif args[1] == "remove-buy-role": panel.remove_buyable_role(args[2])
+            elif args[1] == "list-buy-roles": panel.list_buyable_roles()
 
             elif args[1] == "help": self.help()
 
@@ -38,7 +43,8 @@ class AdminPanel:
         except IndexError as e: print(f"[!] Missed arguments")
         except Exception as e: print(f"[!] Error: {e}")
 
-    def help(self): print("register,unregister,password,role,list,send,read,clear,clear-all,give-coin,take-coin")
+    def help(self): print("register,unregister,password,give-role,take-role,role,list,send,read,clear,clear-all,give-coin,take-coin,add-buy-role,remove-buy-role,list-buy-roles")
+
 
     # User payloads
     def register(self, username, password):
@@ -58,6 +64,26 @@ class AdminPanel:
         self.cursor.execute("UPDATE users SET role = ? WHERE username = ?", (role, username))
         self.db.commit()
         print(f"[+] User '{username}' role changed to '{role}'.")
+    def give_role(self, username, role):
+        self.cursor.execute("SELECT 1 FROM users WHERE username = ?", (username,))
+        if not self.cursor.fetchone():
+            print("[!] User not found.")
+            return
+
+        self.cursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (username, role))
+        if self.cursor.fetchone():
+            print("[~] User already has this role.")
+            return
+
+        self.cursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (username, role))
+        self.db.commit()
+        print(f"[+] Role '{role}' granted to '{username}'.")
+    def take_role(self, username, role):
+        self.cursor.execute("DELETE FROM user_roles WHERE username = ? AND role = ?", (username, role))
+        self.db.commit()
+        print(f"[-] Role '{role}' removed from '{username}'.")
+
+
     def list_users(self):
         self.cursor.execute("SELECT username, role, coins FROM users")
         for row in self.cursor.fetchall():
@@ -93,6 +119,34 @@ class AdminPanel:
         self.cursor.execute("DELETE FROM mails")
         self.db.commit()
         print("[~] All emails cleared from database.")
+
+    # Shop
+
+    def add_buyable_role(self, role, price):
+        self.cursor.execute("SELECT 1 FROM roles WHERE role = ?", (role,))
+        if self.cursor.fetchone():
+            print("[~] This role is already in the store.")
+            return
+
+        self.cursor.execute("INSERT INTO roles (role, price) VALUES (?, ?)", (role, price))
+        self.db.commit()
+        print(f"[+] Role '{role}' is now available for {price} coins.")
+    def remove_buyable_role(self, role):
+        self.cursor.execute("DELETE FROM roles WHERE role = ?", (role,))
+        self.db.commit()
+        print(f"[-] Role '{role}' removed from the store.")
+    def list_buyable_roles(self):
+        self.cursor.execute("SELECT * FROM roles")
+        roles = self.cursor.fetchall()
+
+        if not roles:
+            print("[~] No roles available for purchase.")
+            return
+
+        print("[=] Roles available for purchase:")
+        for row in roles:
+            print(f"[+] {row['role']} - {row['price']} coins")
+
     
     # Coins
     def give_coins(self, username, amount):
