@@ -170,6 +170,10 @@ class Server:
                 self.db.commit()
 
                 self.send(client_socket, "0")
+            elif request['action'] == "listroles":
+                self.cursor.execute("SELECT role, price FROM roles")
+                roles = [f"{row['role']}:{row['price']}" for row in self.cursor.fetchall()]
+                self.send(client_socket, "|".join(roles) if roles else "No roles")
             elif request['action'] == "coins": 
                 self.cursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
                 row = self.cursor.fetchone()
