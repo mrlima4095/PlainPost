@@ -10,7 +10,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
-        window.onload = () => { document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; }); };
+        window.onload = () => { document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail/login"; }); };
     </script>
 </head>
 <body>
