@@ -18,12 +18,14 @@
         <h2>Política de Privacidade</h2><br>
 
         <p>Ao criar sua conta, você concorda com nossos termos de serviço e a nossa política de privacidade. Isto declara que você esta ciente que:</p>
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
+        <p>1. Seus dados, senha e mensagens NÃO são criptografados durante a comunicação com o servidor;</p>
+        <p>2. A única segurança é o protocolo HTTPS do site;</p>
+        <p>3. Sabendo disso, NÃO recomendamos que use nome de usuário nem senhas reais;</p>
+        <p>4. Não fornecemos NENHUM dado dos usuários para terceiros, porém se sua rastrearem sua conexão, não nos responsabilizamos;</p>
+        <p>5. Não nos responsabilizamos por nenhuma ofensa entre usuários, nem baniremos ninguém por ações improprias;</p>
+        <p>6. Como os usuários usam as moedas deste serviço não nos diz respeito;</p>
+        <p>7. Não envie spam (principalmente no canal de Ajuda do ADM), sua conta pode ser suspensa;</p>
+        <p>8. Não use este serviço para cometer crimes. Não nos responsabilizamos por isso! Em caso de investigação podemos entregar suas mensagens;</p>
         <button id="back" type="submit">Retornar</button>
     <div>
 </body>
