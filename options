@@ -91,7 +91,7 @@
 </head>
 <body>
     <div id="conteiner">
-        <h2>Painel da Conta</h2>
+        <h2>Painel da Conta</h2><br>
         <button id="back" type="button">Retornar</button>
         <button id="changetag" type="button">Trocar TAG</button>
         <button id="buytag" type="button">Comprar TAG</button>
