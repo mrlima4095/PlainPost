@@ -26,8 +26,12 @@
         <p>6. Como os usuários usam as moedas deste serviço não nos diz respeito;</p>
         <p>7. Não envie spam, sua conta pode ser suspensa;</p>
         <p>8. Não use este serviço para cometer crimes. Não nos responsabilizamos por isso! Em caso de investigação podemos entregar suas mensagens;</p>
-        <p>9. Arquivos carregados para o BinDrop podem ser acessados por terceiros e compartilhados (Máximo de 100 MB). É proibido o carregamento de qualquer conteúdo de pirataria e pornografia. Isto pode acarretar em penalidades;</p>
-
+        <p>9. Os arquivos carregados para o BinDrop podem ser rastreados e baixados por terceiros. Não faça upload de arquivo sensíveis;</p>
+        <p>10. Arquivos carregados para o BinDrop maiores que 10 MB desapareceram em 5 horas caso não pague por uma maior duração;</p>
+        <p>11. Não carregue arquivos que contenham vírus, imagens de terceiros seu sua autorização, conteúdo adulto e outros de origem criminosa;</p>
+        <p></p>>
+        <p></p>
+        <p></p>
         <button id="back" type="submit">Retornar</button>
     <div>
 </body>
