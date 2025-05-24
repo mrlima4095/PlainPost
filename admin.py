@@ -20,8 +20,6 @@ class AdminPanel:
             if args[1] == "register": panel.register(args[2], args[3])
             elif args[1] == "unregister": panel.unregister(args[2])
             elif args[1] == "password": panel.changepass(args[2], args[3])
-            elif args[1] == "give-role": panel.give_role(args[2], args[3])
-            elif args[1] == "take-role": panel.take_role(args[2], args[3])
             elif args[1] == "role": panel.changerole(args[2], args[3])
             elif args[1] == "list": panel.list_users()
 
@@ -30,12 +28,14 @@ class AdminPanel:
             elif args[1] == "clear": panel.clear(args[2])
             elif args[1] == "clear-all": panel.clear_all()
 
+            elif args[1] == "give-role": panel.give_role(args[2], args[3])
+            elif args[1] == "take-role": panel.take_role(args[2], args[3])
             elif args[1] == "give-coin": panel.give_coins(args[2], int(args[3]))
             elif args[1] == "take-coin": panel.take_coins(args[2], int(args[3]))
 
-            elif args[1] == "add-buy-role": panel.add_buyable_role(args[2], int(args[3]))
-            elif args[1] == "remove-buy-role": panel.remove_buyable_role(args[2])
-            elif args[1] == "list-buy-roles": panel.list_buyable_roles()
+            elif args[1] == "add-role": panel.add_buyable_role(args[2], int(args[3]))
+            elif args[1] == "remove-role": panel.remove_buyable_role(args[2])
+            elif args[1] == "list-roles": panel.list_buyable_roles()
 
             elif args[1] == "help": self.help()
 
@@ -43,7 +43,7 @@ class AdminPanel:
         except IndexError as e: print(f"[!] Missed arguments")
         except Exception as e: print(f"[!] Error: {e}")
 
-    def help(self): print("register,unregister,password,give-role,take-role,role,list,send,read,clear,clear-all,give-coin,take-coin,add-buy-role,remove-buy-role,list-buy-roles")
+    def help(self): print("register,unregister,password,give-role,take-role,role,list,send,read,clear,clear-all,give-coin,take-coin,add-role,remove-role,list-roles")
 
 
     # User payloads
