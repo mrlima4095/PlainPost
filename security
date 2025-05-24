@@ -16,7 +16,6 @@
             document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; });
 
             document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login"; });
-
             document.getElementById("signoff").addEventListener("click", async () => {
                 const username = localStorage.getItem("username");
                 const password = localStorage.getItem("password");
@@ -28,7 +27,6 @@
 
                 try {
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
-
                     const dados = await resposta.json();
 
                     if (dados.response === "0") { localStorage.removeItem("username"); localStorage.removeItem("password"); await Swal.fire("Conta apagada!", "Sua conta foi removida com sucesso.", "success"); window.location.href = "login"; } else { Swal.fire("Erro", "Erro ao apagar a conta.", "error"); }
