@@ -19,6 +19,10 @@
         function tempoRestante() { const desbloqueio = parseInt(localStorage.getItem("bloqueadoAte")) || 0; const restante = desbloqueio - Date.now(); const minutos = Math.floor(restante / 60000); const segundos = Math.floor((restante % 60000) / 1000); return `${minutos}m ${segundos}s`; } 
 
         async function autenticar(acao) {
+            if (!document.getElementById("souHumano").checked) {
+                Swal.fire("Verificação necessária", "Marque a caixa 'Não sou um robô' para continuar.", "warning");
+                return;
+            }
             if (acao === "status" && estaBloqueado()) { Swal.fire("Bloqueado", `Você excedeu o número de tentativas. Tente novamente em ${tempoRestante()}.`, "error"); return; }
 
             const email = document.getElementById("email").value.trim();
@@ -70,6 +74,9 @@
 
             <label for="senha">Senha:</label><br />
             <input type="password" id="senha" name="senha" required /><br /><br />
+
+            <input type="checkbox" id="souHumano" />
+            <label for="souHumano">Não sou um robô</label>
 
             <button type="submit">Entrar</button>
             <button type="submit">Registrar-se</button>
