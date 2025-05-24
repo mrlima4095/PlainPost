@@ -24,6 +24,7 @@ class AdminPanel:
             elif args[1] == "list": panel.list_users()
 
             elif args[1] == "send": panel.send(args[2], ' '.join(args[3:]))
+            elif args[1] == "notifyall": panel.notify_all(' '.join(args[2:]))
             elif args[1] == "read": panel.list_all_mails()
             elif args[1] == "clear": panel.clear(args[2])
             elif args[1] == "clear-all": panel.clear_all()
@@ -43,7 +44,7 @@ class AdminPanel:
         except IndexError as e: print(f"[!] Missed arguments")
         except Exception as e: print(f"[!] Error: {e}")
 
-    def help(self): print("register,unregister,password,give-role,take-role,role,list,send,read,clear,clear-all,give-coin,take-coin,add-role,remove-role,list-roles")
+    def help(self): print("register,unregister,password,give-role,take-role,role,list,send,read,clear,clear-all,notifyall,give-coin,take-coin,add-role,remove-role,list-roles")
 
 
     # User payloads
@@ -102,6 +103,23 @@ class AdminPanel:
                             (target, "admin", full_content, timestamp))
         self.db.commit()
         print(f"[+] Email sent to {target}.")
+    def notify_all(self, content):
+        self.cursor.execute("SELECT username FROM users")
+        users = self.cursor.fetchall()
+
+        if not users:
+            print("[~] No users to notify.")
+            return
+
+        timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
+        full_content = f"[{timestamp} - admin] {content}"
+
+        for user in users:
+            self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", 
+                                (user['username'], "admin", full_content, timestamp))
+        
+        self.db.commit()
+        print(f"[+] Notification sent to all users.")
     def list_all_mails(self):
         self.cursor.execute("SELECT * FROM mails")
         for mail in self.cursor.fetchall():
