@@ -8,3 +8,4 @@
 7   not enough coins
 8   invalid new password/ role
 9   web proxy error
+T 	user already buy this role
