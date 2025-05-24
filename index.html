@@ -111,6 +111,7 @@
 
             document.getElementById("me").addEventListener("click", async () => { const r = await conectar("me"); Swal.fire('Seus dados', r, 'info'); });
             document.getElementById("coins").addEventListener("click", async () => { const r = await conectar("coins"); Swal.fire('Suas moedas', r, 'info'); });
+            document.getElementById("drive").addEventListener("click", () => { window.location.href = "/drive"; });
             document.getElementById("options").addEventListener("click", () => { window.location.href = "options"; });
             document.getElementById("security").addEventListener("click", () => { window.location.href = "security"; });
         };
@@ -129,7 +130,7 @@
         <h2>Minha Conta</h2><br>
         <button id="me" type="submit">Meus Dados</button>
         <button id="coins" type="submit">Meu Saldo</button>
-        <button id="drive" type="submit">Meu Drive</button>
+        <button id="drive" type="submit">BinDrop (Drive)</button>
         <button id="options" type="submit">Painel da Conta</button>
         <button id="security" type="submit">Ações de Segurança</button>
     <div>
