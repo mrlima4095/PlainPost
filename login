@@ -88,8 +88,8 @@
 
             <button type="submit">Entrar</button>
             <button type="submit">Registrar-se</button>
+            <br><a href="/mail/privacy">Política de Privacidade</a>
         </form>
     </div>
-    <br><a href="/mail/privacy">Política de Privacidade</a>
 </body>
 </html>
