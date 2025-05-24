@@ -34,75 +34,40 @@
         }
 
         async function autenticar(acao) {
-            if (acao === "status" && estaBloqueado()) {
-                Swal.fire("Bloqueado", `Você excedeu o número de tentativas. Tente novamente em ${tempoRestante()}.`, "error");
-                return;
-            }
+            if (acao === "status" && estaBloqueado()) { Swal.fire("Bloqueado", `Você excedeu o número de tentativas. Tente novamente em ${tempoRestante()}.`, "error"); return; }
 
             const email = document.getElementById("email").value.trim();
             const senha = document.getElementById("senha").value.trim();
 
-            if (!email || !senha) {
-                Swal.fire("Campos obrigatórios", "Preencha todos os campos.", "warning");
-                return;
-            }
+            if (!email || !senha) { Swal.fire("Campos obrigatórios", "Preencha todos os campos.", "warning"); return; }
 
             const payload = { username: email, password: senha, action: acao };
 
             try {
-                const resposta = await fetch("https://servidordomal.fun/api/mail", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
+                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
 
                 const dados = await resposta.json();
 
-                if (dados.response === "0") {
-                    localStorage.setItem("username", email);
-                    localStorage.setItem("password", senha);
-                    localStorage.removeItem("tentativasFalhas");
-                    localStorage.removeItem("bloqueadoAte");
-                    window.location.href = "/mail";
-                }
+                if (dados.response === "0") { localStorage.setItem("username", email); localStorage.setItem("password", senha); localStorage.removeItem("tentativasFalhas"); localStorage.removeItem("bloqueadoAte"); window.location.href = "/mail"; }
                 else if (dados.response === "1") {
                     let tentativas = parseInt(localStorage.getItem("tentativasFalhas") || "0") + 1;
                     localStorage.setItem("tentativasFalhas", tentativas);
 
-                    if (tentativas >= MAX_TENTATIVAS) {
-                        bloquearUsuario();
-                        Swal.fire("Bloqueado", `Você excedeu ${MAX_TENTATIVAS} tentativas. Tente novamente em ${BLOQUEIO_MINUTOS} minutos.`, "error");
-                    } else {
-                        Swal.fire("Erro", `Usuário ou senha incorretos! Tentativas: ${tentativas}/${MAX_TENTATIVAS}`, "error");
-                    }
+                    if (tentativas >= MAX_TENTATIVAS) { bloquearUsuario(); Swal.fire("Bloqueado", `Você excedeu ${MAX_TENTATIVAS} tentativas. Tente novamente em ${BLOQUEIO_MINUTOS} minutos.`, "error"); } 
+                    else { Swal.fire("Erro", `Usuário ou senha incorretos! Tentativas: ${tentativas}/${MAX_TENTATIVAS}`, "error"); }
                 }
-                else if (dados.response === "3") {
-                    Swal.fire("Erro", "Nome de usuário já está em uso!", "error");
-                }
-                else if (dados.response === "9") {
-                    Swal.fire("Erro", "Ocorreu um erro interno!", "error");
-                }
-                else {
-                    Swal.fire("Resposta inesperada", dados.response, "info");
-                }
-            } catch (erro) {
-                Swal.fire("Erro", "Erro na conexão com o servidor.", "error");
-            }
+                else if (dados.response === "3") { Swal.fire("Erro", "Nome de usuário já está em uso!", "error"); }
+                else if (dados.response === "9") { Swal.fire("Erro", "Ocorreu um erro interno!", "error"); }
+                else { Swal.fire("Resposta inesperada", dados.response, "info"); }
+            } catch (erro) { Swal.fire("Erro", "Erro na conexão com o servidor.", "error"); }
         }
 
         window.onload = () => {
             const form = document.querySelector("form");
             const botoes = form.querySelectorAll("button");
 
-            botoes[0].addEventListener("click", function (event) {
-                event.preventDefault();
-                autenticar("status");
-            });
-
-            botoes[1].addEventListener("click", function (event) {
-                event.preventDefault();
-                autenticar("signup");
-            });
+            botoes[0].addEventListener("click", function (event) { event.preventDefault(); autenticar("status"); });
+            botoes[1].addEventListener("click", function (event) { event.preventDefault(); autenticar("signup"); });
         };
     </script>
 
