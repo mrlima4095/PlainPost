@@ -48,7 +48,7 @@
 
             if (resultado === "0") Swal.fire('Sucesso', 'TAG comprada com sucesso!', 'success');
             else if (resultado === "4") Swal.fire('Erro', 'TAG não encontrada!', 'error');
-            else if (resultado === "7") Swal.fire('Erro', 'Você não tem moedas suficientes!', 'error');
+            else if (resultado === "7") Swal.fire('Erro', 'Saldo insuficiente!', 'error');
             else if (resultado === "8") Swal.fire('Erro', 'TAG inválida!', 'error');
             else if (resultado === "T") Swal.fire('Erro', 'Você já possui essa TAG!', 'error');
             else Swal.fire('Erro', 'Falha ao comprar a TAG.', 'error');
