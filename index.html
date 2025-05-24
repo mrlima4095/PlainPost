@@ -130,7 +130,7 @@
 
             document.getElementById("me").addEventListener("click", async () => { const r = await conectar("me"); Swal.fire('Seus dados', r, 'info'); });
             document.getElementById("coins").addEventListener("click", async () => { const r = await conectar("coins"); Swal.fire('Suas moedas', r, 'info'); });
-            document.getElementById("helpadm").addEventListener("click", helpadm);
+            document.getElementById("options").addEventListener("click", helpadm);
             document.getElementById("security").addEventListener("click", () => { window.location.href = "security"; });
         };
     </script>
