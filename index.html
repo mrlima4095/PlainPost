@@ -19,10 +19,10 @@
             const payload = { username, password, action: acao };
 
             try { 
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
-                const dados = await resposta.json();
+                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), }); 
+                const dados = await resposta.json(); 
 
-                return dados.response;
+                return dados.response; 
             } catch (erro) { return "9"; }
         }
 
@@ -44,26 +44,7 @@
 
                 if (dados.response === "0") Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
                 else if (dados.response === "4") Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
-                else Swal.fire('Erro', 'Erro ao enviar mensagem.', 'error');
-            } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
-        }
-
-        async function helpadm() {
-            const username = localStorage.getItem("username");
-            const password = localStorage.getItem("password");
-
-            const { value: content } = await Swal.fire({ title: 'O que desejas?', input: 'text', inputPlaceholder: 'Escreva sua mensagem para o Administrador', showCancelButton: true, });
-            if (!content) return Swal.fire('Erro', 'Você não pode mandar uma mensagem vazia!', 'error');
-
-            const payload = { username, password, action: "send", to: "admin", content };
-
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
-                const dados = await resposta.json();
-
-                if (dados.response === "0") Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
-                else if (dados.response === "4") Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
-                else Swal.fire('Erro', 'Erro ao enviar mensagem.', 'error');
+                else { Swal.fire('Erro', 'Erro ao enviar mensagem.', 'error'); }
             } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
         }
 
@@ -130,7 +111,7 @@
 
             document.getElementById("me").addEventListener("click", async () => { const r = await conectar("me"); Swal.fire('Seus dados', r, 'info'); });
             document.getElementById("coins").addEventListener("click", async () => { const r = await conectar("coins"); Swal.fire('Suas moedas', r, 'info'); });
-            document.getElementById("options").addEventListener("click", helpadm);
+            document.getElementById("options").addEventListener("click", () => { window.location.href = "options"; });
             document.getElementById("security").addEventListener("click", () => { window.location.href = "security"; });
         };
     </script>
