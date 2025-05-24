@@ -99,7 +99,7 @@ class Server:
                 if self.cursor.fetchone() is None: self.send(client_socket, "4")
 
                 timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
-                full_content = f"[{timestamp} - {request['username']}] {content}"
+                full_content = f"[{timestamp} - {request['username']}] {request['content']}"
                 self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
                                     (request['to'], request['username'], full_content, timestamp))
                 self.db.commit(), self.send(client_socket, "0")
