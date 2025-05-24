@@ -14,7 +14,7 @@
             if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login"; return; }
 
             document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; });
-            document.getElementById("policy").addEventListener("click", () => { window.location.href = "/privacy"; });
+            document.getElementById("policy").addEventListener("click", () => { window.location.href = "/mail/privacy"; });
 
             document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login"; });
 
