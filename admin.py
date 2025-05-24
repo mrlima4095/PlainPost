@@ -121,7 +121,6 @@ class AdminPanel:
         print("[~] All emails cleared from database.")
 
     # Shop
-
     def add_buyable_role(self, role, price):
         self.cursor.execute("SELECT 1 FROM roles WHERE role = ?", (role,))
         if self.cursor.fetchone():
