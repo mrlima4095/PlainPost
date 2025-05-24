@@ -24,32 +24,67 @@
             } catch { return "9"; }
         }
 
-        async function trocarTag() {
-            const { value: tag } = await Swal.fire({
-                title: 'Nova TAG', input: 'text', inputPlaceholder: 'Nome da TAG', showCancelButton: true
-            });
-            if (!tag) return;
-            const resultado = await conectar("changerole", { role: tag });
-
-            if (resultado === "0") Swal.fire('Sucesso', 'TAG trocada com sucesso!', 'success');
-            else if (resultado === "4") Swal.fire('Erro', 'Você não possui essa TAG!', 'error');
-            else if (resultado === "8") Swal.fire('Erro', 'TAG inválida!', 'error');
-            else Swal.fire('Erro', 'Falha ao trocar a TAG.', 'error');
-        }
-
         async function comprarTag() {
+            const roles = await conectar("listroles");
+            if (!roles || roles === "No roles") {
+                return Swal.fire('Erro', 'Nenhuma TAG disponível.', 'error');
+            }
+
+            const opcoes = roles.split("|").map(r => {
+                const [tag, preco] = r.split(":");
+                return `<option value="${tag}">${tag} - ${preco} moedas</option>`;
+            }).join("");
+
             const { value: tag } = await Swal.fire({
-                title: 'Comprar TAG', input: 'text', inputPlaceholder: 'Nome da TAG', showCancelButton: true
+                title: 'Comprar TAG',
+                html: `<select id="swal-tag" class="swal2-select">${opcoes}</select>`,
+                preConfirm: () => document.getElementById('swal-tag').value,
+                showCancelButton: true
             });
+
             if (!tag) return;
+
             const resultado = await conectar("buyrole", { role: tag });
 
             if (resultado === "0") Swal.fire('Sucesso', 'TAG comprada com sucesso!', 'success');
             else if (resultado === "4") Swal.fire('Erro', 'TAG não encontrada!', 'error');
-            else if (resultado === "6") Swal.fire('Erro', 'Você não tem moedas suficientes!', 'error');
+            else if (resultado === "7") Swal.fire('Erro', 'Você não tem moedas suficientes!', 'error');
             else if (resultado === "8") Swal.fire('Erro', 'TAG inválida!', 'error');
+            else if (resultado === "T") Swal.fire('Erro', 'Você já possui essa TAG!', 'error');
             else Swal.fire('Erro', 'Falha ao comprar a TAG.', 'error');
         }
+
+
+        async function comprarTag() {
+            const roles = await conectar("listroles");
+            if (!roles || roles === "No roles") {
+                return Swal.fire('Erro', 'Nenhuma TAG disponível.', 'error');
+            }
+
+            const opcoes = roles.split("|").map(r => {
+                const [tag, preco] = r.split(":");
+                return `<option value="${tag}">${tag} - ${preco} moedas</option>`;
+            }).join("");
+
+            const { value: tag } = await Swal.fire({
+                title: 'Comprar TAG',
+                html: `<select id="swal-tag" class="swal2-select">${opcoes}</select>`,
+                preConfirm: () => document.getElementById('swal-tag').value,
+                showCancelButton: true
+            });
+
+            if (!tag) return;
+
+            const resultado = await conectar("buyrole", { role: tag });
+
+            if (resultado === "0") Swal.fire('Sucesso', 'TAG comprada com sucesso!', 'success');
+            else if (resultado === "4") Swal.fire('Erro', 'TAG não encontrada!', 'error');
+            else if (resultado === "7") Swal.fire('Erro', 'Você não tem moedas suficientes!', 'error');
+            else if (resultado === "8") Swal.fire('Erro', 'TAG inválida!', 'error');
+            else if (resultado === "T") Swal.fire('Erro', 'Você já possui essa TAG!', 'error');
+            else Swal.fire('Erro', 'Falha ao comprar a TAG.', 'error');
+        }
+
 
         window.onload = () => {
             document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; });
