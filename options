@@ -5,20 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PlainPost</title>
 
-
     <link rel="stylesheet" href="style.css">
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script type="text/javascript">
-        window.onload = () => { document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail/login"; }); };
+        async function conectar(acao, extra = {}) {
+            const username = localStorage.getItem("username");
+            const password = localStorage.getItem("password");
+            if (!username || !password) return window.location.href = "/mail/login";
+
+            const payload = { username, password, action: acao, ...extra };
+
+            try {
+                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
+                const dados = await resposta.json();
+
+                return dados.response;
+            } catch { return "9"; }
+        }
+
+        async function trocarTag() {
+            const { value: tag } = await Swal.fire({
+                title: 'Nova TAG', input: 'text', inputPlaceholder: 'Nome da TAG', showCancelButton: true
+            });
+            if (!tag) return;
+            const resultado = await conectar("changerole", { role: tag });
+
+            if (resultado === "0") Swal.fire('Sucesso', 'TAG trocada com sucesso!', 'success');
+            else if (resultado === "4") Swal.fire('Erro', 'Você não possui essa TAG!', 'error');
+            else if (resultado === "8") Swal.fire('Erro', 'TAG inválida!', 'error');
+            else Swal.fire('Erro', 'Falha ao trocar a TAG.', 'error');
+        }
+
+        async function comprarTag() {
+            const { value: tag } = await Swal.fire({
+                title: 'Comprar TAG', input: 'text', inputPlaceholder: 'Nome da TAG', showCancelButton: true
+            });
+            if (!tag) return;
+            const resultado = await conectar("buyrole", { role: tag });
+
+            if (resultado === "0") Swal.fire('Sucesso', 'TAG comprada com sucesso!', 'success');
+            else if (resultado === "4") Swal.fire('Erro', 'TAG não encontrada!', 'error');
+            else if (resultado === "6") Swal.fire('Erro', 'Você não tem moedas suficientes!', 'error');
+            else if (resultado === "8") Swal.fire('Erro', 'TAG inválida!', 'error');
+            else Swal.fire('Erro', 'Falha ao comprar a TAG.', 'error');
+        }
+
+        window.onload = () => {
+            document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; });
+
+            document.getElementById("changetag").addEventListener("click", trocarTag);
+            document.getElementById("buytag").addEventListener("click", comprarTag);
+        }
     </script>
 </head>
 <body>
     <div id="conteiner">
-        <h2>Ações de Segurança</h2>
-        <button id="back" type="submit">Retornar</button>
-        <button id="changetag" type="submit">Trocar TAG</button>
-        <button id="buytag" type="submit">Comprar TAG</button>
-    <div>
+        <h2>Painel da Conta</h2>
+        <button id="back" type="button">Retornar</button>
+        <button id="changetag" type="button">Trocar TAG</button>
+        <button id="buytag" type="button">Comprar TAG</button>
+    </div>
 </body>
 </html>
+
