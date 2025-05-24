@@ -13,25 +13,10 @@
         const MAX_TENTATIVAS = 5;
         const BLOQUEIO_MINUTOS = 5;
 
-        function bloquearUsuario() {
-            const agora = Date.now();
-            const desbloqueio = agora + BLOQUEIO_MINUTOS * 60 * 1000;
-            localStorage.setItem("bloqueadoAte", desbloqueio);
-            localStorage.setItem("tentativasFalhas", "0");
-        }
+        function bloquearUsuario() { const agora = Date.now(); const desbloqueio = agora + BLOQUEIO_MINUTOS * 60 * 1000; localStorage.setItem("bloqueadoAte", desbloqueio); localStorage.setItem("tentativasFalhas", "0"); }
+        function estaBloqueado() { const desbloqueio = parseInt(localStorage.getItem("bloqueadoAte")) || 0; return Date.now() < desbloqueio; }
 
-        function estaBloqueado() {
-            const desbloqueio = parseInt(localStorage.getItem("bloqueadoAte")) || 0;
-            return Date.now() < desbloqueio;
-        }
-
-        function tempoRestante() {
-            const desbloqueio = parseInt(localStorage.getItem("bloqueadoAte")) || 0;
-            const restante = desbloqueio - Date.now();
-            const minutos = Math.floor(restante / 60000);
-            const segundos = Math.floor((restante % 60000) / 1000);
-            return `${minutos}m ${segundos}s`;
-        }
+        function tempoRestante() { const desbloqueio = parseInt(localStorage.getItem("bloqueadoAte")) || 0; const restante = desbloqueio - Date.now(); const minutos = Math.floor(restante / 60000); const segundos = Math.floor((restante % 60000) / 1000); return `${minutos}m ${segundos}s`; } 
 
         async function autenticar(acao) {
             if (acao === "status" && estaBloqueado()) { Swal.fire("Bloqueado", `Você excedeu o número de tentativas. Tente novamente em ${tempoRestante()}.`, "error"); return; }
