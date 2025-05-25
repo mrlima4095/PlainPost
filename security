@@ -54,9 +54,9 @@
     <div id="conteiner">
         <h2>Ações de Segurança</h2><br>
         <button id="back" type="submit">Retornar</button>
+        <button id="changepass" type="submit">Trocar Senha</button>
         <button id="signout" type="submit">Encerrar sessão</button>
         <button id="signoff" type="submit">Apagar Conta</button>
-        <button id="changepass" type="submit">Trocar Senha</button>
     <div>
 </body>
 </html>
