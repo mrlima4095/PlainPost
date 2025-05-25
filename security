@@ -15,6 +15,21 @@
 
             document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; });
 
+            document.getElementById("changepass").addEventListener("click", async () => {
+                const username = localStorage.getItem("username");
+                const password = localStorage.getItem("password");
+
+                const { value: newpass } = await Swal.fire({ title: "Trocar Senha", input: "password", inputLabel: "Digite a nova senha", inputPlaceholder: "Nova senha", showCancelButton: true  });
+                if (!newpass) return;
+
+                try {
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password, action: "changepass", newpass }), });
+                    const dados = await resposta.text();
+
+                    if (dados === "0") { localStorage.setItem("password", newpass); Swal.fire("Sucesso", "Senha alterada com sucesso!", "success"); } 
+                    else { Swal.fire("Erro", "Erro ao trocar senha.", "error"); }
+                } catch { Swal.fire("Erro", "Erro na conexão.", "error"); }
+            });
             document.getElementById("signout").addEventListener("click", () => { localStorage.removeItem("username"); localStorage.removeItem("password"); window.location.href = "login"; });
             document.getElementById("signoff").addEventListener("click", async () => {
                 const username = localStorage.getItem("username");
@@ -41,6 +56,7 @@
         <button id="back" type="submit">Retornar</button>
         <button id="signout" type="submit">Encerrar sessão</button>
         <button id="signoff" type="submit">Apagar Conta</button>
+        <button id="changepass" type="submit">Trocar Senha</button>
     <div>
 </body>
 </html>
