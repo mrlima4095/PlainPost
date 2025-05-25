@@ -22,11 +22,13 @@
                 const { value: newpass } = await Swal.fire({ title: "Trocar Senha", input: "password", inputLabel: "Digite a nova senha", inputPlaceholder: "Nova senha", showCancelButton: true  });
                 if (!newpass) return;
 
-                try {
-                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password, action: "changepass", newpass }), });
-                    const dados = await resposta.text();
+                const payload = { username, password, action: "changepass", newpass };
 
-                    if (dados === "0") { localStorage.setItem("password", newpass); Swal.fire("Sucesso", "Senha alterada com sucesso!", "success"); } 
+                try {
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
+                    const dados = await resposta.json();
+
+                    if (dados.response === "0") { localStorage.setItem("password", newpass); Swal.fire("Sucesso", "Senha alterada com sucesso!", "success"); } 
                     else { Swal.fire("Erro", "Erro ao trocar senha.", "error"); }
                 } catch { Swal.fire("Erro", "Erro na conexão.", "error"); }
             });
