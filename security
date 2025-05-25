@@ -23,7 +23,7 @@
                 if (!newpass) return;
 
                 try {
-                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password, action: "changepass", newpass }), });
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password, action: "newpass", newpass }), });
                     const dados = await resposta.text();
 
                     if (dados === "0") { localStorage.setItem("password", newpass); Swal.fire("Sucesso", "Senha alterada com sucesso!", "success"); } 
