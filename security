@@ -19,7 +19,7 @@
                 const username = localStorage.getItem("username");
                 const password = localStorage.getItem("password");
 
-                const { value: newpass } = await Swal.fire({ title: "Trocar Senha", input: "password", inputLabel: "Digite a nova senha", inputPlaceholder: "Nova senha", showCancelButton: true  });
+                const { value: newpass } = await Swal.fire({ title: "Trocar Senha", input: "password", inputPlaceholder: "Nova senha", showCancelButton: true  });
                 if (!newpass) return;
 
                 const payload = { username, password, action: "changepass", newpass };
