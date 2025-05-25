@@ -115,7 +115,7 @@ class Server:
 
                 self.send(client_socket, status)
             elif request['action'] == "changepass":
-                if not newpass: return "8"
+                if not request['newpass']: return "8"
 
                 self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (request['newpass'], request['username']))
                 self.db.commit(), self.send(client_socket, "0")
