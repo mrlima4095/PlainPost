@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
 
-        async function login(acao) {
+        async function login() {
             const email = document.getElementById("email").value.trim();
             const senha = document.getElementById("senha").value.trim();
 
@@ -20,7 +20,7 @@
             const payload = { username: email, password: senha };
 
             try {
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                const resposta = await fetch("https://servidordomal.fun/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
 
 
                 if (resposta.status === 200) { 
@@ -34,12 +34,32 @@
             } catch (erro) { Swal.fire("Erro", "Erro na conexão com o servidor.", "error"); }
         }
 
+        async function signup() {
+            const email = document.getElementById("email").value.trim();
+            const senha = document.getElementById("senha").value.trim();
+
+            if (!email || !senha) { Swal.fire("Campos obrigatórios", "Preencha todos os campos.", "warning"); return; }
+
+            const payload = { username: email, password: senha };
+
+            try {
+                const resposta = await fetch("https://servidordomal.fun/api/signup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+
+
+                if (resposta.status === 200) { 
+                    
+                }
+                else if (resposta.status === 401) { Swal.fire("Erro", "Usuário ou senha incorretos!");
+                }
+            } catch (erro) { Swal.fire("Erro", "Erro na conexão com o servidor.", "error"); }
+        }
+
         window.onload = () => {
             const form = document.querySelector("form");
             const botoes = form.querySelectorAll("button");
 
-            botoes[0].addEventListener("click", function (event) { event.preventDefault(); autenticar("status"); });
-            botoes[1].addEventListener("click", function (event) { event.preventDefault(); autenticar("signup"); });
+            botoes[0].addEventListener("click", function (event) { event.preventDefault(); login(); });
+            botoes[1].addEventListener("click", function (event) { event.preventDefault(); signup(); });
         };
     </script>
 
