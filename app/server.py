@@ -200,7 +200,7 @@ def mail():
 
         return jsonify({"response": "Account deleted!"}), 200
     elif payload['action'] == "status": return jsonify({"response": "OK"}), 200
-	else: return jsonify({"response": "Method not allowed!"}), 405
+    else: return jsonify({"response": "Method not allowed!"}), 405
 
 @app.route('/api/drive/upload', methods=['POST'])
 def drive_upload():
