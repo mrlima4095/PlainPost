@@ -4,7 +4,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 
-ADD /app
+ADD /app  /app
 
 
 ENV TZ=America/Sao_Paulo
