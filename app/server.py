@@ -33,7 +33,7 @@ def get_user(token):
     row = mailcursor.fetchone()
 
     if row: return row[0]
-else: return None
+    else: return None
 
 
 # PlainPost
