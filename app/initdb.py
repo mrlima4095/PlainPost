@@ -18,7 +18,7 @@ def BinDropDB():
     conn.commit()
     conn.close()
 
-def PlainPostDB(self):
+def PlainPostDB():
     conn = sqlite3.connect('mailserver.db')
     cur = conn.cursor()
 
