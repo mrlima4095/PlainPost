@@ -70,3 +70,7 @@ def PlainPostDB(self):
 
     conn.commit()
     conn.close()
+
+
+BinDropDB()
+PlainPostDB()
