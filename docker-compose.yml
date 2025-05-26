@@ -7,7 +7,6 @@ services:
       - "9834:9834"
     volumes:
       - ./app:/app
-      - /root/uploads:/app/uploads
       - /root/PlainPost/app/drive.db:/app/drive.db
     working_dir: /app
 
