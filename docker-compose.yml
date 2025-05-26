@@ -6,8 +6,8 @@ services:
     ports:
       - "9834:9834"
     volumes:
-      - ./game-site:/app/game-site
+      - ./app:/app
       - /root/uploads:/app/uploads
-      - /root/game-site-server/drive.db:/app/drive.db
+      - /root/PlainPost/app/drive.db:/app/drive.db
     working_dir: /app
 
