@@ -40,7 +40,7 @@ def get_user(token):
 # |
 # Auth API
 # | (Login)
-@app.route('/app/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
     if not request.is_json:
         return jsonify({"error": "Invalid content type. Must be JSON."}), 400
@@ -68,7 +68,7 @@ def login():
 
 
 # | (Register)
-@app.route('/app/signup', methods=['POST'])
+@app.route('/api/signup', methods=['POST'])
 def signup():
     if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
 
@@ -79,7 +79,18 @@ def signup():
 
     mailcursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (payload['username'], payload['password']))
     mailserver.commit()
-    return jsonify({"response": "User registred!"}), 201
+
+    token = gen_token()
+    now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
+
+    mailcursor.execute("""
+        INSERT INTO tokens (token, username, created_at)
+        VALUES (?, ?, ?)
+    """, (token, username, now.isoformat()))
+
+    mailserver.commit()
+
+    return jsonify({"response": token}), 200
 # |
 # Social API
 @app.route('/api/mail', methods=['POST'])
@@ -298,7 +309,7 @@ def init_expiration_checker():
     def check_expired_files():
         now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect('drive.db')
         cur = conn.cursor()
         cur.execute("SELECT id, saved_name FROM files WHERE expire_time IS NOT NULL AND expire_time <= ?", (now.isoformat(),))
         expired = cur.fetchall()
