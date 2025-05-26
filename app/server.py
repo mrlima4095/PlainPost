@@ -25,7 +25,7 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 DB_PATH = 'drive.db'
 
 mailserver = sqlite3.connect('mailserver.db')
-mailcursor = conn.cursor()
+mailcursor = mailserver.cursor()
 
 def gen_token(): return secrets.token_hex(32)
 def get_user(token):
