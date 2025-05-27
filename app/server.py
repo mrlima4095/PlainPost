@@ -24,9 +24,6 @@ SAO_PAULO_TZ = pytz.timezone("America/Sao_Paulo")
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 DB_PATH = 'drive.db'
 
-mailserver = sqlite3.connect('mailserver.db')
-mailcursor = mailserver.cursor()
-
 def gen_token(): return secrets.token_hex(32)
 def get_user(token):
     mailcursor.execute("SELECT username FROM user_tokens WHERE token = ?", (token,))
@@ -35,6 +32,13 @@ def get_user(token):
     if row: return row[0]
     else: return None
 
+def get_mailserver_cursor():
+    conn = sqlite3.connect('mailserver.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    return conn, cursor
+
+
 
 # PlainPost
 # |
@@ -42,8 +46,8 @@ def get_user(token):
 # | (Login)
 @app.route('/api/login', methods=['POST'])
 def login():
-    if not request.is_json:
-        return jsonify({"error": "Invalid content type. Must be JSON."}), 400
+    mailserver, mailcursor = get_mailserver_cursor()
+    if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     username = payload.get('username')
@@ -70,6 +74,7 @@ def login():
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
+    mailserver, mailcursor = get_mailserver_cursor()
     if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
@@ -95,6 +100,7 @@ def signup():
 # Social API
 @app.route('/api/mail', methods=['POST'])
 def mail():
+    mailserver, mailcursor = get_mailserver_cursor()
     if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
 
     username = get_user(request.headers.get("Authorization"))
