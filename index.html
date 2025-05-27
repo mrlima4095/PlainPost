@@ -122,7 +122,7 @@
                 if (!token) { window.location.href = "login"; return; }
 
                 try {
-                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "me", user }), });
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "me" }), });
                     const dados = await resposta.json();
 
                     if (resposta.status === 200) { Swal.fire('Seus dados', dados.response, 'info'); }
