@@ -11,29 +11,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
-        async function conectar(acao) {
-            const token = localStorage.getItem("Mail-Token");
-            if (!token) { window.location.href = "login"; return; }
-
-            const payload = { action: acao };
-
-            try { 
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": localStorage.getItem("Mail-Token") }, body: JSON.stringify(payload), }); 
-                const dados = await resposta.json(); 
-
-                return dados.response; 
-            } catch (erro) { return "9"; }
-        }
-
 
         window.onload = () => {
             const token = localStorage.getItem("Mail-Token");
             if (!token) { window.location.href = "login"; return; }
 
-            document.getElementById("read").addEventListener("click", async () => { 
-                const token = localStorage.getItem("Mail-Token");
-                if (!token) { window.location.href = "login"; return; }
-
+            document.getElementById("read").addEventListener("click", async () => {
                 try { 
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "read" }), }); 
                     const dados = await resposta.json(); 
@@ -43,9 +26,6 @@
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
             });  
             document.getElementById("send").addEventListener("click", async () => {
-                const token = localStorage.getItem("Mail-Token");
-                if (!token) { window.location.href = "login"; return; }
-
                 const { value: target } = await Swal.fire({ title: 'Destinatário:', input: 'text', inputPlaceholder: 'Nome do usuário', showCancelButton: true, });
                 if (!target) return Swal.fire('Erro', 'Destinatário não pode estar vazio!', 'error');
 
@@ -62,9 +42,6 @@
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
             });
             document.getElementById("clear").addEventListener("click", async () => {
-                const token = localStorage.getItem("Mail-Token");
-                if (!token) { window.location.href = "login"; return; }
-
                 const confirm = await Swal.fire({ title: 'Tem certeza?', text: 'Tem certeza que deseja limpar suas mensagens?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Cancelar' });
                 if (!confirm.isConfirmed) { return; }
 
@@ -76,9 +53,6 @@
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
             });
             document.getElementById("transfer").addEventListener("click", async () => {
-                const token = localStorage.getItem("Mail-Token");
-                if (!token) { window.location.href = "login"; return; }
-
                 const { value: target } = await Swal.fire({ title: 'Destinatário:', input: 'text', inputPlaceholder: 'Nome do destinatário', showCancelButton: true, });
                 if (!target) return Swal.fire('Erro', 'Destinatário não pode estar vazio!', 'error');
 
@@ -101,9 +75,6 @@
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
             });
             document.getElementById("search").addEventListener("click", async () => {
-                const token = localStorage.getItem("Mail-Token");
-                if (!token) { window.location.href = "login"; return; }
-
                 const { value: user } = await Swal.fire({ title: 'Quem deseja procurar?', input: 'text', inputPlaceholder: 'Nome de usuário', showCancelButton: true, });
                 if (!user) return Swal.fire('Erro', 'Insira um nome de usuario!', 'error');
 
@@ -118,9 +89,6 @@
             });
 
             document.getElementById("me").addEventListener("click", async () => {
-                const token = localStorage.getItem("Mail-Token");
-                if (!token) { window.location.href = "login"; return; }
-
                 try {
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "me" }), });
                     const dados = await resposta.json();
@@ -131,9 +99,6 @@
 
             });
             document.getElementById("coins").addEventListener("click", async () => {
-                const token = localStorage.getItem("Mail-Token");
-                if (!token) { window.location.href = "login"; return; }
-
                 try {
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "coins" }), });
                     const dados = await resposta.json();
