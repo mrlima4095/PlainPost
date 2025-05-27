@@ -115,7 +115,7 @@ def logout():
     mailcursor.execute("DELETE FROM tokens WHERE token = ?", (token,))
     mailserver.commit()
 
-    if mailcursor.rowcount == 0: return jsonify({"response": "invalid token"}), 404
+    if mailcursor.rowcount == 0: return jsonify({"response": "Invalid token!"}), 404
 
     return jsonify({"response": token}), 200
 
