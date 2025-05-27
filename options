@@ -11,9 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
         async function conectar(acao, extra = {}) {
-            const username = localStorage.getItem("username");
-            const password = localStorage.getItem("password");
-            if (!username || !password) return window.location.href = "/mail/login";
+            const token = localStorage.getItem("Mail-Token");
+            if (!token) { window.location.href = "login"; return; }
 
             const payload = { username, password, action: acao, ...extra };
 
