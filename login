@@ -23,11 +23,10 @@
             try {
                 const resposta = await fetch("https://servidordomal.fun/api/" + api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
 
-
                 if (resposta.status === 200) { 
-                    const token = await resposta.json();
+                    const raw = await resposta.json();
 
-                    localStorage.setItem("Mail-Token", token); 
+                    localStorage.setItem("Mail-Token", raw.response); 
                     window.location.href = "/mail"; 
                 }
                 else if (resposta.status === 401) { Swal.fire("Erro", "Usuário ou senha incorretos!");
