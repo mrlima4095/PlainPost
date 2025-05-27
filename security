@@ -87,9 +87,11 @@
 
     document.getElementById("signoff").addEventListener("click", async () => {
         const token = localStorage.getItem("Mail-Token");
-        const username = localStorage.getItem("username");
-        const password = localStorage.getItem("password");
-
+        if (!token) {
+            window.location.href = "login";
+            return;
+        }
+        
         const result = await Swal.fire({
             title: "Tem certeza?",
             text: "Tem certeza que deseja apagar sua conta?",
@@ -108,7 +110,7 @@
                     "Content-Type": "application/json",
                     "Authorization": token
                 },
-                body: JSON.stringify({ action: "signoff", username, password })
+                body: JSON.stringify({ action: "signoff"  })
             });
 
             if (resposta.status === 200) {
