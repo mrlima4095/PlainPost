@@ -38,7 +38,7 @@ def gen_token():
             return token
 def get_user(token):
     mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT username FROM user_tokens WHERE token = ?", (token,))
+    mailcursor.execute("SELECT username FROM tokens WHERE token = ?", (token,))
     row = mailcursor.fetchone()
 
     if row: return row[0]
