@@ -127,6 +127,7 @@ def mail():
     if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
 
     username = get_user(request.headers.get("Authorization"))
+    if not username: return jsonify({ "response": "bad credentials" }), 401
     payload = request.get_json()
 
     if payload['action'] == "send":
