@@ -244,6 +244,9 @@ def mail():
 
 @app.route('/api/drive/upload', methods=['POST'])
 def drive_upload():
+    username = get_user(request.headers.get("Authorization"))
+    if not username: return jsonify({ "response": "bad credentials" }), 401
+    
     file = request.files.get('file')
     username = request.form.get('username')
 
