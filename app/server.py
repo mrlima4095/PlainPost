@@ -98,7 +98,7 @@ def signup():
     mailcursor.execute("""
         INSERT INTO tokens (token, username, created_at)
         VALUES (?, ?, ?)
-    """, (token, username, now.isoformat()))
+    """, (token, payload['username'], now.isoformat()))
 
     mailserver.commit()
 
