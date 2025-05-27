@@ -17,7 +17,7 @@
             if (!token) { window.location.href = "login"; return; }
 
             try { 
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "read" }), });
+                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "status" }), });
 
                 if (resposta.status === 401) { window.location.href = "login"; return; }
             } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
