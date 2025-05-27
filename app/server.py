@@ -293,8 +293,11 @@ def drive_download(file_id):
     path = os.path.join(UPLOAD_FOLDER, saved_name)
     return send_file(path, as_attachment=True, download_name=original_name)
 
-@app.route('/api/drive/list/', methods=['GET'])
+@app.route('/api/drive/list', methods=['GET'])
 def drive_list():
+    username = get_user(request.headers.get("Authorization"))
+    if not username: return jsonify({ "response": "bad credentials" }), 401
+    
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("SELECT id, original_name, size, upload_time, expire_time FROM files WHERE owner = ?", (username,))
