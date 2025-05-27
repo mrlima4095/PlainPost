@@ -199,7 +199,7 @@ def mail():
         mailserver.commit()
 
         return jsonify({"response": "Changed role!"}), 200
-    elif payload['action'] == "buyrole
+    elif payload['action'] == "buyrole":
         if not payload['role']: return jsonify({"response": "Blank role!"}), 400
 
         mailcursor.execute("SELECT price FROM roles WHERE role = ?", (payload['role'],))
