@@ -196,7 +196,7 @@ def mail():
     elif payload['action'] == "changerole":
         if not payload['role']: return jsonify({"response": "Blank role!"}), 400
 
-        mailcursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (username, request['role']))
+        mailcursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (username, payload['role']))
         if mailcursor.fetchone() is None: return jsonify({"response": "Role not found!"}), 404
 
         mailcursor.execute("UPDATE users SET role = ? WHERE username = ?", (request['role'], username))
