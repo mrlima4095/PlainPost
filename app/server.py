@@ -189,8 +189,9 @@ def mail():
         
         return jsonify({"response": f"[{row['role']}] {username}"}), 200 
     elif payload['action'] == "roles":
-        mailcursor.execute("SELECT role FROaM user_roles WHERE username = ?", (username,))
+        mailcursor.execute("SELECT role FROM user_roles WHERE username = ?", (username,))
         roles = [row['role'] for row in mailcursor.fetchall()]
+        
         return jsonify({"response": ",".join(roles) if roles else "No roles"}), 200
     elif payload['action'] == "changerole":
         if not payload['role']: return jsonify({"response": "Blank role!"}), 400
@@ -217,7 +218,7 @@ def mail():
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
         user_row = mailcursor.fetchone()
         if user_row["coins"] < price: return jsonify({"response": "No enough money!"}), 401
-        
+
         mailcursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (username, request['role']))
         mailcursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (price, username))
         mailserver.commit()
