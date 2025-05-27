@@ -11,103 +11,151 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
         async function conectar(acao) {
-            if (!localStorage.getItem("Mail-Token")) { window.location.href = "login"; return; }
+            const token = localStorage.getItem("Mail-Token");
+            if (!token) { window.location.href = "login"; return; }
 
-            const payload = { username, password, action: acao };
+            const payload = { action: acao };
 
             try { 
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), }); 
+                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": localStorage.getItem("Mail-Token") }, body: JSON.stringify(payload), }); 
                 const dados = await resposta.json(); 
 
                 return dados.response; 
             } catch (erro) { return "9"; }
         }
 
-        async function send() {
-            const username = localStorage.getItem("username");
-            const password = localStorage.getItem("password");
-
-            const { value: target } = await Swal.fire({ title: 'Destinatário:', input: 'text', inputPlaceholder: 'Nome do usuário', showCancelButton: true, });
-            if (!target) return Swal.fire('Erro', 'Destinatário não pode estar vazio!', 'error');
-
-            const { value: content } = await Swal.fire({ title: 'Mensagem:', input: 'text', inputPlaceholder: 'Escreva sua mensagem', showCancelButton: true, });
-            if (!content) return Swal.fire('Erro', 'Você não pode mandar uma mensagem vazia!', 'error');
-
-            const payload = { username, password, action: "send", to: target, content };
-
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
-                const dados = await resposta.json();
-
-                if (dados.response === "0") Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
-                else if (dados.response === "4") Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
-                else { Swal.fire('Erro', 'Erro ao enviar mensagem.', 'error'); }
-            } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
-        }
-
-        async function search() {
-            const username = localStorage.getItem("username");
-            const password = localStorage.getItem("password");
-
-            const { value: user } = await Swal.fire({ title: 'Quem deseja procurar?', input: 'text', inputPlaceholder: 'Nome de usuário', showCancelButton: true, });
-            if (!user) return Swal.fire('Erro', 'Insira um nome de usuario!', 'error');
-
-            const payload = { username, password, action: "search", user };
-
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
-                const dados = await resposta.json();
-
-                if (dados.response === "4") Swal.fire('Erro', 'O usuário não foi encontrado!', 'error');
-                else Swal.fire('Resultado', dados.response, 'info');
-            } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
-        }
-
-        async function transfer() {
-            const username = localStorage.getItem("username");
-            const password = localStorage.getItem("password");
-
-            const { value: target } = await Swal.fire({ title: 'Destinatário:', input: 'text', inputPlaceholder: 'Nome do destinatário', showCancelButton: true, });
-            if (!target) return Swal.fire('Erro', 'Destinatário não pode estar vazio!', 'error');
-
-            const { value: amount } = await Swal.fire({ title: 'Quantidade:', input: 'number', inputPlaceholder: 'Quantas moedas?', showCancelButton: true, });
-            if (!amount) return Swal.fire('Erro', 'Você precisa informar a quantidade!', 'error');
-
-            const confirm = await Swal.fire({ title: 'Confirmar transferência', text: `Tem certeza que deseja enviar ${amount} moedas para ${target}?`, icon: 'question', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Cancelar' });
-
-            if (!confirm.isConfirmed) return Swal.fire('Cancelado', 'Transferência cancelada.', 'info');
-
-            const payload = { username, password, action: "transfer", to: target, amount };
-
-            try {
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), });
-                const dados = await resposta.json();
-
-                if (dados.response === "0") Swal.fire('Sucesso', 'Moedas enviadas!', 'success');
-                else if (dados.response === "4") Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
-                else if (dados.response === "6") Swal.fire('Erro', 'A quantia de moedas a ser enviada é inválida!', 'error');
-                else if (dados.response === "7") Swal.fire('Erro', 'Saldo insuficiente!', 'error');
-                else Swal.fire('Erro', 'Erro ao transferir.', 'error');
-            } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
-        }
 
         window.onload = () => {
-            if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login"; return; }
+            const token = localStorage.getItem("Mail-Token");
+            if (!token) { window.location.href = "login"; return; }
 
-            document.getElementById("read").addEventListener("click", async () => { const r = await conectar("read"); Swal.fire({ icon: "info", title: "Mensagens", html: r.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), }); });
-            document.getElementById("send").addEventListener("click", send);
+            document.getElementById("read").addEventListener("click", async () => { 
+                const token = localStorage.getItem("Mail-Token");
+                if (!token) { window.location.href = "login"; return; }
+
+                try { 
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": ok }, body: JSON.stringify({action: ""}), }); 
+                    const dados = await resposta.json(); 
+
+                    if (resposta.status === 200) { Swal.fire({ icon: "info", title: "Mensagens", html: dados.response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), }); } 
+                    else { Swal.fire('Erro', 'Erro ao ler mensagens.', 'error'); }
+                } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
+            });  
+            document.getElementById("send").addEventListener("click", async () => {
+                const token = localStorage.getItem("Mail-Token");
+                if (!token) { window.location.href = "login"; return; }
+
+                const { value: target } = await Swal.fire({ title: 'Destinatário:', input: 'text', inputPlaceholder: 'Nome do usuário', showCancelButton: true, });
+                if (!target) return Swal.fire('Erro', 'Destinatário não pode estar vazio!', 'error');
+
+                const { value: content } = await Swal.fire({ title: 'Mensagem:', input: 'text', inputPlaceholder: 'Escreva sua mensagem', showCancelButton: true, });
+                if (!content) return Swal.fire('Erro', 'Você não pode mandar uma mensagem vazia!', 'error');
+
+                const payload = { action: "send", to: target, content };
+
+                try {
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify(payload), });
+                    const dados = await resposta.json();
+
+                    if (resposta.status === 200) Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
+                    else if (resposta.status === 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
+                    else { Swal.fire('Erro', 'Erro ao enviar mensagem.', 'error'); }
+                } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
+            });
             document.getElementById("clear").addEventListener("click", async () => {
+                const token = localStorage.getItem("Mail-Token");
+                if (!token) { window.location.href = "login"; return; }
+
                 const confirm = await Swal.fire({ title: 'Tem certeza?', text: 'Tem certeza que deseja limpar suas mensagens?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Cancelar' });
                 if (!confirm.isConfirmed) { return; }
 
-                const r = await conectar("clear"); 
-                if (r === "0") Swal.fire('Sucesso', 'Suas mensagens foram apagadas!', 'success'); else Swal.fire('Erro', 'Ocorreu um erro na conexão!', 'error'); });
+                try { 
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": localStorage.getItem("Mail-Token") }, body: JSON.stringify({ action: "clear" }), }); 
+                    
+                    if (resposta.status === 200) { Swal.fire('Sucesso', 'Suas mensagens foram apagadas!', 'success'); }
+                    else { Swal.fire('Erro', 'Erro ao limpar mensagens.', 'error'); }
+                } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
+            });
+            document.getElementById("transfer").addEventListener("click", async () => {
+                const token = localStorage.getItem("Mail-Token");
+                if (!token) { window.location.href = "login"; return; }
 
-            document.getElementById("transfer").addEventListener("click", transfer);
-            document.getElementById("search").addEventListener("click", search);
+                const { value: target } = await Swal.fire({ title: 'Destinatário:', input: 'text', inputPlaceholder: 'Nome do destinatário', showCancelButton: true, });
+                if (!target) return Swal.fire('Erro', 'Destinatário não pode estar vazio!', 'error');
 
-            document.getElementById("me").addEventListener("click", async () => { const r = await conectar("me"); Swal.fire('Seus dados', r, 'info'); });
-            document.getElementById("coins").addEventListener("click", async () => { const r = await conectar("coins"); Swal.fire('Suas moedas', r, 'info'); });
+                const { value: amount } = await Swal.fire({ title: 'Quantidade:', input: 'number', inputPlaceholder: 'Quantas moedas?', showCancelButton: true, });
+                if (!amount) return Swal.fire('Erro', 'Você precisa informar a quantidade!', 'error');
+
+                const confirm = await Swal.fire({ title: 'Confirmar transferência', text: `Tem certeza que deseja enviar ${amount} moedas para ${target}?`, icon: 'question', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Cancelar' });
+
+                if (!confirm.isConfirmed) return Swal.fire('Cancelado', 'Transferência cancelada.', 'info');
+
+
+                try {
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "transfer", to: target, amount }), });
+
+                    if (resposta.status === 200) Swal.fire('Sucesso', 'Moedas enviadas!', 'success');
+                    else if (resposta.status === 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
+                    else if (dados.response === 406) Swal.fire('Erro', 'A quantia de moedas a ser enviada é inválida!', 'error');
+                    else if (resposta.status === 401) Swal.fire('Erro', 'Saldo insuficiente!', 'error');
+                    else { Swal.fire('Erro', 'Erro ao transferir.', 'error'); }
+                } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
+            });
+            document.getElementById("search").addEventListener("click", async () => {
+                const token = localStorage.getItem("Mail-Token");
+                if (!token) { window.location.href = "login"; return; }
+
+                const { value: user } = await Swal.fire({ title: 'Quem deseja procurar?', input: 'text', inputPlaceholder: 'Nome de usuário', showCancelButton: true, });
+                if (!user) return Swal.fire('Erro', 'Insira um nome de usuario!', 'error');
+
+                const payload = ;
+
+                try {
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "search", user }), });
+                    const dados = await resposta.json();
+
+                    if (resposta.status === 200) { Swal.fire('Resultado', dados.response, 'info'); }
+                    else if (resposta.status === 404) { Swal.fire('Erro', 'O usuário não foi encontrado!', 'error'); }
+                    else { Swal.fire('Erro', 'Erro ao procurar.', 'error'); }
+                } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
+            });
+
+            document.getElementById("me").addEventListener("click", async () => {
+                const token = localStorage.getItem("Mail-Token");
+                if (!token) { window.location.href = "login"; return; }
+
+                const { value: user } = await Swal.fire({ title: 'Quem deseja procurar?', input: 'text', inputPlaceholder: 'Nome de usuário', showCancelButton: true, });
+                if (!user) return Swal.fire('Erro', 'Insira um nome de usuario!', 'error');
+
+                const payload = ;
+
+                try {
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "me", user }), });
+                    const dados = await resposta.json();
+
+                    if (resposta.status === 200) { Swal.fire('Seus dados', dados.response, 'info'); }
+                    else { Swal.fire('Erro', 'Erro ao consultar.', 'error'); }
+                } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
+
+            });
+            document.getElementById("coins").addEventListener("click", async () => {
+                const token = localStorage.getItem("Mail-Token");
+                if (!token) { window.location.href = "login"; return; }
+
+                const { value: user } = await Swal.fire({ title: 'Quem deseja procurar?', input: 'text', inputPlaceholder: 'Nome de usuário', showCancelButton: true, });
+                if (!user) return Swal.fire('Erro', 'Insira um nome de usuario!', 'error');
+
+                const payload = ;
+
+                try {
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "coins", user }), });
+                    const dados = await resposta.json();
+
+                    if (resposta.status === 200) { Swal.fire('Suas moedas', dados.response, 'info') }
+                    else { Swal.fire('Erro', 'Erro ao consultar.', 'error'); }
+                } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
+
+            });
             document.getElementById("drive").addEventListener("click", () => { window.location.href = "/drive"; });
             document.getElementById("options").addEventListener("click", () => { window.location.href = "options"; });
             document.getElementById("security").addEventListener("click", () => { window.location.href = "security"; });
