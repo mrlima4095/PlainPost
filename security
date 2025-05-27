@@ -39,7 +39,7 @@
                 if (!newpass) return;
 
                 try {
-                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "changepass", newpass }), });
+                    const resposta = await fetch("https://servidordomal.fun/api/logout", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "changepass", newpass }), });
 
                     if (resposta.status === 200) { localStorage.getItem("Mail-Token"); window.location.href = "/mail"; } 
                     else { Swal.fire("Erro", "Erro ao encerrar sessão.", "error"); }
