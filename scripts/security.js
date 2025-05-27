@@ -46,29 +46,8 @@ window.onload = () => {
     });
 
     document.getElementById("signout").addEventListener("click", async () => {
-        const token = localStorage.getItem("Mail-Token");
-        if (!token) {
-            window.location.href = "login";
-            return;
-        }
-
-        try {
-            const resposta = await fetch("https://servidordomal.fun/api/logout", {
-                method: "POST",
-                headers: {
-                    "Authorization": token
-                }
-            });
-
-            if (resposta.status === 200) {
-                localStorage.removeItem("Mail-Token");
-                window.location.href = "login";
-            } else {
-                Swal.fire("Erro", "Erro ao encerrar sessão.", "error");
-            }
-        } catch {
-            Swal.fire("Erro", "Erro na conexão.", "error");
-        }
+        localStorage.removeItem("Mail-Token");
+        window.location.href = "login";
     });
 
     document.getElementById("signoff").addEventListener("click", async () => {
