@@ -177,10 +177,8 @@ def mail():
         mailserver.commit() 
 
         return jsonify({"response": "Password changed!"}), 200
-    elif payload['action'] == "search":
-        mailcursor.execute("SELECT role FROM users WHERE username = ?", (payload['user'],))
-        row = mailcursor.fetchone()
-        if row: return jsonify({"response": f"[{row['role']}] {payload['user']}"}), 200 
+    elif payload['action'] == "search":L
+l        if row: return jsonify({"response": f"[{row['role']}] {payload['user']}"}), 200 
         else: return jsonify({"response": "Target not found!"}), 404
     elif payload['action'] == "me":
         mailcursor.execute("SELECT role FROM users WHERE username = ?", (username,))
@@ -188,7 +186,7 @@ def mail():
         
         return jsonify({"response": f"[{row['role']}] {username}"}), 200 
     elif payload['action'] == "roles":
-        mailcursor.execute("SELECT role FROM user_roles WHERE username = ?", (username,))
+        mailcursor.execute("SELECT role FROaM user_roles WHERE username = ?", (username,))
         roles = [row['role'] for row in mailcursor.fetchall()]
         
         return jsonify({"response": ",".join(roles) if roles else "No roles"}), 200
@@ -202,7 +200,7 @@ def mail():
         mailserver.commit()
 
         return jsonify({"response": "Changed role!"}), 200
-    elif payload['action'] == "buyrole":
+    elif payload['action'] == "buyrole
         if not payload['role']: return jsonify({"response": "Blank role!"}), 400
 
         mailcursor.execute("SELECT price FROM roles WHERE role = ?", (payload['role'],))
@@ -236,9 +234,6 @@ def mail():
     elif payload['action'] == "signoff": 
         mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         mailcursor.execute("DELETE FROM users WHERE username = ?", (username,))
-        mailserver.commit()
-
-        mailcursor.execute("DELETE FROM tokens WHERE token = ?", (token,))
         mailserver.commit()
 
         return jsonify({"response": "Account deleted!"}), 200
