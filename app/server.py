@@ -238,6 +238,9 @@ def mail():
         mailcursor.execute("DELETE FROM users WHERE username = ?", (username,))
         mailserver.commit()
 
+        mailcursor.execute("DELETE FROM tokens WHERE token = ?", (token,))
+        mailserver.commit()
+
         return jsonify({"response": "Account deleted!"}), 200
     elif payload['action'] == "status": return jsonify({"response": "OK"}), 200
     else: return jsonify({"response": "Method not allowed!"}), 405
