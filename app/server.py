@@ -24,7 +24,6 @@ CORS(app)
 SAO_PAULO_TZ = pytz.timezone("America/Sao_Paulo")
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
-DB_PATH = 'drive.db'
 
 JWT_SECRET = open("jwt.properties", "r").read()
 JWT_ALGORITHM = 'HS256'
@@ -245,23 +244,18 @@ def drive_upload():
     if size > 20 * 1024 * 1024:
         expire_time = now + timedelta(hours=5)
 
-
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("INSERT INTO files (id, owner, original_name, saved_name, size, upload_time, expire_time) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("INSERT INTO files (id, owner, original_name, saved_name, size, upload_time, expire_time) VALUES (?, ?, ?, ?, ?, ?, ?)",
         (file_id, username, secure_filename(file.filename), saved_name, size, now.isoformat(), expire_time.isoformat() if expire_time else None))
-    conn.commit()
-    conn.close()
+    mailserver.commit()
 
     return jsonify({"success": True}), 200
 
 @app.route('/api/drive/download/<file_id>', methods=['GET'])
 def drive_download(file_id):
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("SELECT original_name, saved_name FROM files WHERE id = ?", (file_id,))
-    row = cur.fetchone()
-    conn.close()
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT original_name, saved_name FROM files WHERE id = ?", (file_id,))
+    row = mailcursor.fetchone()
 
     if not row:
         return jsonify({"error": "Arquivo não encontrado."}), 404
@@ -275,11 +269,9 @@ def drive_list():
     username = get_user(request.headers.get("Authorization"))
     if not username: return jsonify({ "response": "bad credentials" }), 401
     
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("SELECT id, original_name, size, upload_time, expire_time FROM files WHERE owner = ?", (username,))
-    rows = cur.fetchall()
-    conn.close()
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT id, original_name, size, upload_time, expire_time FROM files WHERE owner = ?", (username,))
+    rows = mailcursor.fetchall()
 
     result = []
     for row in rows:
@@ -294,14 +286,11 @@ def drive_list():
 
 @app.route('/api/drive/delete/<file_id>', methods=['DELETE'])
 def drive_delete(file_id):
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
-    row = cur.fetchone()
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
+    row = mailcursor.fetchone()
 
-    if not row:
-        conn.close()
-        return jsonify({"success": False}), 404
+    if not row: return jsonify({"success": False}), 404
 
     saved_name = row[0]
     try:
@@ -309,29 +298,27 @@ def drive_delete(file_id):
     except FileNotFoundError:
         pass
 
-    cur.execute("DELETE FROM files WHERE id = ?", (file_id,))
-    conn.commit()
-    conn.close()
+    mailcursor.execute("DELETE FROM files WHERE id = ?", (file_id,))
+    mailserver.commit()
+
     return jsonify({"success": True}), 200
 
 def init_expiration_checker():
     def check_expired_files():
         now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
 
-        conn = sqlite3.connect('drive.db')
-        cur = conn.cursor()
-        cur.execute("SELECT id, saved_name FROM files WHERE expire_time IS NOT NULL AND expire_time <= ?", (now.isoformat(),))
-        expired = cur.fetchall()
+        mailserver, mailcursor = getdb()
+        mailcursor.execute("SELECT id, saved_name FROM files WHERE expire_time IS NOT NULL AND expire_time <= ?", (now.isoformat(),))
+        expired = mailcursor.fetchall()
 
         for file_id, saved_name in expired:
             try:
                 os.remove(os.path.join(UPLOAD_FOLDER, saved_name))
             except FileNotFoundError:
                 pass
-            cur.execute("DELETE FROM files WHERE id = ?", (file_id,))
+            mailcursor.execute("DELETE FROM files WHERE id = ?", (file_id,))
         
-        conn.commit()
-        conn.close()
+        mailserver.commit()
 
         threading.Timer(300, check_expired_files).start()
 
