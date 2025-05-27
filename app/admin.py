@@ -21,6 +21,7 @@ class AdminPanel:
             elif args[1] == "unregister": panel.unregister(args[2])
             elif args[1] == "tokens": panel.list_tokens()
             elif args[1] == "logout": panel.revoke_tokens(args[2])
+            elif args[1] == "revoke-token": panel.revoke_token(args[2])
             elif args[1] == "password": panel.changepass(args[2], args[3])
             elif args[1] == "role": panel.changerole(args[2], args[3])
             elif args[1] == "list": panel.list_users()
@@ -102,6 +103,11 @@ class AdminPanel:
         self.cursor.execute("DELETE FROM tokens WHERE username = ?", (username,))
         self.db.commit()
         print(f"[~] All tokens revoked for '{username}'.")
+    def revoke_token(self, token):
+        self.cursor.execute("DELETE FROM tokens WHERE token = ?", (token,))
+        self.db.commit()
+        print(f"[-] Token '{token}' revoked.")
+
 
 
 
