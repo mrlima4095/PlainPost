@@ -24,20 +24,25 @@ SAO_PAULO_TZ = pytz.timezone("America/Sao_Paulo")
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 DB_PATH = 'drive.db'
 
-def gen_token(): return secrets.token_hex(32)
-def get_user(token):
-    mailcursor.execute("SELECT username FROM user_tokens WHERE token = ?", (token,))
-    row = mailcursor.fetchone()
-
-    if row: return row[0]
-    else: return None
-
 def get_mailserver_cursor():
     conn = sqlite3.connect('mailserver.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     return conn, cursor
 
+def gen_token():
+    while True:
+        token = secrets.token_hex(32)
+        cursor.execute("SELECT 1 FROM tokens WHERE token = ?", (token,))
+        if cursor.fetchone() is None:
+            return token
+def get_user(token):
+    mailserver, mailcursor = get_mailserver_cursor()
+    mailcursor.execute("SELECT username FROM user_tokens WHERE token = ?", (token,))
+    row = mailcursor.fetchone()
+
+    if row: return row[0]
+    else: return None
 
 
 # PlainPost
