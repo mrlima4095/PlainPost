@@ -108,8 +108,6 @@
                 const { value: user } = await Swal.fire({ title: 'Quem deseja procurar?', input: 'text', inputPlaceholder: 'Nome de usuário', showCancelButton: true, });
                 if (!user) return Swal.fire('Erro', 'Insira um nome de usuario!', 'error');
 
-                const payload = ;
-
                 try {
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "search", user }), });
                     const dados = await resposta.json();
