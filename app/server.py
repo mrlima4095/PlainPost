@@ -4,6 +4,7 @@ from flask import send_file
 from werkzeug.utils import secure_filename
 
 import os
+import jwt
 import time
 import json
 import uuid
@@ -14,6 +15,7 @@ import secrets
 import threading, pytz
 from threading import Timer
 from datetime import datetime, timedelta
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 
 app = Flask(__name__)
@@ -23,9 +25,6 @@ SAO_PAULO_TZ = pytz.timezone("America/Sao_Paulo")
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 DB_PATH = 'drive.db'
-
-import jwt
-from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 JWT_SECRET = open("jwt.properties", "r").read()
 JWT_ALGORITHM = 'HS256'
@@ -38,14 +37,13 @@ def getdb():
     cursor = conn.cursor()
     return conn, cursor
 
-def gen_token():
-    mailserver, mailcursor = getdb()
-    
-    while True:
-        token = secrets.token_hex(32)
-        mailcursor.execute("SELECT 1 FROM tokens WHERE token = ?", (token,))
-        if mailcursor.fetchone() is None:
-            return token
+def gen_token(username):
+    payload = {
+        'username': username,
+        'exp': datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)
+    }
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return token
 def get_user(token):
     if not token:
         return None
@@ -56,7 +54,6 @@ def get_user(token):
         return None
     except InvalidTokenError:
         return None
-
 
 
 # PlainPost
@@ -88,8 +85,6 @@ def login():
 
         return jsonify({"response": token}), 200
     else: return jsonify({"response": "bad credentials"}), 401
-
-
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -115,22 +110,6 @@ def signup():
     mailserver.commit()
 
     return jsonify({"response": token}), 200
-# | (End of Token usage)
-@app.route('/api/logout', methods=['POST'])
-def logout():
-    mailserver, mailcursor = getdb()
-
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({'error': 'invalid token'}), 401
-
-    mailcursor.execute("DELETE FROM tokens WHERE token = ?", (token,))
-    mailserver.commit()
-
-    if mailcursor.rowcount == 0: return jsonify({"response": "Invalid token!"}), 404
-
-    return jsonify({"response": token}), 200
-
 # |
 # Social API
 @app.route('/api/mail', methods=['POST'])
