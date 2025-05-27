@@ -240,7 +240,7 @@ def mail():
         mailcursor.execute("DELETE FROM users WHERE username = ?", (username,))
         mailserver.commit()
         
-        mailcursor.execute("DELETE FROM tokens WHERE token = ?", (token,))
+        mailcursor.execute("DELETE FROM tokens WHERE token = ?", (request.headers.get("Authorization"),))
         mailserver.commit()
 
         return jsonify({"response": "Account deleted!"}), 200
