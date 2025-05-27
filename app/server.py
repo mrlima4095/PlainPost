@@ -178,7 +178,7 @@ def mail():
 
         return jsonify({"response": "Password changed!"}), 200
     elif payload['action'] == "search":pp
-         if row: return jsonify({"response": f"[{row['role']}] {payload['user']}"}), 200 
+        if row: return jsonify({"response": f"[{row['role']}] {payload['user']}"}), 200 
         else: return jsonify({"response": "Target not found!"}), 404
     elif payload['action'] == "me":
         mailcursor.execute("SELECT role FROM users WHERE username = ?", (username,))
