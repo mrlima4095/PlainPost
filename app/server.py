@@ -24,6 +24,14 @@ SAO_PAULO_TZ = pytz.timezone("America/Sao_Paulo")
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 DB_PATH = 'drive.db'
 
+import jwt
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+
+JWT_SECRET = open("jwt.properties", "r").read()
+JWT_ALGORITHM = 'HS256'
+JWT_EXP_DELTA_SECONDS = 604800
+
+
 def getdb():
     conn = sqlite3.connect('mailserver.db')
     conn.row_factory = sqlite3.Row
@@ -39,12 +47,16 @@ def gen_token():
         if mailcursor.fetchone() is None:
             return token
 def get_user(token):
-    mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT username FROM tokens WHERE token = ?", (token,))
-    row = mailcursor.fetchone()
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return payload['username']
+    except ExpiredSignatureError:
+        return None
+    except InvalidTokenError:
+        return None
 
-    if row: return row[0]
-    else: return None
 
 
 # PlainPost
