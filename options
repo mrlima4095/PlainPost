@@ -43,7 +43,7 @@
                     if (resposta.status === 200) { Swal.fire('Sucesso', 'TAG trocada com sucesso!', 'success'); }
                     else if (resposta.status == 404) { Swal.fire('Erro', 'Você não possui essa TAG!', 'error'); }
                     else if (resposta.status === 400) { Swal.fire('Erro', 'TAG inválida!', 'error'); }
-                    else { Swal.fire('Erro', 'Erro ao trocar TAG.' + resposta.json().get('response'), 'error'); }
+                    else { Swal.fire('Erro', 'Erro ao trocar TAG.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
             });
             document.getElementById("buytag").addEventListener("click", async () => {
