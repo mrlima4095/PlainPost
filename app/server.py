@@ -44,11 +44,11 @@ def gen_token(username):
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
 def get_user(token):
-    if not token:
-        return None
+    if not token: return None
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
 
+        mailserver, mailcursor = getdb()
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['username'],))
         status = mailcursor.fetchone() is not None
 
