@@ -97,7 +97,7 @@
 
                     if (resposta.status === 200) Swal.fire('Sucesso', 'Moedas enviadas!', 'success');
                     else if (resposta.status === 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
-                    else if (dados.response === 406) Swal.fire('Erro', 'A quantia de moedas a ser enviada é inválida!', 'error');
+                    else if (resposta.response === 406) Swal.fire('Erro', 'A quantia de moedas a ser enviada é inválida!', 'error');
                     else if (resposta.status === 401) Swal.fire('Erro', 'Saldo insuficiente!', 'error');
                     else { Swal.fire('Erro', 'Erro ao transferir.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
