@@ -14,7 +14,7 @@
             const token = localStorage.getItem("Mail-Token");
             if (!token) { window.location.href = "login"; return; } 
 
-            const payload = { username, password, action: acao, ...extra };
+            const payload = { action: acao, ...extra };
 
             try {
                 const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify(payload), });
