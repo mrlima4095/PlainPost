@@ -223,7 +223,7 @@ def mail():
         mailcursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (price, username))
         mailserver.commit()
 
-        return jsonify({"response": "You buy this role!"}), 200
+        return jsonify({"response": "Role claimed!"}), 200
     elif payload['action'] == "listroles":
         mailcursor.execute("SELECT role, price FROM roles")
         roles = [f"{row['role']}:{row['price']}" for row in mailcursor.fetchall()]
