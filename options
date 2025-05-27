@@ -26,9 +26,7 @@
 
         async function comprarTag() {
             const roles = await conectar("listroles");
-            if (!roles || roles === "No roles") {
-                return Swal.fire('Erro', 'Nenhuma TAG disponível.', 'error');
-            }
+            if (!roles || roles === "No roles") { return Swal.fire('Erro', 'Nenhuma TAG disponível.', 'error'); }
 
             const opcoes = roles.split("|").map(r => {
                 const [tag, preco] = r.split(":");
