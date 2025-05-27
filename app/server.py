@@ -104,7 +104,7 @@ def signup():
 
     return jsonify({"response": token}), 200
 # | (End of Token usage)
-@app.route('/api/logout', methods=['GET'])
+@app.route('/api/logout', methods=['POST'])
 def logout():
     mailserver, mailcursor = getdb()
 
