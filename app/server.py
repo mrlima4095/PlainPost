@@ -219,7 +219,7 @@ def mail():
         user_row = mailcursor.fetchone()
         if user_row["coins"] < price: return jsonify({"response": "No enough money!"}), 401
 
-        mailcursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (username, request['role']))
+        mailcursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (username, payload['role']))
         mailcursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (price, username))
         mailserver.commit()
 
