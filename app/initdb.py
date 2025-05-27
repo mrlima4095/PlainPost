@@ -56,6 +56,4 @@ def PlainPostDB():
     conn.commit()
     conn.close()
 
-
-BinDropDB()
 PlainPostDB()
