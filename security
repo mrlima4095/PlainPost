@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
         window.onload = () => {
-            if (!localStorage.getItem("username") || !localStorage.getItem("password")) { window.location.href = "login"; return; }
+            if (!localStorage.getItem("Mail-Token")) { window.location.href = "login"; return; }
 
             document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; });
 
