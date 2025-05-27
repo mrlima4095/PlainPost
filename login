@@ -13,22 +13,22 @@
     <script type="text/javascript">
 
         async function autenticar(api) {
-            const email = document.getElementById("email").value.trim();
-            const senha = document.getElementById("senha").value.trim();
+            const username = document.getElementById("email").value.trim();
+            const password = document.getElementById("senha").value.trim();
 
-            if (!email || !senha) { Swal.fire("Campos obrigatórios", "Preencha todos os campos.", "warning"); return; }
+            if (!username || !password) { Swal.fire("Campos obrigatórios", "Preencha todos os campos.", "warning"); return; }
 
             try {
-                const resposta = await fetch("https://servidordomal.fun/api/" + api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: email, password: senha }) });
+                const resposta = await fetch("https://servidordomal.fun/api/" + api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) });
 
-                if (resposta.status === 200) { 
+                if (resposta.status == 200 || resposta.status == 201) { 
                     const raw = await resposta.json();
 
                     localStorage.setItem("Mail-Token", raw.response); 
                     window.location.href = "/mail"; 
                 }
-                else if (resposta.status === 401) { Swal.fire("Erro", "Usuário ou senha incorretos!"); }
-                else if (resposta.status === 409) { Swal.fire("Erro", "Este nome de usuário já esta em uso!"); }
+                else if (resposta.status == 401) { Swal.fire("Erro", "Usuário ou senha incorretos!"); }
+                else if (resposta.status == 409) { Swal.fire("Erro", "Este nome de usuário já esta em uso!"); }
             } catch (erro) { Swal.fire("Erro", "Erro na conexão com o servidor.", "error"); }
         }
 
