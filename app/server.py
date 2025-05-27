@@ -115,9 +115,9 @@ def logout():
     mailcursor.execute("DELETE FROM tokens WHERE token = ?", (token,))
     mailserver.commit()
 
-    if mailcursor.rowcount == 0: return jsonify({'error': 'Token inválido ou já expirado.'}), 404
+    if mailcursor.rowcount == 0: return jsonify({"response": "invalid token"}), 404
 
-    return jsonify({'response': 'Sessão encerrada com sucesso.'}), 200
+    return jsonify({"response": token}), 200
 
 # |
 # Social API
@@ -229,7 +229,7 @@ def mail():
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
         
-        return jsonify({"response": row['coins']}), 200
+        return jsonify({"response": f"{row['coins']}"}), 200
     elif payload['action'] == "signoff": 
         mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         mailcursor.execute("DELETE FROM users WHERE username = ?", (username,))
