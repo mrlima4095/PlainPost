@@ -109,7 +109,7 @@
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "coins" }), });
                     const dados = await resposta.json();
 
-                    if (resposta.status === 200) { Swal.fire('Suas moedas', dados.response, 'info') }
+                    if (resposta.status === 200) { Swal.fire('Suas moedas', dados.response, 'info'); }
                     else { Swal.fire('Erro', 'Erro ao consultar.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
 
