@@ -31,10 +31,12 @@ def getdb():
     return conn, cursor
 
 def gen_token():
+    mailserver, mailcursor = getdb()
+    
     while True:
         token = secrets.token_hex(32)
-        cursor.execute("SELECT 1 FROM tokens WHERE token = ?", (token,))
-        if cursor.fetchone() is None:
+        mailcursor.execute("SELECT 1 FROM tokens WHERE token = ?", (token,))
+        if mailcursor.fetchone() is None:
             return token
 def get_user(token):
     mailserver, mailcursor = getdb()
