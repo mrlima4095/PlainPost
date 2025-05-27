@@ -248,8 +248,7 @@ def drive_upload():
     if not username: return jsonify({ "response": "bad credentials" }), 401
     
     file = request.files.get('file')
-    username = request.form.get('username')
-
+    
     file_id = str(uuid.uuid4())
 
     if not file or not username:
