@@ -49,11 +49,14 @@ def get_user(token):
         return None
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        return payload['username']
-    except ExpiredSignatureError:
-        return None
-    except InvalidTokenError:
-        return None
+
+        mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['username'],))
+        status = mailcursor.fetchone() is not None
+
+        if status: return payload['username']
+        else: return None
+    except ExpiredSignatureError: return None
+    except InvalidTokenError: return None
 
 
 # PlainPost
@@ -208,9 +211,6 @@ def mail():
     elif payload['action'] == "signoff": 
         mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         mailcursor.execute("DELETE FROM users WHERE username = ?", (username,))
-        mailserver.commit()
-        
-        mailcursor.execute("DELETE FROM tokens WHERE token = ?", (request.headers.get("Authorization"),))
         mailserver.commit()
 
         return jsonify({"response": "Account deleted!"}), 200
