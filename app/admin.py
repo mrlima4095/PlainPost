@@ -19,6 +19,7 @@ class AdminPanel:
         try:
             if args[1] == "register": panel.register(args[2], args[3])
             elif args[1] == "unregister": panel.unregister(args[2])
+            elif args[1] == "tokens": panel.list_tokens()
             elif args[1] == "logout": panel.revoke_tokens(args[2])
             elif args[1] == "password": panel.changepass(args[2], args[3])
             elif args[1] == "role": panel.changerole(args[2], args[3])
@@ -84,6 +85,18 @@ class AdminPanel:
         self.cursor.execute("DELETE FROM user_roles WHERE username = ? AND role = ?", (username, role))
         self.db.commit()
         print(f"[-] Role '{role}' removed from '{username}'.")
+
+    def list_tokens(self):
+        self.cursor.execute("SELECT token, username, created_at FROM tokens ORDER BY created_at DESC")
+        tokens = self.cursor.fetchall()
+
+        if not tokens:
+            print("[~] No active sessions found.")
+            return
+
+        print("[=] Active Sessions:")
+        for row in tokens:
+            print(f"[+] User: {row['username']} | Token: {row['token']} | Created At: {row['created_at']}")
 
     def revoke_tokens(self, username):
         self.cursor.execute("DELETE FROM tokens WHERE username = ?", (username,))
