@@ -11,26 +11,17 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
-        async function status() {
-            try { 
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "status" }), });
-
-                if (resposta.status === 401) { window.location.href = "login"; }
-            } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
-        }
-
         window.onload = () => {
             const token = localStorage.getItem("Mail-Token");
             if (!token) { window.location.href = "login"; return; }
 
-            status();
-            
             document.getElementById("read").addEventListener("click", async () => {
                 try { 
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "read" }), }); 
                     const dados = await resposta.json(); 
 
-                    if (resposta.status === 200) { Swal.fire({ icon: "info", title: "Mensagens", html: dados.response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), }); } 
+                    if (resposta.status == 200) { Swal.fire({ icon: "info", title: "Mensagens", html: dados.response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), }); } 
+                    else if (resposta.status == 404) { window.location.href = "login"; }
                     else { Swal.fire('Erro', 'Erro ao ler mensagens.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
             });  
@@ -45,8 +36,8 @@
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "send", to: target, content }), });
                     const dados = await resposta.json();
 
-                    if (resposta.status === 200) Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
-                    else if (resposta.status === 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
+                    if (resposta.status == 200) Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
+                    else if (resposta.status == 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
                     else { Swal.fire('Erro', 'Erro ao enviar mensagem.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
             });
@@ -57,29 +48,28 @@
                 try { 
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": localStorage.getItem("Mail-Token") }, body: JSON.stringify({ action: "clear" }), }); 
                     
-                    if (resposta.status === 200) { Swal.fire('Sucesso', 'Suas mensagens foram apagadas!', 'success'); }
+                    if (resposta.status == 200) { Swal.fire('Sucesso', 'Suas mensagens foram apagadas!', 'success'); }
                     else { Swal.fire('Erro', 'Erro ao limpar mensagens.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
             });
             document.getElementById("transfer").addEventListener("click", async () => {
                 const { value: target } = await Swal.fire({ title: 'Destinatário:', input: 'text', inputPlaceholder: 'Nome do destinatário', showCancelButton: true, });
-                if (!target) return Swal.fire('Erro', 'Destinatário não pode estar vazio!', 'error');
+                if (!target) return { Swal.fire('Erro', 'Destinatário não pode estar vazio!', 'error'); }
 
                 const { value: amount } = await Swal.fire({ title: 'Quantidade:', input: 'number', inputPlaceholder: 'Quantas moedas?', showCancelButton: true, });
-                if (!amount) return Swal.fire('Erro', 'Você precisa informar a quantidade!', 'error');
+                if (!amount) return { Swal.fire('Erro', 'Você precisa informar a quantidade!', 'error'); }
 
                 const confirm = await Swal.fire({ title: 'Confirmar transferência', text: `Tem certeza que deseja enviar ${amount} moedas para ${target}?`, icon: 'question', showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Cancelar' });
-
                 if (!confirm.isConfirmed) return Swal.fire('Cancelado', 'Transferência cancelada.', 'info');
 
 
                 try {
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "transfer", to: target, amount }), });
 
-                    if (resposta.status === 200) Swal.fire('Sucesso', 'Moedas enviadas!', 'success');
-                    else if (resposta.status === 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
-                    else if (resposta.response === 406) Swal.fire('Erro', 'A quantia de moedas a ser enviada é inválida!', 'error');
-                    else if (resposta.status === 401) Swal.fire('Erro', 'Saldo insuficiente!', 'error');
+                    if (resposta.status == 200) Swal.fire('Sucesso', 'Moedas enviadas!', 'success');
+                    else if (resposta.status == 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
+                    else if (resposta.response == 406) Swal.fire('Erro', 'A quantia de moedas a ser enviada é inválida!', 'error');
+                    else if (resposta.status == 401) Swal.fire('Erro', 'Saldo insuficiente!', 'error');
                     else { Swal.fire('Erro', 'Erro ao transferir.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
             });
@@ -91,8 +81,8 @@
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "search", user }), });
                     const dados = await resposta.json();
 
-                    if (resposta.status === 200) { Swal.fire('Resultado', dados.response, 'info'); }
-                    else if (resposta.status === 404) { Swal.fire('Erro', 'O usuário não foi encontrado!', 'error'); }
+                    if (resposta.status == 200) { Swal.fire('Resultado', dados.response, 'info'); }
+                    else if (resposta.status == 404) { Swal.fire('Erro', 'O usuário não foi encontrado!', 'error'); }
                     else { Swal.fire('Erro', 'Erro ao procurar.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
             });
@@ -102,20 +92,20 @@
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "me" }), });
                     const dados = await resposta.json();
 
-                    if (resposta.status === 200) { Swal.fire('Seus dados', dados.response, 'info'); }
+                    if (resposta.status == 200) { Swal.fire('Seus dados', dados.response, 'info'); }
+                    else if (resposta.status == 404) { window.location.href = "login"; }
                     else { Swal.fire('Erro', 'Erro ao consultar.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
-
             });
             document.getElementById("coins").addEventListener("click", async () => {
                 try {
                     const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "coins" }), });
                     const dados = await resposta.json();
 
-                    if (resposta.status === 200) { Swal.fire('Suas moedas', dados.response, 'info'); }
+                    if (resposta.status == 200) { Swal.fire('Suas moedas', dados.response, 'info'); }
+                    else if (resposta.status == 404) { window.location.href = "login"; }
                     else { Swal.fire('Erro', 'Erro ao consultar.', 'error'); }
                 } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
-
             });
             document.getElementById("drive").addEventListener("click", () => { window.location.href = "/drive"; });
             document.getElementById("options").addEventListener("click", () => { window.location.href = "options"; });
