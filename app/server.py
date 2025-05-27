@@ -72,18 +72,7 @@ def login():
     mailcursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
     user = mailcursor.fetchone()
 
-    if user:
-        token = gen_token()
-        now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
-
-        mailcursor.execute("""
-            INSERT INTO tokens (token, username, created_at)
-            VALUES (?, ?, ?)
-        """, (token, username, now.isoformat()))
-
-        mailserver.commit()
-
-        return jsonify({"response": token}), 200
+    if user: return jsonify({"response": gen_token(username)}), 200
     else: return jsonify({"response": "bad credentials"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
@@ -99,17 +88,7 @@ def signup():
     mailcursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (payload['username'], payload['password']))
     mailserver.commit()
 
-    token = gen_token()
-    now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
-
-    mailcursor.execute("""
-        INSERT INTO tokens (token, username, created_at)
-        VALUES (?, ?, ?)
-    """, (token, payload['username'], now.isoformat()))
-
-    mailserver.commit()
-
-    return jsonify({"response": token}), 200
+    return jsonify({"response": gen_token(username)}), 200
 # |
 # Social API
 @app.route('/api/mail', methods=['POST'])
