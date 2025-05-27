@@ -1,23 +1,6 @@
 import os
 import sqlite3
 
-def BinDropDB():
-    conn = sqlite3.connect('drive.db')
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS files (
-            id TEXT PRIMARY KEY,
-            owner TEXT NOT NULL,
-            original_name TEXT NOT NULL,
-            saved_name TEXT NOT NULL,
-            size INTEGER NOT NULL,
-            upload_time TEXT NOT NULL,
-            expire_time TEXT
-        )
-    """)
-    conn.commit()
-    conn.close()
-
 def PlainPostDB():
     conn = sqlite3.connect('mailserver.db')
     cur = conn.cursor()
@@ -59,13 +42,15 @@ def PlainPostDB():
     """)
 
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS tokens (
-            token TEXT PRIMARY KEY,
-            username TEXT NOT NULL,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(username) REFERENCES users(username)
+        CREATE TABLE IF NOT EXISTS files (
+            id TEXT PRIMARY KEY,
+            owner TEXT NOT NULL,
+            original_name TEXT NOT NULL,
+            saved_name TEXT NOT NULL,
+            size INTEGER NOT NULL,
+            upload_time TEXT NOT NULL,
+            expire_time TEXT
         )
-
     """)
 
     conn.commit()
