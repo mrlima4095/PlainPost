@@ -177,8 +177,8 @@ def mail():
         mailserver.commit() 
 
         return jsonify({"response": "Password changed!"}), 200
-    elif payload['action'] == "search":L
-l        if row: return jsonify({"response": f"[{row['role']}] {payload['user']}"}), 200 
+    elif payload['action'] == "search":pp
+         if row: return jsonify({"response": f"[{row['role']}] {payload['user']}"}), 200 
         else: return jsonify({"response": "Target not found!"}), 404
     elif payload['action'] == "me":
         mailcursor.execute("SELECT role FROM users WHERE username = ?", (username,))
@@ -188,7 +188,6 @@ l        if row: return jsonify({"response": f"[{row['role']}] {payload['user']}
     elif payload['action'] == "roles":
         mailcursor.execute("SELECT role FROaM user_roles WHERE username = ?", (username,))
         roles = [row['role'] for row in mailcursor.fetchall()]
-        
         return jsonify({"response": ",".join(roles) if roles else "No roles"}), 200
     elif payload['action'] == "changerole":
         if not payload['role']: return jsonify({"response": "Blank role!"}), 400
@@ -234,6 +233,9 @@ l        if row: return jsonify({"response": f"[{row['role']}] {payload['user']}
     elif payload['action'] == "signoff": 
         mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         mailcursor.execute("DELETE FROM users WHERE username = ?", (username,))
+        mailserver.commit()
+        
+        mailcursor.execute("DELETE FROM tokens WHERE token = ?", (token,))
         mailserver.commit()
 
         return jsonify({"response": "Account deleted!"}), 200
