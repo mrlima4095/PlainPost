@@ -18,10 +18,8 @@
 
             if (!email || !senha) { Swal.fire("Campos obrigatórios", "Preencha todos os campos.", "warning"); return; }
 
-            const payload = { username: email, password: senha };
-
             try {
-                const resposta = await fetch("https://servidordomal.fun/api/" + api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                const resposta = await fetch("https://servidordomal.fun/api/" + api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: email, password: senha }) });
 
                 if (resposta.status === 200) { 
                     const raw = await resposta.json();
