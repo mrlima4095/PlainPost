@@ -14,14 +14,12 @@
             const token = localStorage.getItem("Mail-Token");
             if (!token) { window.location.href = "login"; return; } 
 
-            const payload = { action: acao, ...extra };
-
             try {
-                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify(payload), });
+                const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: acao, ...extra }), });
                 const dados = await resposta.json();
 
                 return dados.response;
-            } catch { return "9"; }
+            } catch { return; }
         }
 
         window.onload = () => {
