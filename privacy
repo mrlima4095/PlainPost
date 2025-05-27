@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,7 +17,16 @@
     <div id="conteiner">
         <h2>Política de Privacidade</h2><br>
 
-        <p>EM DESENVOLVIMENTO</p>
+        <p>Ao criar sua conta você concorda com nossos termos de serviço e nossa política de privacidade, declarando que esta ciente de que:</p>
+        <p>1. Seus dados não são criptografados durante a comunicação com nossos servidores;</p>
+        <p>2. Não compartilhe dados sensíveis por meio de mensagens;</p>
+        <p>3. Não é possível apagar uma mensagem após envia-la;</p>
+        <p>4. Não </p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
         <p></p>
         <p></p>
         <button id="back" type="submit">Retornar</button>
