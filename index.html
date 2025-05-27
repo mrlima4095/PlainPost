@@ -52,10 +52,8 @@
                 const { value: content } = await Swal.fire({ title: 'Mensagem:', input: 'text', inputPlaceholder: 'Escreva sua mensagem', showCancelButton: true, });
                 if (!content) return Swal.fire('Erro', 'Você não pode mandar uma mensagem vazia!', 'error');
 
-                const payload = { action: "send", to: target, content };
-
                 try {
-                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify(payload), });
+                    const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "send", to: target, content }), });
                     const dados = await resposta.json();
 
                     if (resposta.status === 200) Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
