@@ -29,8 +29,8 @@
                     localStorage.setItem("Mail-Token", raw.response); 
                     window.location.href = "/mail"; 
                 }
-                else if (resposta.status === 401) { Swal.fire("Erro", "Usuário ou senha incorretos!");
-                }
+                else if (resposta.status === 401) { Swal.fire("Erro", "Usuário ou senha incorretos!"); }
+                else if (resposta.status === 409) { Swal.fire("Erro", "Este nome de usuário já esta em uso!"); }
             } catch (erro) { Swal.fire("Erro", "Erro na conexão com o servidor.", "error"); }
         }
 
