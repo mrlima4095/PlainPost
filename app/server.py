@@ -101,6 +101,22 @@ def signup():
     mailserver.commit()
 
     return jsonify({"response": token}), 200
+# | (End of Token usage)
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    mailserver, mailcursor = getdb()
+
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'error': 'invalid token'}), 401
+
+    mailcursor.execute("DELETE FROM tokens WHERE token = ?", (token,))
+    mailserver.commit()
+
+    if mailcursor.rowcount == 0: return jsonify({'error': 'Token inválido ou já expirado.'}), 404
+
+    return jsonify({'response': 'Sessão encerrada com sucesso.'}), 200
+
 # |
 # Social API
 @app.route('/api/mail', methods=['POST'])
