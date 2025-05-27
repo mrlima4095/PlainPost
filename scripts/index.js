@@ -17,15 +17,11 @@ window.onload = () => {
     };
 
     const buttons = {
-        read: async () => {
-            const { status, response } = await fetchRequest("read");
-            if (status === 200) {
-                Swal.fire({ icon: "info", title: "Mensagens", html: response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>") });
-            } else if (status === 404) {
-                window.location.href = "login";
-            } else {
-                Swal.fire('Erro', 'Erro ao ler mensagens.', 'error');
-            }
+        read: async () => { 
+            const { status, response } = await fetchRequest("read"); 
+            if (status === 200) Swal.fire({ icon: "info", title: "Mensagens", html: response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>") });
+            else if (status === 404) window.location.href = "login";
+            else Swal.fire('Erro', 'Erro ao ler mensagens.', 'error'); 
         },
         send: async () => {
             const { value: target } = await Swal.fire({ title: 'Destinatário:', input: 'text', inputPlaceholder: 'Nome do usuário', showCancelButton: true });
@@ -33,6 +29,9 @@ window.onload = () => {
 
             const { value: content } = await Swal.fire({ title: 'Mensagem:', input: 'text', inputPlaceholder: 'Escreva sua mensagem', showCancelButton: true });
             if (!content) return Swal.fire('Erro', 'Você não pode mandar uma mensagem vazia!', 'error');
+
+            const confirm = await Swal.fire({ title: 'Enviar mensagem', text: `Destinatário: ${target}<br><br>Conteudo: ${content}`, icon: 'question', showCancelButton: true, confirmButtonText: 'Enviar', cancelButtonText: 'Cancelar' });
+            if (!confirm.isConfirmed) return Swal.fire('Cancelado', 'Envio cancelado.', 'info');
 
             const { status } = await fetchRequest("send", { to: target, content });
             if (status === 200) Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
