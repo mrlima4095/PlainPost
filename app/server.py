@@ -127,7 +127,7 @@ def mail():
     if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
 
     username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "bad credentials" }), 401
+    if not username: return jsonify({ "response": "Bad credentials!" }), 401
     payload = request.get_json()
 
     if payload['action'] == "send":
@@ -155,7 +155,7 @@ def mail():
         try:
             amount = int(payload['amount'])
             if amount <= 0: return jsonify({"response": "Invalid amount!"}), 406
-        except ValueError: return jsonify({"response": "Invalid amount"}), 406
+        except ValueError: return jsonify({"response": "Invalid amount!"}), 406
 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (payload['to'],))
         recipient_row = mailcursor.fetchone()
@@ -187,7 +187,8 @@ def mail():
         mailcursor.execute("SELECT role FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
         
-        return jsonify({"response": f"[{row['role']}] {username}"}), 200 
+        if row: return jsonify({"response": f"[{row['role']}] {username}"}), 200 
+        else: return jsonify({"response": "Invalid token!"}), 404
     elif payload['action'] == "roles":
         mailcursor.execute("SELECT role FROM user_roles WHERE username = ?", (username,))
         roles = [row['role'] for row in mailcursor.fetchall()]
