@@ -63,7 +63,7 @@ class AdminPanel:
     def list_users(self):
         self.cursor.execute("SELECT username, biography, coins FROM users")
         for row in self.cursor.fetchall():
-            print(f" {row['username']} (Coins: {row['coins']}) - {row['biography']}")
+            print(f"[+] {row['username']} (Coins: {row['coins']}) - {row['biography']}")
 
     # Mails
     def send(self, target, content):
