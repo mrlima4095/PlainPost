@@ -2,7 +2,13 @@ import os
 import sqlite3
 
 def PlainPostDB():
-    conn = sqlite3.connect('mailserver.db')
+    conn = psycopg2.connect(
+        dbname=json.load(open("jwt.properties", "r"))['NAME'],,
+        user=json.load(open("jwt.properties", "r"))['DB_USER'],,
+        password=json.load(open("jwt.properties", "r"))['BD_PASSWORD'],
+        host=json.load(open("jwt.properties", "r"))['BD_HOST'], 
+        port=json.load(open("jwt.properties", "r"))['BD_PORT'],
+    )
     cur = conn.cursor()
 
     cur.execute("""
