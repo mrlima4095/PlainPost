@@ -36,6 +36,8 @@ def getdb():
     cursor = conn.cursor()
     return conn, cursor
 
+# JWT Tokens
+# |
 def gen_token(username):
     payload = {
         'username': username,
@@ -215,7 +217,10 @@ def mail():
         return jsonify({"response": "Account deleted!"}), 200
     elif payload['action'] == "status": return jsonify({"response": "OK"}), 200
     else: return jsonify({"response": "Method not allowed!"}), 405
+# |
 
+# BinDrop
+# 
 @app.route('/api/drive/upload', methods=['POST'])
 def drive_upload():
     username = get_user(request.headers.get("Authorization"))
