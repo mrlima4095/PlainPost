@@ -23,11 +23,7 @@
         <p>3. Não é possível apagar uma mensagem após envia-la;</p>
         <p>4. Não de deve carregar conteúdo improprio para o BinDrop, podemos acessar todos os arquivos carregados;</p>
         <p>5. Não fornecemos nenhum dado dos usuários para terceiros;</p>
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
+
         <p></p>
         <button id="back" type="submit">Retornar</button>
     <div>
