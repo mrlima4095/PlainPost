@@ -1,18 +1,22 @@
-import os
 import json
-import sqlite3
 import psycopg2
 
 def PlainPostDB():
+    config = json.load(open("jwt.properties", "r"))
+
     conn = psycopg2.connect(
-        dbname=json.load(open("jwt.properties", "r"))['DB_NAME'],
-        user=json.load(open("jwt.properties", "r"))['DB_USER'],
-        password=json.load(open("jwt.properties", "r"))['DB_PASSWORD'],
-        host=json.load(open("jwt.properties", "r"))['DB_HOST'], 
-        port=json.load(open("jwt.properties", "r"))['DB_PORT'],
+        dbname=config['DB_NAME'],
+        user=config['DB_USER'],
+        password=config['DB_PASSWORD'],
+        host=config['DB_HOST'], 
+        port=config['DB_PORT'],
     )
     cur = conn.cursor()
+    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INTEGER DEFAULT 0")
+    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user'")
+    
 
+    # users
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             username TEXT PRIMARY KEY,
@@ -21,9 +25,8 @@ def PlainPostDB():
             role TEXT DEFAULT 'user'
         )
     """)
-    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INTEGER DEFAULT 0")
-    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user'")
-    
+
+    # user_roles
     cur.execute("""
         CREATE TABLE IF NOT EXISTS user_roles (
             username TEXT,
@@ -33,6 +36,7 @@ def PlainPostDB():
         )
     """)
 
+    # roles
     cur.execute("""
         CREATE TABLE IF NOT EXISTS roles (
             role TEXT PRIMARY KEY,
@@ -40,9 +44,10 @@ def PlainPostDB():
         )
     """)
 
+    # mails
     cur.execute("""
         CREATE TABLE IF NOT EXISTS mails (
-            id INTEGER PRIMARY KEY SERIAL,
+            id SERIAL PRIMARY KEY,
             recipient TEXT,
             sender TEXT,
             content TEXT,
@@ -51,6 +56,7 @@ def PlainPostDB():
         )
     """)
 
+    # files
     cur.execute("""
         CREATE TABLE IF NOT EXISTS files (
             id TEXT PRIMARY KEY,
