@@ -43,7 +43,7 @@ class AdminPanel:
 
     # User payloads
     def register(self, username, password):
-        self.cursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (username, password))
+        self.cursor.execute("INSERT INTO users (username, password, coins, biography) VALUES (?, ?, 0, 'user')", (username, password))
         self.db.commit()
         print(f"[+] User '{username}' created.")
     def unregister(self, username):
@@ -112,33 +112,6 @@ class AdminPanel:
         self.cursor.execute("DELETE FROM mails")
         self.db.commit()
         print("[~] All emails cleared from database.")
-
-    # Shop
-    def add_buyable_role(self, role, price):
-        self.cursor.execute("SELECT 1 FROM roles WHERE role = ?", (role,))
-        if self.cursor.fetchone():
-            print("[~] This role is already in the store.")
-            return
-
-        self.cursor.execute("INSERT INTO roles (role, price) VALUES (?, ?)", (role, price))
-        self.db.commit()
-        print(f"[+] Role '{role}' is now available for {price} coins.")
-    def remove_buyable_role(self, role):
-        self.cursor.execute("DELETE FROM roles WHERE role = ?", (role,))
-        self.db.commit()
-        print(f"[-] Role '{role}' removed from the store.")
-    def list_buyable_roles(self):
-        self.cursor.execute("SELECT * FROM roles")
-        roles = self.cursor.fetchall()
-
-        if not roles:
-            print("[~] No roles available for purchase.")
-            return
-
-        print("[=] Roles available for purchase:")
-        for row in roles:
-            print(f"[+] {row['role']} - {row['price']} coins")
-
     
     # Coins
     def give_coins(self, username, amount):
