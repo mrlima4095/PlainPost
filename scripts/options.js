@@ -13,8 +13,6 @@ window.onload = () => {
     document.getElementById("changebio").addEventListener("click", async () => {
         const { value: content } = await Swal.fire({ title: 'Biografia:', input: 'text', inputPlaceholder: 'O que esta pensando?', showCancelButton: true });
         if (!content) return Swal.fire('Erro', 'Sua biografia não pode estar vazia!', 'error');
-
-        const { status } = await conectar("changebio", { bio: content });
         
         try {
             const resposta = await fetch("https://servidordomal.fun/api/mail", {
