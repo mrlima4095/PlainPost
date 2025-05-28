@@ -9,11 +9,8 @@ async function conectar(acao, extra = {}) {
             body: JSON.stringify({ action: acao, ...extra }),
         });
 
-        const dados = await resposta.json();
-        return dados.response;
-    } catch {
-        return;
-    }
+        return resposta.status;
+    } catch { return; }
 }
 
 window.onload = () => {
