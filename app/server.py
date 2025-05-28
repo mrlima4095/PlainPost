@@ -155,55 +155,20 @@ def mail():
         mailcursor.execute("SELECT role FROM users WHERE username = ?", (payload['user'],))
         row = mailcursor.fetchone()
 
-        if row: return jsonify({"response": f"[{row['role']}] {payload['user']}"}), 200 
-        else: return jsonify({"response": "Target not found!"}), 404
+        if row: return jsonify({"response": f"ID: {payload['user']}\nBio: {row['biography']}"}), 200 
+        else: return 404
     elif payload['action'] == "me":
         mailcursor.execute("SELECT role FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
         
-        if row: return jsonify({"response": f"[{row['role']}] {username}"}), 200 
-        else: return jsonify({"response": "Invalid token!"}), 404
-    elif payload['action'] == "roles":
-        mailcursor.execute("SELECT role FROM user_roles WHERE username = ?", (username,))
-        roles = [row['role'] for row in mailcursor.fetchall()]
-        
-        return jsonify({"response": ",".join(roles) if roles else "No roles"}), 200
-    elif payload['action'] == "changerole":
-        if not payload['role']: return jsonify({"response": "Blank role!"}), 400
+        return jsonify({"response": f"ID: {username}\nBio: {row['biography']}"}), 200
+    elif payload['action'] == "changebio":
+        if not payload['bio']: return 400
 
-        mailcursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (username, payload['role']))
-        if mailcursor.fetchone() is None: return jsonify({"response": "Role not found!"}), 404
-
-        mailcursor.execute("UPDATE users SET role = ? WHERE username = ?", (payload['role'], username))
+        mailcursor.execute("UPDATE users SET biography = ? WHERE username = ?", (payload['bio'], username))
         mailserver.commit()
 
-        return jsonify({"response": "Changed role!"}), 200
-    elif payload['action'] == "buyrole":
-        if not payload['role']: return jsonify({"response": "Blank role!"}), 400
-
-        mailcursor.execute("SELECT price FROM roles WHERE role = ?", (payload['role'],))
-        role_row = mailcursor.fetchone()
-        if role_row is None: return jsonify({"response": "Role not found!"}), 404
-
-        price = role_row['price']
-
-        mailcursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (username, payload['role']))
-        if mailcursor.fetchone(): return jsonify({"response": "Role already bought!"}), 406
-
-        mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
-        user_row = mailcursor.fetchone()
-        if user_row["coins"] < price: return jsonify({"response": "No enough money!"}), 401
-
-        mailcursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (username, payload['role']))
-        mailcursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (price, username))
-        mailserver.commit()
-
-        return jsonify({"response": "Role claimed!"}), 200
-    elif payload['action'] == "listroles":
-        mailcursor.execute("SELECT role, price FROM roles")
-        roles = [f"{row['role']}:{row['price']}" for row in mailcursor.fetchall()]
-        
-        return jsonify({"response": "|".join(roles) if roles else "No roles"}), 200
+        return 200
     elif payload['action'] == "coins": 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
@@ -215,8 +180,8 @@ def mail():
         mailserver.commit()
 
         return jsonify({"response": "Account deleted!"}), 200
-    elif payload['action'] == "status": return jsonify({"response": "OK"}), 200
-    else: return jsonify({"response": "Method not allowed!"}), 405
+    elif payload['action'] == "status": return 200
+    else: return 405
 # |
 
 # BinDrop
