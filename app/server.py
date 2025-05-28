@@ -34,7 +34,7 @@ def getdb():
     conn = psycopg2.connect(
         dbname=json.load(open("jwt.properties", "r"))['DB_NAME'],
         user=json.load(open("jwt.properties", "r"))['DB_USER'],
-        password=json.load(open("jwt.properties", "r"))['BD_PASSWORD'],
+        password=json.load(open("jwt.properties", "r"))['DB_PASSWORD'],
         host=json.load(open("jwt.properties", "r"))['DB_HOST'], 
         port=json.load(open("jwt.properties", "r"))['DB_PORT'],
     )
