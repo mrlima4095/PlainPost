@@ -19,8 +19,8 @@ window.onload = () => {
     const buttons = {
         read: async () => { 
             const { status, response } = await fetchRequest("read"); 
-            if (status === 200) Swal.fire({ icon: "info", title: "Mensagens", html: response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>") });
-            else if (status === 404) window.location.href = "login";
+            if (status == 200) Swal.fire({ icon: "info", title: "Mensagens", html: response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>") });
+            else if (status == 404) window.location.href = "login";
             else Swal.fire('Erro', 'Erro ao ler mensagens.', 'error'); 
         },
         send: async () => {
@@ -34,8 +34,8 @@ window.onload = () => {
             if (!confirm.isConfirmed) return Swal.fire('Cancelado', 'Envio cancelado.', 'info');
 
             const { status } = await fetchRequest("send", { to: target, content });
-            if (status === 200) Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
-            else if (status === 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
+            if (status == 200) Swal.fire('Sucesso', 'Sua mensagem foi enviada!', 'success');
+            else if (status == 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
             else Swal.fire('Erro', 'Erro ao enviar mensagem.', 'error');
         },
         clear: async () => {
@@ -43,7 +43,7 @@ window.onload = () => {
             if (!confirm.isConfirmed) return;
 
             const { status } = await fetchRequest("clear");
-            if (status === 200) Swal.fire('Sucesso', 'Suas mensagens foram apagadas!', 'success');
+            if (status == 200) Swal.fire('Sucesso', 'Suas mensagens foram apagadas!', 'success');
             else Swal.fire('Erro', 'Erro ao limpar mensagens.', 'error');
         },
         transfer: async () => {
@@ -57,10 +57,10 @@ window.onload = () => {
             if (!confirm.isConfirmed) return Swal.fire('Cancelado', 'Transferência cancelada.', 'info');
 
             const { status } = await fetchRequest("transfer", { to: target, amount });
-            if (status === 200) Swal.fire('Sucesso', 'Moedas enviadas!', 'success');
-            else if (status === 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
-            else if (status === 406) Swal.fire('Erro', 'A quantia de moedas a ser enviada é inválida!', 'error');
-            else if (status === 401) Swal.fire('Erro', 'Saldo insuficiente!', 'error');
+            if (status == 200) Swal.fire('Sucesso', 'Moedas enviadas!', 'success');
+            else if (status == 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
+            else if (status == 406) Swal.fire('Erro', 'A quantia de moedas a ser enviada é inválida!', 'error');
+            else if (status == 401) Swal.fire('Erro', 'Saldo insuficiente!', 'error');
             else Swal.fire('Erro', 'Erro ao transferir.', 'error');
         },
         search: async () => {
@@ -68,20 +68,20 @@ window.onload = () => {
             if (!user) return Swal.fire('Erro', 'Insira um nome de usuario!', 'error');
 
             const { status, response } = await fetchRequest("search", { user });
-            if (status === 200) Swal.fire('Resultado', response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), 'info');
-            else if (status === 404) Swal.fire('Erro', 'O usuário não foi encontrado!', 'error');
+            if (status == 200) Swal.fire('Resultado', response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), 'info');
+            else if (status == 404) Swal.fire('Erro', 'O usuário não foi encontrado!', 'error');
             else Swal.fire('Erro', 'Erro ao procurar.', 'error');
         },
         me: async () => {
             const { status, response } = await fetchRequest("me");
-            if (status === 200) Swal.fire('Seus dados', response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), 'info');
-            else if (status === 404) window.location.href = "login";
+            if (status == 200) Swal.fire('Seus dados', response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), 'info');
+            else if (status == 404) window.location.href = "login";
             else Swal.fire('Erro', 'Erro ao consultar.', 'error');
         },
         coins: async () => {
             const { status, response } = await fetchRequest("coins");
-            if (status === 200) Swal.fire('Suas moedas', response, 'info');
-            else if (status === 404) window.location.href = "login";
+            if (status == 200) Swal.fire('Suas moedas', response, 'info');
+            else if (status == 404) window.location.href = "login";
             else Swal.fire('Erro', 'Erro ao consultar.', 'error');
         },
         drive: () => window.location.href = "/drive",
