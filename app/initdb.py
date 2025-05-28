@@ -13,22 +13,6 @@ def PlainPostDB():
             role TEXT DEFAULT 'user'
         )
     """)
-    
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS user_roles (
-            username TEXT,
-            role TEXT,
-            PRIMARY KEY(username, role),
-            FOREIGN KEY(username) REFERENCES users(username)
-        )
-    """)
-
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS roles (
-            role TEXT PRIMARY KEY,
-            price INTEGER NOT NULL
-        )
-    """)
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS mails (
