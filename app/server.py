@@ -1,7 +1,12 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# |
+# Imports
+# | (Flask)
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask import send_file
-
+# | (Others)
 import os
 import jwt
 import time
@@ -16,8 +21,8 @@ from threading import Timer
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
-
-
+# |
+# |
 app = Flask(__name__)
 CORS(app)
 # |
