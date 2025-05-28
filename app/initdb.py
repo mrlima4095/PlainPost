@@ -42,7 +42,7 @@ def PlainPostDB():
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS mails (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY SERIAL,
             recipient TEXT,
             sender TEXT,
             content TEXT,
