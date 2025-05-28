@@ -168,7 +168,7 @@ def mail():
         mailcursor.execute("UPDATE users SET biography = ? WHERE username = ?", (payload['bio'], username))
         mailserver.commit()
 
-        return 200
+        return jsonify({"response": "Bio changed!"}), 200
     elif payload['action'] == "coins": 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
@@ -180,8 +180,8 @@ def mail():
         mailserver.commit()
 
         return jsonify({"response": "Account deleted!"}), 200
-    elif payload['action'] == "status": return 200
-    else: return 405
+    elif payload['action'] == "status": return jsonify({"response": "OK"}), 200
+    else: return jsonify({"response": "Invalid payload!"}), 405
 # |
 
 # BinDrop
