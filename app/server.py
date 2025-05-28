@@ -309,7 +309,6 @@ def drive_delete(file_id):
 
     return jsonify({"success": True}), 200
 
-
 def init_expiration_checker():
     def check_expired_files():
         now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
