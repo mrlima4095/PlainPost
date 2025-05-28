@@ -221,7 +221,7 @@ def mail():
 
 # BinDrop
 # |
-# | (Upload)
+# Upload API
 @app.route('/api/drive/upload', methods=['POST'])
 def drive_upload():
     username = get_user(request.headers.get("Authorization"))
@@ -256,7 +256,7 @@ def drive_upload():
     mailserver.commit()
 
     return jsonify({"success": True}), 200
-# | (Download)
+# Download
 @app.route('/api/drive/download/<file_id>', methods=['GET'])
 def drive_download(file_id):
     mailserver, mailcursor = getdb()
