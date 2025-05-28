@@ -68,13 +68,13 @@ window.onload = () => {
             if (!user) return Swal.fire('Erro', 'Insira um nome de usuario!', 'error');
 
             const { status, response } = await fetchRequest("search", { user });
-            if (status === 200) Swal.fire('Resultado', response, 'info');
+            if (status === 200) Swal.fire('Resultado', response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), 'info');
             else if (status === 404) Swal.fire('Erro', 'O usuário não foi encontrado!', 'error');
             else Swal.fire('Erro', 'Erro ao procurar.', 'error');
         },
         me: async () => {
             const { status, response } = await fetchRequest("me");
-            if (status === 200) Swal.fire('Seus dados', response, 'info');
+            if (status === 200) Swal.fire('Seus dados', response.replaceAll("\\n", "<br>").replaceAll("\n", "<br>"), 'info');
             else if (status === 404) window.location.href = "login";
             else Swal.fire('Erro', 'Erro ao consultar.', 'error');
         },
