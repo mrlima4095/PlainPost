@@ -3,21 +3,16 @@
 #
 
 import sys
-import psycopg2
+import sqlite3
 from datetime import datetime
 
 class AdminPanel:
     def __init__(self):
-        config = json.load(open("jwt.properties", "r"))
-
-        self.db = psycopg2.connect(
-            dbname=config['DB_NAME'],
-            user=config['DB_USER'],
-            password=config['DB_PASSWORD'],
-            host=config['DB_HOST'], 
-            port=config['DB_PORT'],
-        )
+        self.db = sqlite3.connect("mailserver.db")
+        self.db.row_factory = sqlite3.Row 
         self.cursor = self.db.cursor()
+        self.cursor.execute("PRAGMA foreign_keys = ON;")
+
     def run(self, args=sys.argv):
         if len(args) < 2: self.help(); sys.exit(0)
 
