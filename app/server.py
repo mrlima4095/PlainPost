@@ -32,8 +32,8 @@ JWT_EXP_DELTA_SECONDS = 604800
 
 def getdb():
     conn = psycopg2.connect(
-        dbname=json.load(open("jwt.properties", "r"))['NAME'],,
-        user=json.load(open("jwt.properties", "r"))['DB_USER'],,
+        dbname=json.load(open("jwt.properties", "r"))['NAME'],
+        user=json.load(open("jwt.properties", "r"))['DB_USER'],
         password=json.load(open("jwt.properties", "r"))['BD_PASSWORD'],
         host=json.load(open("jwt.properties", "r"))['BD_HOST'], 
         port=json.load(open("jwt.properties", "r"))['BD_PORT'],
