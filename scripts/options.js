@@ -2,15 +2,7 @@ async function conectar(acao, extra = {}) {
     const token = localStorage.getItem("Mail-Token");
     if (!token) { window.location.href = "login"; return; }
 
-    try {
-        const resposta = await fetch("https://servidordomal.fun/api/mail", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": token },
-            body: JSON.stringify({ action: acao, ...extra }),
-        });
-
-        return resposta.status;
-    } catch { return; }
+    
 }
 
 window.onload = () => {
@@ -23,8 +15,17 @@ window.onload = () => {
         if (!content) return Swal.fire('Erro', 'Sua biografia não pode estar vazia!', 'error');
 
         const { status } = await conectar("changebio", { bio: content });
-        if (status === 200) Swal.fire('Sucesso', 'Sua biografia foi alterada!', 'success');
-        else if (status === 404) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
-        else Swal.fire('Erro', 'Erro ao alterar sua biografia.', 'error');
+        
+        try {
+            const resposta = await fetch("https://servidordomal.fun/api/mail", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": token },
+                body: JSON.stringify({ action: "changebio", bio: content }),
+            });
+
+            if (status == 200) Swal.fire('Sucesso', 'Sua biografia foi alterada!', 'success');
+            else if (status == 401) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
+            else Swal.fire('Erro', 'Erro ao alterar sua biografia.', 'error');
+        } catch { Swal.fire('Erro', 'Erro ao procurar.', 'error'); }
     });
 };
