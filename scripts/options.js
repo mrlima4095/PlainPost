@@ -1,10 +1,3 @@
-async function conectar(acao, extra = {}) {
-    const token = localStorage.getItem("Mail-Token");
-    if (!token) { window.location.href = "login"; return; }
-
-    
-}
-
 window.onload = () => {
     const token = localStorage.getItem("Mail-Token");
     if (!token) { window.location.href = "login"; return; }
