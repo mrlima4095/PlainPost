@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask import send_file
-from werkzeug.utils import secure_filename
 
 import os
 import jwt
@@ -15,6 +14,7 @@ import secrets
 import threading, pytz
 from threading import Timer
 from datetime import datetime, timedelta
+from werkzeug.utils import secure_filename
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 
