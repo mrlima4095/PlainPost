@@ -20,7 +20,7 @@ class AdminPanel:
             if args[1] == "register": panel.register(args[2], args[3])
             elif args[1] == "unregister": panel.unregister(args[2])
             elif args[1] == "password": panel.changepass(args[2], args[3])
-            elif args[1] == "bio": panel.bio(args[2], args[3])
+            elif args[1] == "bio": panel.bio(args[2], ' '.join(args[3:]))
             elif args[1] == "list": panel.list_users()
 
             elif args[1] == "send": panel.send(args[2], ' '.join(args[3:]))
@@ -59,10 +59,10 @@ class AdminPanel:
         self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (newpass, username))
         self.db.commit()
         print(f"[+] Password for '{username}' changed.")
-    def changerole(self, username, role):
-        self.cursor.execute("UPDATE users SET role = ? WHERE username = ?", (role, username))
+    def changebio(self, username, bio):
+        self.cursor.execute("UPDATE users SET biography = ? WHERE username = ?", (bio, username))
         self.db.commit()
-        print(f"[+] User '{username}' role changed to '{role}'.")
+        print(f"[+] User '{username}' bio changed to '{bio}'.")
     
     def list_users(self):
         self.cursor.execute("SELECT username, role, coins FROM users")
