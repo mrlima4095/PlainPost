@@ -311,7 +311,9 @@ def drive_delete(file_id):
     mailserver.commit()
 
     return jsonify({"success": True}), 200
-
+# |
+# |
+# Thread - Clear expired files
 def init_expiration_checker():
     def check_expired_files():
         now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
