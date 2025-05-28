@@ -14,8 +14,8 @@ window.onload = () => {
                 body: JSON.stringify({ action: "changebio", bio: content }),
             });
 
-            if (status == 200) Swal.fire('Sucesso', 'Sua biografia foi alterada!', 'success');
-            else if (status == 401) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
+            if (resposta.status == 200) Swal.fire('Sucesso', 'Sua biografia foi alterada!', 'success');
+            else if (resposta.status == 401) Swal.fire('Erro', 'O destinatário não foi encontrado!', 'error');
             else Swal.fire('Erro', 'Erro ao alterar sua biografia.', 'error');
         } catch { Swal.fire('Erro', 'Erro ao procurar.', 'error'); }
     });
