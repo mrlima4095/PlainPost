@@ -256,7 +256,7 @@ def drive_upload():
     mailserver.commit()
 
     return jsonify({"success": True}), 200
-# Download
+# Download API
 @app.route('/api/drive/download/<file_id>', methods=['GET'])
 def drive_download(file_id):
     mailserver, mailcursor = getdb()
