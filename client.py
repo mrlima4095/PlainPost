@@ -32,11 +32,6 @@ class Client:
             except Exception:
                 return "9"
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('31.97.20.160', 10142))
-        s.sendall(payload.encode())
-        return s.recv(4096).decode()
-
     def run(self):
         status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "status"})).strip()
 
