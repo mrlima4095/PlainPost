@@ -20,7 +20,7 @@ class AdminPanel:
             if args[1] == "register": panel.register(args[2], args[3])
             elif args[1] == "unregister": panel.unregister(args[2])
             elif args[1] == "password": panel.changepass(args[2], args[3])
-            elif args[1] == "role": panel.changerole(args[2], args[3])
+            elif args[1] == "bio": panel.bio(args[2], args[3])
             elif args[1] == "list": panel.list_users()
 
             elif args[1] == "send": panel.send(args[2], ' '.join(args[3:]))
@@ -29,8 +29,6 @@ class AdminPanel:
             elif args[1] == "clear": panel.clear(args[2])
             elif args[1] == "clear-all": panel.clear_all()
 
-            elif args[1] == "give-role": panel.give_role(args[2], args[3])
-            elif args[1] == "take-role": panel.take_role(args[2], args[3])
             elif args[1] == "give-coin": panel.give_coins(args[2], int(args[3]))
             elif args[1] == "take-coin": panel.take_coins(args[2], int(args[3]))
 
@@ -44,7 +42,7 @@ class AdminPanel:
         except IndexError as e: print(f"[!] Missed arguments")
         except Exception as e: print(f"[!] Error: {e}")
 
-    def help(self): print("register,unregister,password,give-role,take-role,role,list,send,read,clear,clear-all,notifyall,give-coin,take-coin,add-role,remove-role,list-roles")
+    def help(self): print("register,unregister,password,bio,list,send,read,clear,clear-all,notifyall,give-coin,take-coin")
 
 
     # User payloads
@@ -65,29 +63,11 @@ class AdminPanel:
         self.cursor.execute("UPDATE users SET role = ? WHERE username = ?", (role, username))
         self.db.commit()
         print(f"[+] User '{username}' role changed to '{role}'.")
-    def give_role(self, username, role):
-        self.cursor.execute("SELECT 1 FROM users WHERE username = ?", (username,))
-        if not self.cursor.fetchone():
-            print("[!] User not found.")
-            return
-
-        self.cursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (username, role))
-        if self.cursor.fetchone():
-            print("[~] User already has this role.")
-            return
-
-        self.cursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (username, role))
-        self.db.commit()
-        print(f"[+] Role '{role}' granted to '{username}'.")
-    def take_role(self, username, role):
-        self.cursor.execute("DELETE FROM user_roles WHERE username = ? AND role = ?", (username, role))
-        self.db.commit()
-        print(f"[-] Role '{role}' removed from '{username}'.")
-
+    
     def list_users(self):
         self.cursor.execute("SELECT username, role, coins FROM users")
         for row in self.cursor.fetchall():
-            print(f"[{row['role']}] {row['username']} (Coins: {row['coins']})")
+            print(f" {row['username']} (Coins: {row['coins']}) - {row['biography']}")
 
     # Mails
     def send(self, target, content):
