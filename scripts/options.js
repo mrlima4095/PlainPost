@@ -28,8 +28,8 @@ window.onload = () => {
 
     document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; });   
     document.getElementById("changebio").addEventListener("click", async () => {
-        const { value: target } = await Swal.fire({ title: 'Biografia:', input: 'text', inputPlaceholder: 'Nome do usuário', showCancelButton: true });
-        if (!target) return Swal.fire('Erro', 'Destinatário não pode estar vazio!', 'error');
+        const { value: target } = await Swal.fire({ title: 'Biografia:', input: 'text', inputPlaceholder: 'O que esta pensando?', showCancelButton: true });
+        if (!target) return Swal.fire('Erro', 'Sua biografia não pode estar vazia!', 'error');
 
         const { status } = await fetchRequest("send", { to: target, content });
         if (status === 200) Swal.fire('Sucesso', 'Sua biografia foi alterada!', 'success');
