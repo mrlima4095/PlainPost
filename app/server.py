@@ -152,13 +152,13 @@ def mail():
 
         return jsonify({"response": "Password changed!"}), 200
     elif payload['action'] == "search":
-        mailcursor.execute("SELECT role FROM users WHERE username = ?", (payload['user'],))
+        mailcursor.execute("SELECT biography FROM users WHERE username = ?", (payload['user'],))
         row = mailcursor.fetchone()
 
         if row: return jsonify({"response": f"ID: {payload['user']}\nBio: {row['biography']}"}), 200 
         else: return 404
     elif payload['action'] == "me":
-        mailcursor.execute("SELECT role FROM users WHERE username = ?", (username,))
+        mailcursor.execute("SELECT biography FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
         
         return jsonify({"response": f"ID: {username}\nBio: {row['biography']}"}), 200
