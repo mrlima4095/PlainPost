@@ -19,6 +19,8 @@ def PlainPostDB():
             role TEXT DEFAULT 'user'
         )
     """)
+    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INTEGER DEFAULT 0")
+    cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user'")
     
     cur.execute("""
         CREATE TABLE IF NOT EXISTS user_roles (
