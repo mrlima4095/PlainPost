@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import psycopg2
 
 def PlainPostDB():
     conn = psycopg2.connect(
