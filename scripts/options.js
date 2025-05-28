@@ -1,17 +1,11 @@
 async function conectar(acao, extra = {}) {
     const token = localStorage.getItem("Mail-Token");
-    if (!token) {
-        window.location.href = "login";
-        return;
-    }
+    if (!token) { window.location.href = "login"; return; }
 
     try {
         const resposta = await fetch("https://servidordomal.fun/api/mail", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": token
-            },
+            headers: { "Content-Type": "application/json", "Authorization": token },
             body: JSON.stringify({ action: acao, ...extra }),
         });
 
