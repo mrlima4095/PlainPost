@@ -25,16 +25,20 @@ SAO_PAULO_TZ = pytz.timezone("America/Sao_Paulo")
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 
-JWT_SECRET = open("jwt.properties", "r").read()
+JWT_SECRET = json.load(open("jwt.properties", "r"))['JWT_SECRET']
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 604800
 
 
 def getdb():
-    conn = sqlite3.connect('mailserver.db')
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    return conn, cursor
+    conn = psycopg2.connect(
+        dbname=json.load(open("jwt.properties", "r"))['NAME'],,
+        user=json.load(open("jwt.properties", "r"))['DB_USER'],,
+        password=json.load(open("jwt.properties", "r"))['BD_PASSWORD'],
+        host=json.load(open("jwt.properties", "r"))['BD_HOST'], 
+        port=json.load(open("jwt.properties", "r"))['BD_PORT'],
+    )
+    return conn, conn.cursor()
 
 # JWT Tokens
 # |
@@ -51,7 +55,7 @@ def get_user(token):
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
 
         mailserver, mailcursor = getdb()
-        mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['username'],))
+        mailcursor.execute("SELECT * FROM users WHERE username = %s", (payload['username'],))
         status = mailcursor.fetchone() is not None
 
         if status: return payload['username']
@@ -73,7 +77,7 @@ def login():
     username = payload.get('username')
     password = payload.get('password')
 
-    mailcursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+    mailcursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
     user = mailcursor.fetchone()
 
     if user: return jsonify({"response": gen_token(username)}), 200
@@ -86,10 +90,10 @@ def signup():
 
     payload = request.get_json()
 
-    mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['username'],))
+    mailcursor.execute("SELECT * FROM users WHERE username = %s", (payload['username'],))
     if mailcursor.fetchone(): return jsonify({"response": "This username is already in use."}), 409
 
-    mailcursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (payload['username'], payload['password']))
+    mailcursor.execute("INSERT INTO users (username, password, coins, role) VALUES (%s, %s, 0, 'user')", (payload['username'], payload['password']))
     mailserver.commit()
 
     return jsonify({"response": gen_token(username)}), 200
@@ -105,23 +109,23 @@ def mail():
     payload = request.get_json()
 
     if payload['action'] == "send":
-        mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['to'],))
+        mailcursor.execute("SELECT * FROM users WHERE username = %s", (payload['to'],))
         if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
         full_content = f"[{timestamp} - {username}] {payload['content']}"
-        mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
+        mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (%s, %s, %s, %s)",
                             (payload['to'], username, full_content, timestamp))
         mailserver.commit()
 
         return jsonify({"response": "Mail sent!"}), 200
     elif payload['action'] == "read":
-        mailcursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
+        mailcursor.execute("SELECT content FROM mails WHERE recipient = %s", (username,))
         mails = [row["content"] for row in mailcursor.fetchall()]
 
         return jsonify({"response": '\n'.join(mails) if mails else "No messages"}), 200
     elif payload['action'] == "clear": 
-        mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
+        mailcursor.execute("DELETE FROM mails WHERE recipient = %s", (username,))
         mailserver.commit()
 
         return jsonify({"response": "Inbox was cleared!"}), 200
@@ -131,71 +135,71 @@ def mail():
             if amount <= 0: return jsonify({"response": "Invalid amount!"}), 406
         except ValueError: return jsonify({"response": "Invalid amount!"}), 406
 
-        mailcursor.execute("SELECT coins FROM users WHERE username = ?", (payload['to'],))
+        mailcursor.execute("SELECT coins FROM users WHERE username = %s", (payload['to'],))
         recipient_row = mailcursor.fetchone()
         if recipient_row is None: return jsonify({"response": "Target not found!"}), 404
 
-        mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
+        mailcursor.execute("SELECT coins FROM users WHERE username = %s", (username,))
         sender_row = mailcursor.fetchone()
         if sender_row["coins"] < amount: return jsonify({"response": "No enough money!"}), 401
 
-        mailcursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (amount, username))
-        mailcursor.execute("UPDATE users SET coins = coins + ? WHERE username = ?", (amount, payload['to']))
+        mailcursor.execute("UPDATE users SET coins = coins - %s WHERE username = %s", (amount, username))
+        mailcursor.execute("UPDATE users SET coins = coins + %s WHERE username = %s", (amount, payload['to']))
         mailserver.commit()
         
         return jsonify({"response": "OK"}), 200
     elif payload['action'] == "changepass":
         if not payload['newpass']: return jsonify({"response": "Blank new password!"}), 400
 
-        mailcursor.execute("UPDATE users SET password = ? WHERE username = ?", (payload['newpass'], username))
+        mailcursor.execute("UPDATE users SET password = %s WHERE username = %s", (payload['newpass'], username))
         mailserver.commit() 
 
         return jsonify({"response": "Password changed!"}), 200
     elif payload['action'] == "search":
-        mailcursor.execute("SELECT role FROM users WHERE username = ?", (payload['user'],))
+        mailcursor.execute("SELECT role FROM users WHERE username = %s", (payload['user'],))
         row = mailcursor.fetchone()
 
         if row: return jsonify({"response": f"[{row['role']}] {payload['user']}"}), 200 
         else: return jsonify({"response": "Target not found!"}), 404
     elif payload['action'] == "me":
-        mailcursor.execute("SELECT role FROM users WHERE username = ?", (username,))
+        mailcursor.execute("SELECT role FROM users WHERE username = %s", (username,))
         row = mailcursor.fetchone()
         
         if row: return jsonify({"response": f"[{row['role']}] {username}"}), 200 
         else: return jsonify({"response": "Invalid token!"}), 404
     elif payload['action'] == "roles":
-        mailcursor.execute("SELECT role FROM user_roles WHERE username = ?", (username,))
+        mailcursor.execute("SELECT role FROM user_roles WHERE username = %s", (username,))
         roles = [row['role'] for row in mailcursor.fetchall()]
         
         return jsonify({"response": ",".join(roles) if roles else "No roles"}), 200
     elif payload['action'] == "changerole":
         if not payload['role']: return jsonify({"response": "Blank role!"}), 400
 
-        mailcursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (username, payload['role']))
+        mailcursor.execute("SELECT 1 FROM user_roles WHERE username = %s AND role = %s", (username, payload['role']))
         if mailcursor.fetchone() is None: return jsonify({"response": "Role not found!"}), 404
 
-        mailcursor.execute("UPDATE users SET role = ? WHERE username = ?", (payload['role'], username))
+        mailcursor.execute("UPDATE users SET role = %s WHERE username = %s", (payload['role'], username))
         mailserver.commit()
 
         return jsonify({"response": "Changed role!"}), 200
     elif payload['action'] == "buyrole":
         if not payload['role']: return jsonify({"response": "Blank role!"}), 400
 
-        mailcursor.execute("SELECT price FROM roles WHERE role = ?", (payload['role'],))
+        mailcursor.execute("SELECT price FROM roles WHERE role = %s", (payload['role'],))
         role_row = mailcursor.fetchone()
         if role_row is None: return jsonify({"response": "Role not found!"}), 404
 
         price = role_row['price']
 
-        mailcursor.execute("SELECT 1 FROM user_roles WHERE username = ? AND role = ?", (username, payload['role']))
+        mailcursor.execute("SELECT 1 FROM user_roles WHERE username = %s AND role = %s", (username, payload['role']))
         if mailcursor.fetchone(): return jsonify({"response": "Role already bought!"}), 406
 
-        mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
+        mailcursor.execute("SELECT coins FROM users WHERE username = %s", (username,))
         user_row = mailcursor.fetchone()
         if user_row["coins"] < price: return jsonify({"response": "No enough money!"}), 401
 
-        mailcursor.execute("INSERT INTO user_roles (username, role) VALUES (?, ?)", (username, payload['role']))
-        mailcursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (price, username))
+        mailcursor.execute("INSERT INTO user_roles (username, role) VALUES (%s, %s)", (username, payload['role']))
+        mailcursor.execute("UPDATE users SET coins = coins - %s WHERE username = %s", (price, username))
         mailserver.commit()
 
         return jsonify({"response": "Role claimed!"}), 200
@@ -205,13 +209,13 @@ def mail():
         
         return jsonify({"response": "|".join(roles) if roles else "No roles"}), 200
     elif payload['action'] == "coins": 
-        mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
+        mailcursor.execute("SELECT coins FROM users WHERE username = %s", (username,))
         row = mailcursor.fetchone()
         
         return jsonify({"response": f"{row['coins']}"}), 200
     elif payload['action'] == "signoff": 
-        mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
-        mailcursor.execute("DELETE FROM users WHERE username = ?", (username,))
+        mailcursor.execute("DELETE FROM mails WHERE recipient = %s", (username,))
+        mailcursor.execute("DELETE FROM users WHERE username = %s", (username,))
         mailserver.commit()
 
         return jsonify({"response": "Account deleted!"}), 200
@@ -251,7 +255,7 @@ def drive_upload():
         expire_time = now + timedelta(hours=5)
 
     mailserver, mailcursor = getdb()
-    mailcursor.execute("INSERT INTO files (id, owner, original_name, saved_name, size, upload_time, expire_time) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    mailcursor.execute("INSERT INTO files (id, owner, original_name, saved_name, size, upload_time, expire_time) VALUES (%s, %s, %s, %s, %s, %s, %s)",
         (file_id, username, secure_filename(file.filename), saved_name, size, now.isoformat(), expire_time.isoformat() if expire_time else None))
     mailserver.commit()
 
@@ -261,7 +265,7 @@ def drive_upload():
 @app.route('/api/drive/download/<file_id>', methods=['GET'])
 def drive_download(file_id):
     mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT original_name, saved_name FROM files WHERE id = ?", (file_id,))
+    mailcursor.execute("SELECT original_name, saved_name FROM files WHERE id = %s", (file_id,))
     row = mailcursor.fetchone()
 
     if not row:
@@ -278,7 +282,7 @@ def drive_list():
     if not username: return jsonify({ "response": "bad credentials" }), 401
     
     mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT id, original_name, size, upload_time, expire_time FROM files WHERE owner = ?", (username,))
+    mailcursor.execute("SELECT id, original_name, size, upload_time, expire_time FROM files WHERE owner = %s", (username,))
     rows = mailcursor.fetchall()
 
     result = []
@@ -296,7 +300,7 @@ def drive_list():
 @app.route('/api/drive/delete/<file_id>', methods=['DELETE'])
 def drive_delete(file_id):
     mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
+    mailcursor.execute("SELECT saved_name FROM files WHERE id = %s", (file_id,))
     row = mailcursor.fetchone()
 
     if not row: return jsonify({"success": False}), 404
@@ -307,7 +311,7 @@ def drive_delete(file_id):
     except FileNotFoundError:
         pass
 
-    mailcursor.execute("DELETE FROM files WHERE id = ?", (file_id,))
+    mailcursor.execute("DELETE FROM files WHERE id = %s", (file_id,))
     mailserver.commit()
 
     return jsonify({"success": True}), 200
@@ -319,7 +323,7 @@ def init_expiration_checker():
         now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
 
         mailserver, mailcursor = getdb()
-        mailcursor.execute("SELECT id, saved_name FROM files WHERE expire_time IS NOT NULL AND expire_time <= ?", (now.isoformat(),))
+        mailcursor.execute("SELECT id, saved_name FROM files WHERE expire_time IS NOT NULL AND expire_time <= %s", (now.isoformat(),))
         expired = mailcursor.fetchall()
 
         for file_id, saved_name in expired:
@@ -327,7 +331,7 @@ def init_expiration_checker():
                 os.remove(os.path.join(UPLOAD_FOLDER, saved_name))
             except FileNotFoundError:
                 pass
-            mailcursor.execute("DELETE FROM files WHERE id = ?", (file_id,))
+            mailcursor.execute("DELETE FROM files WHERE id = %s", (file_id,))
         
         mailserver.commit()
 
