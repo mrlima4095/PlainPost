@@ -32,10 +32,6 @@ class AdminPanel:
             elif args[1] == "give-coin": panel.give_coins(args[2], int(args[3]))
             elif args[1] == "take-coin": panel.take_coins(args[2], int(args[3]))
 
-            elif args[1] == "add-role": panel.add_buyable_role(args[2], int(args[3]))
-            elif args[1] == "remove-role": panel.remove_buyable_role(args[2])
-            elif args[1] == "list-roles": panel.list_buyable_roles()
-
             elif args[1] == "help": self.help()
 
             else: print("[!] invalid request")
