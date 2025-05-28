@@ -20,22 +20,24 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 app = Flask(__name__)
 CORS(app)
-
+# |
 SAO_PAULO_TZ = pytz.timezone("America/Sao_Paulo")
-
+# |
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
-
+# |
+# | (JWT Settings)
 JWT_SECRET = open("jwt.properties", "r").read()
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 604800
-
-
+# |
+# SQLite3  
+# | (Open Connection)
 def getdb():
     conn = sqlite3.connect('mailserver.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     return conn, cursor
-
+# |
 # JWT Tokens
 # |
 def gen_token(username):
@@ -58,8 +60,8 @@ def get_user(token):
         else: return None
     except ExpiredSignatureError: return None
     except InvalidTokenError: return None
-
-
+# |
+# |
 # PlainPost
 # |
 # Auth API
@@ -183,7 +185,7 @@ def mail():
     elif payload['action'] == "status": return jsonify({"response": "OK"}), 200
     else: return jsonify({"response": "Invalid payload!"}), 405
 # |
-
+# |
 # BinDrop
 # |
 # Upload API
