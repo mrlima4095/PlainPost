@@ -18,6 +18,7 @@ class AdminPanel:
         self.cursor.execute("PRAGMA foreign_keys = ON;")
         self.fernet = Fernet(json.load(open("server.json", "r"))['FERNET_KEY'].encode())
     # |
+    # Run command
     def run(self, args=sys.argv):
         if len(args) < 2: self.help(); sys.exit(0)
 
