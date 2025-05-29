@@ -36,7 +36,7 @@ JWT_SECRET = json.load(open("server.json", "r"))['JWT_SECRET']
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 604800
 # | (Fernet Settings)
-FERNET_KEY = json.load(open("server.json", "r"))['FERNET_KEY'].encode()
+fernet = Fernet(json.load(open("server.json", "r"))['FERNET_KEY'].encode())
 # |
 # SQLite3  
 # | (Open Connection)
@@ -118,20 +118,34 @@ def mail():
 
     if payload['action'] == "send":
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['to'],))
-        if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
+        if mailcursor.fetchone() is None:
+            return jsonify({"response": "Target not found!"}), 404
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
         full_content = f"[{timestamp} - {username}] {payload['content']}"
-        mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
-                            (payload['to'], username, full_content, timestamp))
+        
+        encrypted_content = fernet.encrypt(full_content.encode())
+
+        mailcursor.execute(
+            "INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
+            (payload['to'], username, encrypted_content, timestamp)
+        )
         mailserver.commit()
 
         return jsonify({"response": "Mail sent!"}), 200
+
     elif payload['action'] == "read":
         mailcursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
-        mails = [row["content"] for row in mailcursor.fetchall()]
+        rows = mailcursor.fetchall()
 
-        return jsonify({"response": '\n'.join(mails) if mails else "No messages"}), 200
+        decrypted_mails = []
+        for row in rows:
+            encrypted_content = row["content"]
+            # descriptografa o conteúdo (converte bytes para string)
+            decrypted_content = fernet.decrypt(encrypted_content).decode()
+            decrypted_mails.append(decrypted_content)
+
+        return jsonify({"response": '\n'.join(decrypted_mails) if decrypted_mails else "No messages"}), 200
     elif payload['action'] == "clear": 
         mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         mailserver.commit()
