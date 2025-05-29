@@ -47,7 +47,6 @@ def getdb():
     cursor = conn.cursor()
     return conn, cursor
 # |
-
 # |
 # JWT Tokens
 # |
