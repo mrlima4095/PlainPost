@@ -74,9 +74,9 @@ class AdminPanel:
             return
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
-        full_content = f"[{timestamp} - admin] {content}"
+        content = fernet.encrypt(f"[{timestamp} - admin] {content}".encode()).decode('utf-8')
         self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", 
-                            (target, "admin", full_content, timestamp))
+                            (target, "admin", content, timestamp))
         self.db.commit()
         print(f"[+] Email sent to {target}.")
     def notify_all(self, content):
@@ -88,11 +88,11 @@ class AdminPanel:
             return
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
-        full_content = f"[{timestamp} - admin] {content}"
+        content = fernet.encrypt(f"[{timestamp} - admin] {content}".encode()).decode('utf-8')
 
         for user in users:
             self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", 
-                                (user['username'], "admin", full_content, timestamp))
+                                (user['username'], "admin", content, timestamp))
         
         self.db.commit()
         print(f"[+] Notification sent to all users.")
