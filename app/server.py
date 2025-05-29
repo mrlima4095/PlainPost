@@ -39,7 +39,6 @@ JWT_EXP_DELTA_SECONDS = 604800
 # | (Fernet Settings)
 fernet = Fernet(json.load(open("server.json", "r"))['FERNET_KEY'].encode())
 # |
-# |
 # SQLite3  
 # | (Open Connection)
 def getdb():
@@ -47,7 +46,6 @@ def getdb():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     return conn, cursor
-# |
 # |
 # JWT Tokens
 # |
@@ -90,7 +88,7 @@ def login():
     row = mailcursor.fetchone()
 
     if row and bcrypt.checkpw(payload.get('password').encode('utf-8'), row['password']): return jsonify({"response": gen_token(username)}), 200
-    else: return jsonify({"response": "bad credentials"}), 401
+    else: return jsonify({"response": "Bad credentials"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -212,7 +210,7 @@ def mail():
 @app.route('/api/drive/upload', methods=['POST'])
 def drive_upload():
     username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "bad credentials" }), 401
+    if not username: return jsonify({ "response": "Bad credentials" }), 401
     
     file = request.files.get('file')
     
@@ -262,7 +260,7 @@ def drive_download(file_id):
 @app.route('/api/drive/list', methods=['GET'])
 def drive_list():
     username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "bad credentials" }), 401
+    if not username: return jsonify({ "response": "Bad credentials" }), 401
     
     mailserver, mailcursor = getdb()
     mailcursor.execute("SELECT id, original_name, size, upload_time, expire_time FROM files WHERE owner = ?", (username,))
@@ -329,7 +327,7 @@ init_expiration_checker()
 @app.route('/api/shorten', methods=['POST'])
 def create_shortlink():
     username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "bad credentials" }), 401
+    if not username: return jsonify({ "response": "Bad credentials" }), 401
     
     payload = request.get_json()
     url = payload.get("url")
@@ -362,7 +360,7 @@ def redirect_shortlink(short_id):
 @app.route('/api/shorten/list', methods=['GET'])
 def list_shortlinks():
     username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "bad credentials" }), 401
+    if not username: return jsonify({ "response": "Bad credentials" }), 401
 
     mailserver, mailcursor = getdb()
     mailcursor.execute("SELECT id, original_url, creation_time FROM shortlinks WHERE owner = ?", (username,))
@@ -379,7 +377,7 @@ def list_shortlinks():
 @app.route('/api/shorten/delete/<short_id>', methods=['DELETE'])
 def delete_shortlink(short_id):
     username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "bad credentials" }), 401
+    if not username: return jsonify({ "response": "Bad credentials" }), 401
 
     mailserver, mailcursor = getdb()
     mailcursor.execute("DELETE FROM shortlinks WHERE id = ? AND owner = ?", (short_id, username))
