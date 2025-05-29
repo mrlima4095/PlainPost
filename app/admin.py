@@ -3,6 +3,7 @@
 #
 
 import sys
+import bcrypt
 import sqlite3
 from datetime import datetime
 
