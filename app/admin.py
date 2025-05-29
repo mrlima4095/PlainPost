@@ -76,6 +76,7 @@ class AdminPanel:
         for row in self.cursor.fetchall():
             print(f"[+] {row['username']} (Coins: {row['coins']}) - {row['biography']}")
     # |
+    # Mails Tools
     def send(self, target, content):
         self.cursor.execute("SELECT * FROM users WHERE username = ?", (target,))
         if not self.cursor.fetchone():
