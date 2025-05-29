@@ -123,7 +123,7 @@ class AdminPanel:
         self.cursor.execute("DELETE FROM mails")
         self.db.commit()
         print("[~] All emails cleared from database.")
-    
+    # |
     def give_coins(self, username, amount):
         self.cursor.execute("UPDATE users SET coins = coins + ? WHERE username = ?", (amount, username))
         self.db.commit()
