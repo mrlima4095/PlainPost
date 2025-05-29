@@ -43,7 +43,7 @@ class AdminPanel:
             else: print("[!] invalid request")
         except IndexError as e: print(f"[!] Missed arguments")
         except Exception as e: print(f"[!] Error: {e}")
-
+    # 
     def help(self): print("register,unregister,password,bio,list,send,read,clear,clear-all,notifyall,give-coin,take-coin")
     # |
     # |
