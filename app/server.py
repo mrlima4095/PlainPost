@@ -219,7 +219,7 @@ def drive_upload():
         return jsonify({"success": False, "error": "Arquivo ou usuário não fornecido."}), 400
 
     size = len(file.read())
-    file.seek(0)
+    file.seek(0) 
 
     if size > 100 * 1024 * 1024:
         return jsonify({"success": False, "error": "Arquivo excede o limite de 100MB."}), 413
