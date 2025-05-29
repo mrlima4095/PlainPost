@@ -108,7 +108,7 @@ class AdminPanel:
                     print(mail['content'])
 
             else:
-                print(f"At: {mail['recipient']} -> {mail['content']}")
+                print(f"At: {mail['recipient']} -> {fernet.decrypt(mail['content'].encode('utf-8')).decode()}")
     def clear(self, username):
         self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         self.db.commit()
