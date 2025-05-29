@@ -7,7 +7,7 @@ import json
 import bcrypt
 import sqlite3
 from datetime import datetime
-from cryptography.self.fernet import fernet
+from cryptography.fernet import Fernet
 # |
 # Main Class
 class AdminPanel:
@@ -16,7 +16,7 @@ class AdminPanel:
         self.db.row_factory = sqlite3.Row 
         self.cursor = self.db.cursor()
         self.cursor.execute("PRAGMA foreign_keys = ON;")
-        self.self.fernet = self.fernet(json.load(open("server.json", "r"))['self.fernet_KEY'].encode())
+        self.fernet = self.fernet(json.load(open("server.json", "r"))['FERNET_KEY'].encode())
 
 
     def run(self, args=sys.argv):
