@@ -175,7 +175,7 @@ def mail():
         row = mailcursor.fetchone()
 
         if row: return jsonify({"response": f"ID: {payload['user']}\nBio: {row['biography']}"}), 200 
-        else: return 404
+        else: return jsonify({"response": "Target not found!"}), 404
     elif payload['action'] == "me":
         mailcursor.execute("SELECT biography FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
