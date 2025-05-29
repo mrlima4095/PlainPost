@@ -15,7 +15,7 @@
     <div id="conteiner">
         <header>
             <h2>PlainPost - Login</h2>
-            <p>Seja bem-vindo(a)! Agora temos sistema de segurança...</p>
+            <p>Seja bem-vindo(a)!</p>
         </header>
         <form>
             <label for="email">ID:</label><br />
