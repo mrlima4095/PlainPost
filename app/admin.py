@@ -16,7 +16,7 @@ class AdminPanel:
         self.db.row_factory = sqlite3.Row 
         self.cursor = self.db.cursor()
         self.cursor.execute("PRAGMA foreign_keys = ON;")
-        self.fernet = self.fernet(json.load(open("server.json", "r"))['FERNET_KEY'].encode())
+        self.fernet = Fernet(json.load(open("server.json", "r"))['FERNET_KEY'].encode())
 
 
     def run(self, args=sys.argv):
