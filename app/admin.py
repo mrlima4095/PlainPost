@@ -51,15 +51,17 @@ class AdminPanel:
         self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         self.cursor.execute("DELETE FROM users WHERE username = ?", (username,))
         self.db.commit()
-        
+
         print(f"[-] User '{username}' deleted.")
     def changepass(self, username, newpass):
         self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (bcrypt.hashpw(newpass.encode('utf-8'), bcrypt.gensalt()), username))
         self.db.commit()
+
         print(f"[+] Password for '{username}' changed.")
     def changebio(self, username, bio):
         self.cursor.execute("UPDATE users SET biography = ? WHERE username = ?", (bio, username))
         self.db.commit()
+        
         print(f"[+] User '{username}' bio changed to '{bio}'.")
     
     def list_users(self):
