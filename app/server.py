@@ -74,16 +74,16 @@ def get_user(token):
 @app.route('/api/login', methods=['POST'])
 def login():
     mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json:
+        return jsonify({"error": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     username = payload.get('username')
-    password = payload.get('password')
 
-    mailcursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
-    user = mailcursor.fetchone()
+    mailcursor.execute("SELECT password FROM users WHERE username = ?", (username,))
+    row = mailcursor.fetchone()
 
-    if user: return jsonify({"response": gen_token(username)}), 200
+    if row and bcrypt.checkpw(payload.get('password').encode('utf-8'), row['password']): return jsonify({"response": gen_token(username)}), 200
     else: return jsonify({"response": "bad credentials"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
@@ -92,11 +92,13 @@ def signup():
     if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
+    username = payload['username']
+    password = bcrypt.hashpw(payload['password'].encode('utf-8'), bcrypt.gensalt())
 
-    mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['username'],))
+    mailcursor.execute("SELECT * FROM users WHERE username = ?", (username,))
     if mailcursor.fetchone(): return jsonify({"response": "This username is already in use."}), 409
 
-    mailcursor.execute("INSERT INTO users (username, password, coins, role) VALUES (?, ?, 0, 'user')", (payload['username'], payload['password']))
+    mailcursor.execute("INSERT INTO users (username, password, coins, biography) VALUES (?, ?, 0, 'A PlainPost user')", (username, password))
     mailserver.commit()
 
     return jsonify({"response": gen_token(username)}), 200
