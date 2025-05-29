@@ -15,7 +15,7 @@
     <div id="conteiner">
         <header>
             <h2>PlainPost - Login</h2>
-            <p>Não use seu nome real como usuario nem use suas senhas reais aqui!</p>
+            <p>Seja bem-vindo(a)</p>
         </header>
         <form>
             <label for="email">ID:</label><br />
