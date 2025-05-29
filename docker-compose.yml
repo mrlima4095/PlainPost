@@ -9,4 +9,3 @@ services:
       - ./app:/app
       - /root/PlainPost/app/drive.db:/app/drive.db
     working_dir: /app
-
