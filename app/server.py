@@ -38,6 +38,7 @@ JWT_EXP_DELTA_SECONDS = 604800
 # | (Fernet Settings)
 fernet = Fernet(json.load(open("server.json", "r"))['FERNET_KEY'].encode())
 # |
+#|
 # SQLite3  
 # | (Open Connection)
 def getdb():
