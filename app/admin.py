@@ -7,7 +7,7 @@ import json
 import bcrypt
 import sqlite3
 from datetime import datetime
-from cryptography.fernet import Fernet
+from cryptography.self.fernet import self.fernet
 # |
 # Main Class
 class AdminPanel:
@@ -16,7 +16,7 @@ class AdminPanel:
         self.db.row_factory = sqlite3.Row 
         self.cursor = self.db.cursor()
         self.cursor.execute("PRAGMA foreign_keys = ON;")
-        self.fernet = Fernet(json.load(open("server.json", "r"))['FERNET_KEY'].encode())
+        self.self.fernet = self.fernet(json.load(open("server.json", "r"))['self.fernet_KEY'].encode())
 
 
     def run(self, args=sys.argv):
@@ -80,7 +80,7 @@ class AdminPanel:
             return
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
-        content = fernet.encrypt(f"[{timestamp} - admin] {content}".encode()).decode('utf-8')
+        content = self.fernet.encrypt(f"[{timestamp} - admin] {content}".encode()).decode('utf-8')
         self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", 
                             (target, "admin", content, timestamp))
         self.db.commit()
@@ -94,7 +94,7 @@ class AdminPanel:
             return
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
-        content = fernet.encrypt(f"[{timestamp} - admin] {content}".encode()).decode('utf-8')
+        content = self.fernet.encrypt(f"[{timestamp} - admin] {content}".encode()).decode('utf-8')
 
         for user in users:
             self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", 
@@ -110,7 +110,7 @@ class AdminPanel:
                     print(mail['content'])
 
             else:
-                print(f"At: {mail['recipient']} -> {fernet.decrypt(mail['content'].encode('utf-8')).decode()}")
+                print(f"At: {mail['recipient']} -> {self.fernet.decrypt(mail['content'].encode('utf-8')).decode()}")
     def clear(self, username):
         self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         self.db.commit()
