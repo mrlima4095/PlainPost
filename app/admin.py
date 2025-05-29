@@ -7,7 +7,7 @@ import json
 import bcrypt
 import sqlite3
 from datetime import datetime
-from cryptography.self.fernet import self.fernet
+from cryptography.self.fernet import fernet
 # |
 # Main Class
 class AdminPanel:
