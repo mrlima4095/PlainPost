@@ -322,69 +322,6 @@ def init_expiration_checker():
 init_expiration_checker()
 # |
 # |
-# Short links
-
-@app.route('/api/shorten', methods=['POST'])
-def create_shortlink():
-    username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "Bad credentials" }), 401
-    
-    payload = request.get_json()
-    url = payload.get("url")
-    if not url: return jsonify({ "error": "Missing URL" }), 400
-
-    mailserver, mailcursor = getdb()
-    while True:
-        short_id = str(random.randint(100000, 999999))
-        mailcursor.execute("SELECT 1 FROM shortlinks WHERE id = ?", (short_id,))
-        if not mailcursor.fetchone(): break
-
-    now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
-    mailcursor.execute("INSERT INTO shortlinks (id, owner, original_url, creation_time) VALUES (?, ?, ?, ?)",
-        (short_id, username, url, now.isoformat()))
-    mailserver.commit()
-
-    return jsonify({ "short_url": f"/s/{short_id}" }), 200
-
-@app.route('/s/<short_id>', methods=['GET'])
-def redirect_shortlink(short_id):
-    mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT original_url FROM shortlinks WHERE id = ?", (short_id,))
-    row = mailcursor.fetchone()
-
-    if not row:
-        return jsonify({"error": "Shortlink not found"}), 404
-
-    return flask.redirect(row['original_url'])
-
-@app.route('/api/shorten/list', methods=['GET'])
-def list_shortlinks():
-    username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "Bad credentials" }), 401
-
-    mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT id, original_url, creation_time FROM shortlinks WHERE owner = ?", (username,))
-    rows = mailcursor.fetchall()
-
-    return jsonify([
-        {
-            "id": row["id"],
-            "original_url": row["original_url"],
-            "creation_time": row["creation_time"]
-        } for row in rows
-    ]), 200
-
-@app.route('/api/shorten/delete/<short_id>', methods=['DELETE'])
-def delete_shortlink(short_id):
-    username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "Bad credentials" }), 401
-
-    mailserver, mailcursor = getdb()
-    mailcursor.execute("DELETE FROM shortlinks WHERE id = ? AND owner = ?", (short_id, username))
-    mailserver.commit()
-
-    return jsonify({ "success": True }), 200
-
 # |
 # Start API
 if __name__ == '__main__':
