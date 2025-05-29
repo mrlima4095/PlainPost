@@ -18,12 +18,15 @@
         <h2>Política de Privacidade</h2><br>
 
         <p>Ao criar sua conta você concorda com nossos termos de serviço e nossa política de privacidade, declarando que esta ciente de que:</p>
-        <p>1. Este serviço é esta em fase de testes;</p>
-        <p>2. Não se deve compartilhar dados sensíveis por meio de mensagens;</p>
-        <p>3. Não é possível apagar uma mensagem após envia-la;</p>
-        <p>4. Não de deve carregar conteúdo improprio para o BinDrop, podemos acessar todos os arquivos carregados;</p>
-        <p>5. Não fornecemos nenhum dado dos usuários para terceiros;</p>
-
+        <p>1. Seus dados não são enviados para terceiros;</p>
+        <p>2. Após enviar uma mensagem, você não pode apagá-la;</p>
+        <p>3. Não e recomendado enviar dados sensíveis por mensagens;</p>
+        <p>4. </p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
         <p></p>
         <button id="back" type="submit">Retornar</button>
     <div>
