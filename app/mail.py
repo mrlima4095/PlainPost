@@ -20,47 +20,6 @@ class Server:
         self.db = sqlite3.connect("mailserver.db", check_same_thread=False)
         self.db.row_factory = sqlite3.Row
         self.cursor = self.db.cursor()
-        self.init_db()
-
-    def init_db(self):
-        self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                username TEXT PRIMARY KEY,
-                password TEXT NOT NULL,
-                coins INTEGER DEFAULT 0,
-                role TEXT DEFAULT 'user'
-            )
-        """)
-        
-        self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS user_roles (
-                username TEXT,
-                role TEXT,
-                PRIMARY KEY(username, role),
-                FOREIGN KEY(username) REFERENCES users(username)
-            )
-        """)
-
-        self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS roles (
-                role TEXT PRIMARY KEY,
-                price INTEGER NOT NULL
-            )
-        """)
-
-        self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS mails (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                recipient TEXT,
-                sender TEXT,
-                content TEXT,
-                timestamp TEXT,
-                FOREIGN KEY(recipient) REFERENCES users(username)
-            )
-        """)
-        
-        self.db.commit()
-
 
     def start(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
