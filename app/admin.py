@@ -45,11 +45,13 @@ class AdminPanel:
     def register(self, username, password):
         self.cursor.execute("INSERT INTO users (username, password, coins, biography) VALUES (?, ?, 0, 'user')", (username, bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())))
         self.db.commit()
+
         print(f"[+] User '{username}' created.")
     def unregister(self, username):
         self.cursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         self.cursor.execute("DELETE FROM users WHERE username = ?", (username,))
         self.db.commit()
+        
         print(f"[-] User '{username}' deleted.")
     def changepass(self, username, newpass):
         self.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (bcrypt.hashpw(newpass.encode('utf-8'), bcrypt.gensalt()), username))
