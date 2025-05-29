@@ -118,22 +118,15 @@ def mail():
 
     if payload['action'] == "send":
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['to'],))
-        if mailcursor.fetchone() is None:
-            return jsonify({"response": "Target not found!"}), 404
+        if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
-        full_content = f"[{timestamp} - {username}] {payload['content']}"
-        
-        encrypted_content = fernet.encrypt(full_content.encode())
+        content = fernet.encrypt(f"[{timestamp} - {username}] {payload['content']}".encode()).decode('utf-8')
 
-        mailcursor.execute(
-            "INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
-            (payload['to'], username, encrypted_content, timestamp)
-        )
+        mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (payload['to'], username, content, timestamp))
         mailserver.commit()
 
         return jsonify({"response": "Mail sent!"}), 200
-
     elif payload['action'] == "read":
         mailcursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
         rows = mailcursor.fetchall()
@@ -141,8 +134,8 @@ def mail():
         decrypted_mails = []
         for row in rows:
             encrypted_content = row["content"]
-            # descriptografa o conteúdo (converte bytes para string)
-            decrypted_content = fernet.decrypt(encrypted_content).decode()
+
+            decrypted_content = fernet.decrypt(encrypted_content.encode('utf-8')).decode()
             decrypted_mails.append(decrypted_content)
 
         return jsonify({"response": '\n'.join(decrypted_mails) if decrypted_mails else "No messages"}), 200
