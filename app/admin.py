@@ -111,7 +111,7 @@ class AdminPanel:
         for mail in self.cursor.fetchall():
             if len(sys.argv) >= 3:
                 if sys.argv[2] == mail['recipient']:
-                    print(mail['content'])
+                    print(self.fernet.decrypt(mail['content'].encode('utf-8')).decode())
 
             else:
                 print(f"At: {mail['recipient']} -> {self.fernet.decrypt(mail['content'].encode('utf-8')).decode()}")
