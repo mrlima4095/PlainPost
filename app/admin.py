@@ -46,6 +46,8 @@ class AdminPanel:
 
     def help(self): print("register,unregister,password,bio,list,send,read,clear,clear-all,notifyall,give-coin,take-coin")
 
+    # |
+    # User credentials 
     def register(self, username, password):
         self.cursor.execute("INSERT INTO users (username, password, coins, biography) VALUES (?, ?, 0, 'user')", (username, bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())))
         self.db.commit()
