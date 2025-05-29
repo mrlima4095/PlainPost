@@ -18,6 +18,7 @@ import bcrypt
 import sqlite3
 import threading, pytz
 from threading import Timer
+from cryptography.fernet import Fernet
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
@@ -31,9 +32,11 @@ SAO_PAULO_TZ = pytz.timezone("America/Sao_Paulo")
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 # |
 # | (JWT Settings)
-JWT_SECRET = open("jwt.properties", "r").read()
+JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 604800
+# | (Fernet Settings)
+FERNET_KEY = os.getenv("FERNET_KEY").encode()
 # |
 # SQLite3  
 # | (Open Connection)
