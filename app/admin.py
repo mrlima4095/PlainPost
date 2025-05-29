@@ -75,7 +75,7 @@ class AdminPanel:
         self.cursor.execute("SELECT username, biography, coins FROM users")
         for row in self.cursor.fetchall():
             print(f"[+] {row['username']} (Coins: {row['coins']}) - {row['biography']}")
-
+    #|
     def send(self, target, content):
         self.cursor.execute("SELECT * FROM users WHERE username = ?", (target,))
         if not self.cursor.fetchone():
