@@ -32,11 +32,11 @@ SAO_PAULO_TZ = pytz.timezone("America/Sao_Paulo")
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 # |
 # | (JWT Settings)
-JWT_SECRET = os.getenv("JWT_SECRET")
+JWT_SECRET = json.load(open("server.json", "r"))['JWT_SECRET']
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 604800
 # | (Fernet Settings)
-FERNET_KEY = os.getenv("FERNET_KEY").encode()
+FERNET_KEY = json.load(open("server.json", "r"))['FERNET_KEY'].encode()
 # |
 # SQLite3  
 # | (Open Connection)
