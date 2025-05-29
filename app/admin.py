@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-
+# |
+# Imports
 import sys
 import bcrypt
 import sqlite3
 from datetime import datetime
-
+# |
+# Main Class
 class AdminPanel:
     def __init__(self):
         self.db = sqlite3.connect("mailserver.db")
