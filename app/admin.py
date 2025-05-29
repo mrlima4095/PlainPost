@@ -69,7 +69,7 @@ class AdminPanel:
         self.db.commit()
         
         print(f"[+] User '{username}' bio changed to '{bio}'.")
-    
+    #|
     def list_users(self):
         self.cursor.execute("SELECT username, biography, coins FROM users")
         for row in self.cursor.fetchall():
