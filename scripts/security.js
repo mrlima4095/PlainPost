@@ -26,9 +26,6 @@ window.onload = () => {
         const result = await Swal.fire({ title: "Tem certeza?", text: "Tem certeza que deseja apagar sua conta?", icon: "warning", showCancelButton: true, confirmButtonText: "Sim, apagar", cancelButtonText: "Cancelar" });
         if (!result.isConfirmed) return;
 
-        const result2 = await Swal.fire({ title: "Tem certeza?", text: "Tem certeza que deseja apagar sua conta de verdade?", icon: "warning", showCancelButton: true, confirmButtonText: "Sim, apagar", cancelButtonText: "Cancelar" });
-        if (!result2.isConfirmed) return;
-
         try {
             const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "signoff" }) });
 
