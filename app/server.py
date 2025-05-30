@@ -167,7 +167,7 @@ def mail():
     elif payload['action'] == "changepass":
         if not payload['newpass']: return jsonify({"response": "Blank new password!"}), 400
 
-        mailcursor.execute("UPDATE users SET password = ? WHERE username = ?", (payload['newpass'], username))
+        mailcursor.execute("UPDATE users SET password = ? WHERE username = ?", (bcrypt.hashpw(payload['newpass'].encode('utf-8'), bcrypt.gensalt()), username))
         mailserver.commit() 
 
         return jsonify({"response": "Password changed!"}), 200
