@@ -19,11 +19,12 @@ class Client:
         self.token = ""
 
         if len(sys.argv) == 2 and sys.argv[1] == "signup":
-            status = self.request(json.dumps({"action": "signup"})).strip()
+            status = self.signup(json.dumps({"action": "signup"})).strip()
             if status == "3":
                 print("[-] Este nome de usuario ja esta em uso!")
                 sys.exit(0)
 
+        self.login()
         self.run()
 
     def request(self, payload):
@@ -39,13 +40,35 @@ class Client:
             )
             return response.json().get('response', '')
         except Exception:
-            return "9"
+            return None
+
+    def login(self):
+        try:
+            response = requests.post(
+                "https://servidordomal.fun/api/login",
+                json=json.loads({"username": self.username, "password": self.password}),
+            )
+
+            if response.status == 200: self.token = response.json().get('response', ''); 
+            else: print("\n[-] Usuario ou senha incorretos!"); sys.exit(0)
+        except Exception:
+            return None
+    def signup(self):
+        try:
+            response = requests.post(
+                "https://servidordomal.fun/api/login",
+                json=json.loads({"username": self.username, "password": self.password}),
+            )
+
+            if response.status == 200: self.token = response.json().get('response', ''); 
+            else: print("\n[-] Usuario ou senha incorretos!"); sys.exit(0)
+        except Exception:
+            return None
 
 
     def run(self):
         status = self.request(json.dumps({"action": "status"})).strip()
-
-        if status == "1": return print("\n[-] Usuario ou senha incorretos!")
+        if status == "Bad credentials!": return print("\n[-] Usuario ou senha incorretos!")
 
         print(f"\n[+] Você entrou como {self.username}")
         while True:
