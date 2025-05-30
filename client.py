@@ -70,12 +70,12 @@ class Client:
 
                     if not target or not message: print("[-] Destinatário ou mensagem estão vazios!")
                     else:
-                        status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "send", "to": target, "content": message})).strip()
+                        status = self.request(json.dumps({"action": "send", "to": target, "content": message})).strip()
 
                         if status == "0": print("[+] Mensagem enviada com sucesso!")
                         elif status == "4": print("[-] Destinatário inexistente!")
                 elif action == "3":
-                    status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "clear"})).strip()
+                    status = self.request(json.dumps({"action": "clear"})).strip()
                     
                     if status == "0": print("[+] Suas mensagens foram apagadas!")
                     else: print("[-] Ocorreu um erro ao apagar suas mensagens!")
@@ -86,7 +86,7 @@ class Client:
 
                     if not target or not amount: print("[-] Destinatário ou quantidade estão vazios!")
                     else: 
-                        status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "transfer", "to": target, "amount": amount})).strip()
+                        status = self.request(json.dumps({"action": "transfer", "to": target, "amount": amount})).strip()
 
                         if status == "0": print("[+] Moedas enviadas com sucesso!")
                         elif status == "4": print("[-] Destinatário inexistente!")
@@ -96,23 +96,23 @@ class Client:
                     user = input("[+] Nome do usuário para procurar: ").strip()
                     if not user: print("[-] Nome de usuário não pode estar vazio!")
                     else: 
-                        result = self.request(json.dumps({"username": self.username, "password": self.password, "action": "search", "user": user})).strip()
+                        result = self.request(json.dumps({"action": "search", "user": user})).strip()
 
                         if result == "4": print("[-] Usuário não encontrado!")
                         else: print(f"[+] {result}")
-                elif action == "6": print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "me"})).strip())
-                elif action == "7": print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "coins"})).strip())
+                elif action == "6": print(self.request(json.dumps({"action": "me"})).strip())
+                elif action == "7": print(self.request(json.dumps({"action": "coins"})).strip())
                 elif action == "8":
                     password = getpass.getpass("[+] Nova senha: ").strip()
                     if not password:
                         print("[-] A senha está vazia!")
                     else:
-                        if self.request(json.dumps({"username": self.username, "password": self.password, "action": "changepass", "newpass": password})).strip() == "0":
+                        if self.request(json.dumps({"action": "changepass", "newpass": password})).strip() == "0":
                             print("[+] Senha alterada com sucesso!")
                             self.password = password
 
                 elif action == "9":
-                    status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "signoff"})).strip()
+                    status = self.request(json.dumps({"action": "signoff"})).strip()
                     if status == "0":
                         print("[!] Sua conta foi deletada!")
                         break
