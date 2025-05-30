@@ -23,20 +23,20 @@ class AdminPanel:
         if len(args) < 2: self.help(); sys.exit(0)
 
         try:
-            if args[1] == "register": panel.register(args[2], args[3])
-            elif args[1] == "unregister": panel.unregister(args[2])
-            elif args[1] == "password": panel.changepass(args[2], args[3])
-            elif args[1] == "bio": panel.bio(args[2], ' '.join(args[3:]))
-            elif args[1] == "list": panel.list_users()
+            if args[1] == "register": sellf.register(args[2], args[3])
+            elif args[1] == "unregister": self.unregister(args[2])
+            elif args[1] == "password": self.changepass(args[2], args[3])
+            elif args[1] == "bio": self.bio(args[2], ' '.join(args[3:]))
+            elif args[1] == "list": self.list_users()
 
-            elif args[1] == "send": panel.send(args[2], ' '.join(args[3:]))
-            elif args[1] == "notifyall": panel.notify_all(' '.join(args[2:]))
-            elif args[1] == "read": panel.list_all_mails()
-            elif args[1] == "clear": panel.clear(args[2])
-            elif args[1] == "clear-all": panel.clear_all()
+            elif args[1] == "send": self.send(args[2], ' '.join(args[3:]))
+            elif args[1] == "notifyall": self.notify_all(' '.join(args[2:]))
+            elif args[1] == "read": self.list_all_mails()
+            elif args[1] == "clear": self.clear(args[2])
+            elif args[1] == "clear-all": self.clear_all()
 
-            elif args[1] == "give-coin": panel.give_coins(args[2], int(args[3]))
-            elif args[1] == "take-coin": panel.take_coins(args[2], int(args[3]))
+            elif args[1] == "give-coin": self.give_coins(args[2], int(args[3]))
+            elif args[1] == "take-coin": self.take_coins(args[2], int(args[3]))
 
             elif args[1] == "help": self.help()
 
