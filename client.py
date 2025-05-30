@@ -16,8 +16,10 @@ class Client:
 
         if not self.username or not self.password: return print("[-] Usuario ou senha estão vazios!")
 
+        self.token = ""
+
         if len(sys.argv) == 2 and sys.argv[1] == "signup":
-            status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "signup"})).strip()
+            status = self.request(json.dumps({"action": "signup"})).strip()
             if status == "3":
                 print("[-] Este nome de usuario ja esta em uso!")
                 sys.exit(0)
@@ -26,13 +28,22 @@ class Client:
 
     def request(self, payload):
         try:
-            response = requests.post("https://servidordomal.fun/api/mail", json=json.loads(payload))
+            headers = {
+                "Authorization": self.token,
+                "Content-Type": "application/json"
+            }
+            response = requests.post(
+                "https://servidordomal.fun/api/mail",
+                json=json.loads(payload),
+                headers=headers
+            )
             return response.json().get('response', '')
         except Exception:
             return "9"
 
+
     def run(self):
-        status = self.request(json.dumps({"username": self.username, "password": self.password, "action": "status"})).strip()
+        status = self.request(json.dumps({"action": "status"})).strip()
 
         if status == "1": return print("\n[-] Usuario ou senha incorretos!")
 
@@ -51,7 +62,7 @@ class Client:
 
                 if not action: continue
 
-                elif action == "1": print(self.request(json.dumps({"username": self.username, "password": self.password, "action": "read"})).strip())
+                elif action == "1": print(self.request(json.dumps({"action": "read"})).strip())
                 elif action == "2":
                     print("[+] Enviar mensagem\n")
                     target = input("[+] Destinatário: ").strip()
