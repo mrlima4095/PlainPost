@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
 
 import os
 import sys
@@ -14,17 +13,20 @@ class Client:
         self.username = input("Username: ").strip()
         self.password = getpass.getpass("Password: ").strip()
 
-        if not self.username or not self.password: return print("[-] Usuario ou senha estão vazios!")
+        if not self.username or not self.password:
+            return print("[-] Usuário ou senha estão vazios!")
 
         self.token = ""
 
         if len(sys.argv) == 2 and sys.argv[1] == "signup":
-            status = self.signup(json.dumps({"action": "signup"})).strip()
-            if status == "3":
-                print("[-] Este nome de usuario ja esta em uso!")
+            if not self.signup():
+                print("[-] Este nome de usuário já está em uso!")
                 sys.exit(0)
 
-        self.login()
+        if not self.login():
+            print("[-] Usuário ou senha incorretos!")
+            sys.exit(0)
+
         self.run()
 
     def request(self, payload):
@@ -35,41 +37,43 @@ class Client:
             }
             response = requests.post(
                 "https://servidordomal.fun/api/mail",
-                json=json.loads(payload),
+                json=payload,
                 headers=headers
             )
             return response.json().get('response', '')
-        except Exception:
+        except Exception as e:
+            print(f"Erro na requisição: {e}")
             return None
 
     def login(self):
         try:
             response = requests.post(
                 "https://servidordomal.fun/api/login",
-                json=json.loads({"username": self.username, "password": self.password}),
+                json={"username": self.username, "password": self.password}
             )
+            if response.status_code == 200:
+                self.token = response.json().get('response', '')
+                return True
+            return False
+        except Exception as e:
+            print(f"Erro ao fazer login: {e}")
+            return False
 
-            if response.status == 200: self.token = response.json().get('response', ''); 
-            else: print("\n[-] Usuario ou senha incorretos!"); sys.exit(0)
-        except Exception:
-            return None
     def signup(self):
         try:
             response = requests.post(
-                "https://servidordomal.fun/api/login",
-                json=json.loads({"username": self.username, "password": self.password}),
+                "https://servidordomal.fun/api/signup",
+                json={"username": self.username, "password": self.password}
             )
-
-            if response.status == 200: self.token = response.json().get('response', ''); 
-            else: print("\n[-] Usuario ou senha incorretos!"); sys.exit(0)
-        except Exception:
-            return None
-
+            if response.status_code == 200:
+                self.token = response.json().get('response', '')
+                return True
+            return False
+        except Exception as e:
+            print(f"Erro ao registrar: {e}")
+            return False
 
     def run(self):
-        status = self.request(json.dumps({"action": "status"})).strip()
-        if status == "Bad credentials!": return print("\n[-] Usuario ou senha incorretos!")
-
         print(f"\n[+] Você entrou como {self.username}")
         while True:
             try:
@@ -83,62 +87,59 @@ class Client:
                 action = input("[+] ").strip()
                 self.clear()
 
-                if not action: continue
+                if not action:
+                    continue
 
-                elif action == "1": print(self.request(json.dumps({"action": "read"})).strip())
+                elif action == "1":
+                    print(self.request({"action": "read"}))
+
                 elif action == "2":
                     print("[+] Enviar mensagem\n")
                     target = input("[+] Destinatário: ").strip()
                     message = input("[+] Mensagem: ").strip()
 
-                    if not target or not message: print("[-] Destinatário ou mensagem estão vazios!")
+                    if not target or not message:
+                        print("[-] Destinatário ou mensagem estão vazios!")
                     else:
-                        status = self.request(json.dumps({"action": "send", "to": target, "content": message})).strip()
+                        print(self.request({"action": "send", "to": target, "content": message}))
 
-                        if status == "0": print("[+] Mensagem enviada com sucesso!")
-                        elif status == "4": print("[-] Destinatário inexistente!")
                 elif action == "3":
-                    status = self.request(json.dumps({"action": "clear"})).strip()
-                    
-                    if status == "0": print("[+] Suas mensagens foram apagadas!")
-                    else: print("[-] Ocorreu um erro ao apagar suas mensagens!")
+                    print(self.request({"action": "clear"}))
+
                 elif action == "4":
                     print("[+] Enviar moedas\n")
                     target = input("[+] Destinatário: ").strip()
                     amount = input("[+] Quantidade: ").strip()
 
-                    if not target or not amount: print("[-] Destinatário ou quantidade estão vazios!")
-                    else: 
-                        status = self.request(json.dumps({"action": "transfer", "to": target, "amount": amount})).strip()
+                    if not target or not amount:
+                        print("[-] Destinatário ou quantidade estão vazios!")
+                    else:
+                        print(self.request({"action": "transfer", "to": target, "amount": amount}))
 
-                        if status == "0": print("[+] Moedas enviadas com sucesso!")
-                        elif status == "4": print("[-] Destinatário inexistente!")
-                        elif status == "6": print("[-] Quantidade inválida!")
-                        elif status == "7": print("[-] Saldo insuficiente!")
-                elif action == "5": 
+                elif action == "5":
                     user = input("[+] Nome do usuário para procurar: ").strip()
-                    if not user: print("[-] Nome de usuário não pode estar vazio!")
-                    else: 
-                        result = self.request(json.dumps({"action": "search", "user": user})).strip()
+                    if not user:
+                        print("[-] Nome de usuário não pode estar vazio!")
+                    else:
+                        print(self.request({"action": "search", "user": user}))
 
-                        if result == "4": print("[-] Usuário não encontrado!")
-                        else: print(f"[+] {result}")
-                elif action == "6": print(self.request(json.dumps({"action": "me"})).strip())
-                elif action == "7": print(self.request(json.dumps({"action": "coins"})).strip())
+                elif action == "6":
+                    print(self.request({"action": "me"}))
+
+                elif action == "7":
+                    print(self.request({"action": "coins"}))
+
                 elif action == "8":
                     password = getpass.getpass("[+] Nova senha: ").strip()
                     if not password:
                         print("[-] A senha está vazia!")
                     else:
-                        if self.request(json.dumps({"action": "changepass", "newpass": password})).strip() == "0":
-                            print("[+] Senha alterada com sucesso!")
-                            self.password = password
+                        print(self.request({"action": "changepass", "newpass": password}))
+                        self.password = password
 
                 elif action == "9":
-                    status = self.request(json.dumps({"action": "signoff"})).strip()
-                    if status == "0":
-                        print("[!] Sua conta foi deletada!")
-                        break
+                    print(self.request({"action": "signoff"}))
+                    break
 
                 elif action == "10":
                     print("[+] Saindo...")
