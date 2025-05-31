@@ -138,7 +138,7 @@ class Client:
                         self.password = password
 
                 elif action == "9":
-                    print(self.request({"action": "signoff"}))
+                    print("[-] Operação não permitida via console")
                     break
 
                 elif action == "10":
