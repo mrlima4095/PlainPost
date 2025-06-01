@@ -212,7 +212,7 @@ def mural_settings():
     username = get_user(request.headers.get("Authorization"))
     if not username: return jsonify({"response": "Bad credentials!"}), 401
     payload = request.get_json()
-    file_id = payload['file_id'] + ".bin"
+    file_id = payload['file_id']
     file_id = file_id if not "/" in file_id else file_id.split("/")[6]
 
     if not file_id: return jsonify({"response": ""}), 400
@@ -223,7 +223,7 @@ def mural_settings():
     if not row: return jsonify({"response": "File not found or you arent owner of it."}), 404
 
     saved_name = row[0]
-    file_path = os.path.join(UPLOAD_FOLDER, saved_name)
+    file_path = os.path.join(UPLOAD_FOLDER, saved_name + ".bin")
 
     if not os.path.exists(file_path): return jsonify({"response": "File not found."}), 410
 
