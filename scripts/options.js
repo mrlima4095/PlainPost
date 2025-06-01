@@ -19,4 +19,6 @@ window.onload = () => {
             else Swal.fire('Erro', 'Erro ao alterar sua biografia.', 'error');
         } catch { Swal.fire('Erro', 'Erro ao procurar.', 'error'); }
     });
+    document.getElementById("app").addEventListener("click", () => { window.open("https://apk.e-droid.net/apk/app3599871-8b35ha.apk?v=2", "_blank"); });   
+    
 };
