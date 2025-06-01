@@ -79,7 +79,7 @@ def get_user(token):
 def login():
     mailserver, mailcursor = getdb()
     if not request.is_json:
-        return jsonify({"error": "Invalid content type. Must be JSON."}), 400
+        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     username = payload.get('username')
@@ -93,7 +93,7 @@ def login():
 @app.route('/api/signup', methods=['POST'])
 def signup():
     mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     username = payload['username']
@@ -111,7 +111,7 @@ def signup():
 @app.route('/api/mail', methods=['POST'])
 def mail():
     mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     username = get_user(request.headers.get("Authorization"))
     if not username: return jsonify({ "response": "Bad credentials!" }), 401
@@ -207,17 +207,55 @@ def mail():
 @app.route('/api/mural', methods=['POST'])
 def mural_settings():
     mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     username = get_user(request.headers.get("Authorization"))
     if not username: return jsonify({"response": "Bad credentials!"}), 401
     payload = request.get_json()
+    file_id = payload['file_id'] + ".bin"
+    file_id = file_id if not "/" in file_id else file_id.split("/")[6]
 
+    if not file_id: return jsonify({"response": ""}), 400
+
+    mailcursor.execute("SELECT saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
+    row = mailcursor.fetchone()
+
+    if not row: return jsonify({"response": "File not found or you arent owner of it."}), 404
+
+    saved_name = row[0]
+    file_path = os.path.join(UPLOAD_FOLDER, saved_name)
+
+    if not os.path.exists(file_path): return jsonify({"response": "File not found."}), 410
+
+    mailcursor.execute("UPDATE users SET page = ? WHERE username = ?", (file_id, username))
+    mailserver.commit()
+
+    return jsonify({"response": "Page changed with sucess."}), 200
     
-
 @app.route('/mural/<username>', methods=['GET'])
 def mural(username):
+    mailserver, mailcursor = getdb()
 
+    mailcursor.execute("SELECT page FROM users WHERE username = ?", (username,))
+    row = mailcursor.fetchone()
+
+    if not row: return jsonify({"response": "User not found!."}), 404
+
+    file_id = row[0]
+
+    if not file_id: return jsonify({"response": "User dont have mural."}), 404
+
+    mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
+    row = mailcursor.fetchone()
+
+    if not row: return jsonify({"response": "Mural file not found."}), 404
+
+    saved_name = row[0] + ".bin"
+    file_path = os.path.join(UPLOAD_FOLDER, saved_name)
+
+    if not os.path.exists(file_path): return jsonify({"response": "Mural file is not avaliable."}), 410
+
+    return send_file(file_path, mimetype='text/html')
 # |
 # |
 # BinDrop
@@ -233,13 +271,13 @@ def drive_upload():
     file_id = str(uuid.uuid4())
 
     if not file or not username:
-        return jsonify({"success": False, "error": "Arquivo ou usuário não fornecido."}), 400
+        return jsonify({"success": False, "response": "Arquivo ou usuário não fornecido."}), 400
 
     size = len(file.read())
     file.seek(0)
 
     if size > 100 * 1024 * 1024:
-        return jsonify({"success": False, "error": "Arquivo excede o limite de 100MB."}), 413
+        return jsonify({"success": False, "response": "Arquivo excede o limite de 100MB."}), 413
 
     saved_name = f"{file_id}.bin"
     path = os.path.join(UPLOAD_FOLDER, saved_name)
@@ -266,7 +304,7 @@ def drive_download(file_id):
     row = mailcursor.fetchone()
 
     if not row:
-        return jsonify({"error": "Arquivo não encontrado."}), 404
+        return jsonify({"response": "Arquivo não encontrado."}), 404
 
     original_name, saved_name = row
     path = os.path.join(UPLOAD_FOLDER, saved_name)
