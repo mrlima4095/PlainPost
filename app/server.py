@@ -250,7 +250,7 @@ def mural(username):
 
     if not row: return jsonify({"response": "Mural file not found."}), 404
 
-    saved_name = row[0] + ".bin"
+    saved_name = row[0]
     file_path = os.path.join(UPLOAD_FOLDER, saved_name)
 
     if not os.path.exists(file_path): return jsonify({"response": "Mural file is not avaliable."}), 410
