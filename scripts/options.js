@@ -15,40 +15,10 @@ window.onload = () => {
     });*/   
     document.getElementById("changepage").addEventListener("click", async () => {
     alert("Clique detectado");
-    const { value: file_id } = await Swal.fire({
-        title: 'ID do arquivo:',
-        input: 'text',
-        inputPlaceholder: 'Link do arquivo do BinDrop',
-        showCancelButton: true
+    
     });
 
-    alert("Valor digitado: " + file_id);
-    if (!file_id) return Swal.fire('Erro', 'O ID não pode estar vazio!', 'error');
-
-    alert("Enviando para o servidor...");
-    try {
-        const resposta = await fetch("https://servidordomal.fun/api/mural", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": token
-            },
-            body: JSON.stringify({ file_id }),
-        });
-
-        alert("Status: " + resposta.status);
-        if (resposta.status == 200)
-            Swal.fire('Sucesso', 'A página do seu mural foi alterada!', 'success');
-        else if (resposta.status == 404)
-            Swal.fire('Erro', 'O arquivo não foi encontrado, ou você não é o dono dele!', 'error');
-        else if (resposta.status == 410)
-            Swal.fire('Erro', 'O arquivo não está disponível!', 'error');
-        else
-            Swal.fire('Erro', 'Erro ao alterar a página.', 'error');
-    } catch (err) {
-        Swal.fire('Erro', 'Erro na conexão: ' + err.message, 'error');
-    }
-});
+    
     document.getElementById("changebio").addEventListener("click", async () => {
         const { value: content } = await Swal.fire({ title: 'Biografia:', input: 'text', inputPlaceholder: 'O que esta pensando?', showCancelButton: true });
         if (!content) return Swal.fire('Erro', 'Sua biografia não pode estar vazia!', 'error');
