@@ -9,7 +9,7 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="scripts/options.js" defer></script>
+    <script src="scripts/options.js" ></script>
 </head>
 <body>
     <div id="conteiner">
