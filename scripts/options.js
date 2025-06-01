@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
             Swal.fire('Erro', 'Erro na conexão.', 'error');
         }
     });
+    
 
     document.getElementById("changebio").addEventListener("click", async () => {
         const { value: content } = await Swal.fire({
