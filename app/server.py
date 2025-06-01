@@ -222,10 +222,10 @@ def mural_settings():
 
     if not row: return jsonify({"response": "File not found or you arent owner of it."}), 404
 
-    saved_name = row[0] + ".bin"
-    file_path = os.path.join(UPLOAD_FOLDER, saved_name)
+    #saved_name = row[0] + ".bin"
+    #file_path = os.path.join(UPLOAD_FOLDER, saved_name)
 
-    if not os.path.exists(file_path): return jsonify({"response": "File not found."}), 410
+    #if not os.path.exists(file_path): return jsonify({"response": "File not found."}), 410
 
     mailcursor.execute("UPDATE users SET page = ? WHERE username = ?", (file_id, username))
     mailserver.commit()
