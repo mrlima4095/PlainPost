@@ -15,7 +15,9 @@
     <div id="conteiner">
         <h2>Painel da Conta</h2><br>
         <button id="back" type="button">Retornar</button>
+        <button id="mural" type="button">Meu Mural</button>
         <button id="changebio" type="button">Mudar Biografia</button>
+        <button id="changepage" type="button">Configurar Mural</button>
     </div>
 </body>
 </html>
