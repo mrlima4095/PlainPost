@@ -204,6 +204,22 @@ def mail():
     else: return jsonify({"response": "Invalid payload!"}), 405
 # |
 # |
+@app.route('/api/mural', methods=['POST'])
+def mural_settings():
+    mailserver, mailcursor = getdb()
+    if not request.is_json: return jsonify({"error": "Invalid content type. Must be JSON."}), 400
+
+    username = get_user(request.headers.get("Authorization"))
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
+    payload = request.get_json()
+
+    
+
+@app.route('/mural/<username>', methods=['GET'])
+def mural(username):
+
+# |
+# |
 # BinDrop
 # |
 # Upload API
