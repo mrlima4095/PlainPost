@@ -3,7 +3,7 @@ window.onload = () => {
     if (!token) { window.location.href = "login"; return; }
 
     document.getElementById("back").addEventListener("click", () => { window.location.href = "/mail"; });   
-    document.getElementById("mural").addEventListener("click", () => { 
+    document.getElementById("mural").addEventListener("click", async () => { 
         try {
             const resposta = await fetch("https://servidordomal.fun/api/mail", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": token }, body: JSON.stringify({ action: "status" }), });
             const dados = await resposta.json();
