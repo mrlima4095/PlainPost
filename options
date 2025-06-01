@@ -16,7 +16,6 @@
         <h2>Painel da Conta</h2><br>
         <button id="back" type="button">Retornar</button>
         <button id="changebio" type="button">Mudar Biografia</button>
-        <button id="app" type="button">Instalar App</button>
     </div>
 </body>
 </html>
