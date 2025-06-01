@@ -40,4 +40,4 @@ window.onload = () => {
     });
 
 }
-function compartilhar(fileId) { const link = `${apiBase}/download/${fileId}`; navigator.clipboard.writeText(link).then(() => { Swal.fire("Link copiado!", "O link de download foi copiado para a área de transferência.", "success"); }).catch(() => { Swal.fire("Erro", "Não foi possível copiar o link.", "error"); }); }
+//function compartilhar(fileId) { const link = `${apiBase}/download/${fileId}`; navigator.clipboard.writeText(link).then(() => { Swal.fire("Link copiado!", "O link de download foi copiado para a área de transferência.", "success"); }).catch(() => { Swal.fire("Erro", "Não foi possível copiar o link.", "error"); }); }
