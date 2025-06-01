@@ -200,7 +200,7 @@ def mail():
         mailserver.commit()
 
         return jsonify({"response": "Account deleted!"}), 200
-    elif payload['action'] == "status": return jsonify({"response": "OK"}), 200
+    elif payload['action'] == "status": return jsonify({"response": username}), 200
     else: return jsonify({"response": "Invalid payload!"}), 405
 # |
 # |
