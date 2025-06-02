@@ -271,11 +271,7 @@ def detect_js(file):
         buffer = ""
         tags = []
 
-        js_patterns = [
-            r"<script\b",  # tag script
-            r"javascript\s*:",  # javascript: em href, src...
-            r"\s(onabort|onblur|onchange|onclick|oncontextmenu|ondblclick|ondrag|ondrop|onerror|onfocus|oninput|onkeydown|onkeypress|onkeyup|onload|onmousedown|onmousemove|onmouseout|onmouseover|onmouseup|onreset|onresize|onscroll|onselect|onsubmit|onunload)\s*="  # eventos inline
-        ]
+        js_patterns = [ r"<script\b", r"javascript\s*:", r"\s(onabort|onblur|onchange|onclick|oncontextmenu|ondblclick|ondrag|ondrop|onerror|onfocus|oninput|onkeydown|onkeypress|onkeyup|onload|onmousedown|onmousemove|onmouseout|onmouseover|onmouseup|onreset|onresize|onscroll|onselect|onsubmit|onunload)\s*=" ]
 
         for char in content:
             if char == "<":
@@ -289,18 +285,14 @@ def detect_js(file):
                     buffer = ""
                 inTag = False
 
-            elif inTag:
-                buffer += char
+            elif inTag: buffer += char
 
         for tag in tags:
             for pattern in js_patterns:
                 if re.search(pattern, tag, re.IGNORECASE):
                     return True
-
         return False
-
-    except UnicodeDecodeError:
-        return True
+    except UnicodeDecodeError: return True
 # |
 # |
 # BinDrop
