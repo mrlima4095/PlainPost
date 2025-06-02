@@ -272,13 +272,13 @@ def detect_js(file):
 
         inTag = False
         buffer = ""
-        patterns = []
+        tags = []
 
+        # Lista de eventos comuns do HTML que podem conter JS
         js_patterns = [
-            r"<script\b",             # tag <script
-            r"javascript\s*:",        # href="javascript:..."
-            r"\s(on(abort|blur|change|click|contextmenu|dblclick|drag|drop|error|focus|input|keydown|keypress|keyup|load|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|unload))\s*=",  
-            
+            r"<script\b",  # tag script
+            r"javascript\s*:",  # javascript: em href, src...
+            r"\s(onabort|onblur|onchange|onclick|oncontextmenu|ondblclick|ondrag|ondrop|onerror|onfocus|oninput|onkeydown|onkeypress|onkeyup|onload|onmousedown|onmousemove|onmouseout|onmouseover|onmouseup|onreset|onresize|onscroll|onselect|onsubmit|onunload)\s*="  # eventos inline
         ]
 
         for char in content:
@@ -289,20 +289,22 @@ def detect_js(file):
             elif char == ">":
                 if inTag:
                     buffer += ">"
-                    patterns.append(buffer)
+                    tags.append(buffer)
                     buffer = ""
                 inTag = False
 
-            elif inTag: buffer += char
+            elif inTag:
+                buffer += char
 
-        for tag in patterns:
+        for tag in tags:
             for pattern in js_patterns:
                 if re.search(pattern, tag, re.IGNORECASE):
                     return 1  # JavaScript detectado
 
-        return True
+        return True  # Sem JS
 
-    except UnicodeDecodeError: return 2
+    except UnicodeDecodeError:
+        return 2  # Arquivo binário
 # |
 # |
 # BinDrop
