@@ -231,8 +231,9 @@ def mural_settings():
     if not os.path.exists(file_path): return jsonify({"response": "File not found."}), 410
 
     shield = detect_js(file_path)
-    if shield == 1: return jsonify({"response": "JavaScript have been blocked!"}), 415
-    elif shield == 2: return jsonify({"response": "Binary file cant be loaded!"}), 406
+    if shield != True:
+        if shield == 1: return jsonify({"response": "JavaScript have been blocked!"}), 415
+        elif shield == 2: return jsonify({"response": "Binary file cant be loaded!"}), 406
 
     mailcursor.execute("UPDATE users SET page = ? WHERE username = ?", (file_id, username))
     mailserver.commit()
