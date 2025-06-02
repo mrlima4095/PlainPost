@@ -230,6 +230,10 @@ def mural_settings():
     file_path = os.path.join(UPLOAD_FOLDER, saved_name)
     if not os.path.exists(file_path): return jsonify({"response": "File not found."}), 410
 
+    shield = detect_js(file_path)
+    if shield == 1: return jsonify("response": "JavaScript have been blocked!"), 415
+    elif shield == 2: return jsonify("response": "Binary file cant be loaded!"), 406
+
     mailcursor.execute("UPDATE users SET page = ? WHERE username = ?", (file_id, username))
     mailserver.commit()
 
@@ -261,7 +265,22 @@ def mural(username):
     return send_file(file_path, mimetype='text/html')
 # |
 def detect_js(file):
-   
+    try:
+        with open(file, "rt") as file:
+            content = html.read().decode("utf-8")
+
+        patterns = [
+            r"<script",
+            r"javascript:"
+        ]
+        for pattern in patterns:
+            if re.search(pattern, content, re.IGNORECASE):
+                return 1
+
+        return True
+    except UnicodeDecodeError: 
+        return 2
+
 # |
 # |
 # BinDrop
