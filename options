@@ -17,6 +17,7 @@
         <button id="back" type="button">Retornar</button>
         <button id="mural" type="button">Meu Mural</button>
         <button id="changepage" type="button">Configurar Mural</button>
+        <button id="gitea" type="button">Acesse o GITea</button>
         <button id="changebio" type="button">Mudar Biografia</button>
     </div>
 </body>
