@@ -276,7 +276,8 @@ def detect_js(file):
         js_patterns = [
             r"<script\b",             # tag <script
             r"javascript\s*:",        # href="javascript:..."
-            r"on\w+\s*="              # atributos tipo onclick=, onload=, etc
+            r"\s(on(abort|blur|change|click|contextmenu|dblclick|drag|drop|error|focus|input|keydown|keypress|keyup|load|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|unload))\s*=",  
+            
         ]
 
         for char in content:
