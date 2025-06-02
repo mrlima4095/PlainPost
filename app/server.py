@@ -204,6 +204,10 @@ def mail():
     else: return jsonify({"response": "Invalid payload!"}), 405
 # |
 # |
+# Murals
+# |
+# Settings
+# | (Change HTML page)
 @app.route('/api/mural', methods=['POST'])
 def mural_settings():
     mailserver, mailcursor = getdb()
@@ -230,7 +234,7 @@ def mural_settings():
     mailserver.commit()
 
     return jsonify({"response": "Page changed with sucess."}), 200
-    
+# | (Access mural from an user)
 @app.route('/mural/<username>', methods=['GET'])
 def mural(username):
     mailserver, mailcursor = getdb()
