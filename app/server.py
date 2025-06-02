@@ -271,8 +271,10 @@ def detect_js(file):
 
         patterns = [
             r"<script",
-            r"javascript:"
+            r"javascript:",
+            r"on\w+\s*="
         ]
+        
         for pattern in patterns:
             if re.search(pattern, content, re.IGNORECASE):
                 return 1
