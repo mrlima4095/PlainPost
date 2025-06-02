@@ -260,6 +260,9 @@ def mural(username):
 
     return send_file(file_path, mimetype='text/html')
 # |
+def detect_js(file):
+   
+# |
 # |
 # BinDrop
 # |
