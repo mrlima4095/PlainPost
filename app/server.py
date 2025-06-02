@@ -264,28 +264,48 @@ def mural(username):
 
     return send_file(file_path, mimetype='text/html')
 # |
+import re
+
 def detect_js(file):
     try:
         with open(file, "rt", encoding="utf-8") as f:
             content = f.read()
 
-        tag_attributes = re.findall(r"<[^>]+>", content)
+        inTag = False
+        buffer = ""
+        patterns = []
 
         js_patterns = [
-            r"<script\b",             
-            r"javascript\s*:",        
-            r"on\w+\s*="              
+            r"<script\b",             # tag <script
+            r"javascript\s*:",        # href="javascript:..."
+            r"on\w+\s*="              # atributos tipo onclick=, onload=, etc
         ]
 
-        for tag in tag_attributes:
+        for char in content:
+            if char == "<":
+                inTag = True
+                buffer = "<"  # começa nova tag
+
+            elif char == ">":
+                if inTag:
+                    buffer += ">"
+                    patterns.append(buffer)
+                    buffer = ""
+                inTag = False
+
+            elif inTag:
+                buffer += char
+
+        # Agora patterns tem todas as tags do HTML
+        for tag in patterns:
             for pattern in js_patterns:
                 if re.search(pattern, tag, re.IGNORECASE):
-                    return 1  
+                    return 1  # JavaScript detectado
 
-        return True 
+        return True  # OK, sem JS detectado
+
     except UnicodeDecodeError:
-        return 2  
-
+        return 2  # Arquivo binário
 
 # |
 # |
