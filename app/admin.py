@@ -104,7 +104,7 @@ class AdminPanel:
             self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", 
                                 (user['username'], "admin", content, timestamp))
         
-        self.db.commit()
+        self.db.commit() 
         print(f"[+] Notification sent to all users.")
     def list_all_mails(self):
         self.cursor.execute("SELECT * FROM mails")
