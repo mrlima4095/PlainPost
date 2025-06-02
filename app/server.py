@@ -231,7 +231,7 @@ def mural_settings():
 
     return jsonify({"response": "Page changed with sucess."}), 200
     
-@app.route('api/u/<username>', methods=['GET'])
+@app.route('/api/u/<username>', methods=['GET'])
 def mural(username):
     mailserver, mailcursor = getdb()
 
