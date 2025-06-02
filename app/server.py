@@ -299,7 +299,9 @@ def detect_js(file):
         # Agora patterns tem todas as tags do HTML
         for tag in patterns:
             for pattern in js_patterns:
+                print(pattern)
                 if re.search(pattern, tag, re.IGNORECASE):
+                    print("foi esse")
                     return 1  # JavaScript detectado
 
         return True  # OK, sem JS detectado
