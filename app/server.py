@@ -242,7 +242,7 @@ def mural(username):
 
     file_id = row[0]
 
-    if not file_id: return jsonify({"response": "User dont have mural."}), 404
+    if not file_id: return jsonify({"response": "User dont have mural."}), 403
 
     mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
     row = mailcursor.fetchone()
