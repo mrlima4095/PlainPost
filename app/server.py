@@ -267,7 +267,7 @@ def mural(username):
 def detect_js(file):
     try:
         with open(file, "rt") as file:
-            content = html.read().decode("utf-8")
+            content = file.read().decode("utf-8")
 
         patterns = [
             r"<script",
