@@ -23,6 +23,8 @@ window.onload = () => {
 
             if (resposta.status == 200) Swal.fire('Sucesso', 'A pagina do seu mural foi alterada!', 'success');
             else if (resposta.status == 404) Swal.fire('Erro', 'O arquivo não foi encontrado, ou você não é o dono dele!', 'error');
+            else if (resposta.status == 415) Swal.fire('Erro', 'Você não pode incluir JavaScript em uma pagina de mural!', 'error');
+            else if (resposta.status == 406) Swal.fire('Erro', 'O arquivo não pode ser binario!', 'error');
             else if (resposta.status == 410) Swal.fire('Erro', 'O arquivo não esta disponivel!', 'error');
             else { Swal.fire('Erro', 'Erro ao alterar a pagina.', 'error'); }
         } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); }
