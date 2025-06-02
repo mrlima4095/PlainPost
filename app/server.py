@@ -266,22 +266,26 @@ def mural(username):
 # |
 def detect_js(file):
     try:
-        with open(file, "rt") as file:
-            content = file.read()
+        with open(file, "rt", encoding="utf-8") as f:
+            content = f.read()
 
-        patterns = [
-            r"<script",
-            r"javascript:",
-            r"on\w+\s*="
+        tag_attributes = re.findall(r"<[^>]+>", content)
+
+        js_patterns = [
+            r"<script\b",             
+            r"javascript\s*:",        
+            r"on\w+\s*="              
         ]
 
-        for pattern in patterns:
-            if re.search(pattern, content, re.IGNORECASE):
-                return 1
+        for tag in tag_attributes:
+            for pattern in js_patterns:
+                if re.search(pattern, tag, re.IGNORECASE):
+                    return 1  
 
-        return True
-    except UnicodeDecodeError: 
-        return 2
+        return True 
+    except UnicodeDecodeError:
+        return 2  
+
 
 # |
 # |
