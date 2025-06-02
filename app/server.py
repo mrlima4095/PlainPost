@@ -263,9 +263,7 @@ def mural(username):
     if not os.path.exists(file_path): return jsonify({"response": "Mural file is not avaliable."}), 410
 
     return send_file(file_path, mimetype='text/html')
-# |
-import re
-
+# | (Detect JavaScript)
 def detect_js(file):
     try:
         with open(file, "rt", encoding="utf-8") as f:
@@ -284,7 +282,7 @@ def detect_js(file):
         for char in content:
             if char == "<":
                 inTag = True
-                buffer = "<"  # começa nova tag
+                buffer = "<"
 
             elif char == ">":
                 if inTag:
@@ -293,22 +291,16 @@ def detect_js(file):
                     buffer = ""
                 inTag = False
 
-            elif inTag:
-                buffer += char
+            elif inTag: buffer += char
 
-        # Agora patterns tem todas as tags do HTML
         for tag in patterns:
             for pattern in js_patterns:
-                print(pattern, file="logs")
                 if re.search(pattern, tag, re.IGNORECASE):
-                    print("foi esse", file="logs")
                     return 1  # JavaScript detectado
 
-        return True  # OK, sem JS detectado
+        return True
 
-    except UnicodeDecodeError:
-        return 2  # Arquivo binário
-
+    except UnicodeDecodeError: return 2
 # |
 # |
 # BinDrop
