@@ -34,15 +34,8 @@ class Bot:
 
     def request(self, payload):
         try:
-            headers = {
-                "Authorization": self.token,
-                "Content-Type": "application/json"
-            }
-            response = requests.post(
-                "https://servidordomal.fun/api/mail",
-                json=payload,
-                headers=headers
-            )
+            headers = { "Authorization": self.token, "Content-Type": "application/json" }
+            response = requests.post("https://servidordomal.fun/api/mail", json=payload, headers=headers )
             return response.json().get('response', '')
         except Exception as e: return print(f"[-] {e}")
 
@@ -58,10 +51,10 @@ class Bot:
         thr = threading.Timer(300, expire, args=(this,))
         thr.start()
 
-        self.db[this] = thr
+        self.db[f"{this}"] = thr
 
         print(f"[+] Waiting a user for Token {this}")
-
+    # |
     def CheckUser(self):
         messages = self.request({"action": "read"})
 
@@ -69,19 +62,26 @@ class Bot:
 
         messages = messages.split('\n')
         for message in messages:
-            sender = message.split(']')[0].split('-')[1].strip()
-            content = message.split(']')[1].strip()
+            try:
+                sender = message.split(']')[0]
+                sender = sender.split('-')[1].strip()
+                content = message.split(']')[1].strip()
+            except IndexError:
+                continue
 
-        if content in self.db:
-            print(f"[+] Authorized {sender} from code: {content}")
-            self.db[content].cancel()
-            del self.db[content]
+            if content in self.db:
+                print(f"[+] {sender} -> {content}")
+                self.db[content].cancel()
+                del self.db[content]
+
+        thr = threading.Timer(10, self.CheckUser)
+        thr.start()
 
 
-
-app = Bot()
+app = Bot("","")
 app.start()
 app.StartGetUserProcess()
+app.CheckUser()
 
 
 
