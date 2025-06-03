@@ -90,7 +90,7 @@ class Bot:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((host, port))
         s.listen(31522)
-        print(f"[+] Socket server listening on {host}:{port}")
+        print(f"[+] Listening on {host}:{port}")
 
         while True:
             conn, addr = s.accept()
@@ -107,13 +107,8 @@ app = Bot("","")
 app.start()
 app.CheckUser()
 
-# Rodar socket_server em thread separada
 threading.Thread(target=app.socket_server, daemon=True).start()
 
-# Você pode gerar um código inicial para testar
-print("[*] Generating initial code:")
-app.generate_code()
 
-# Mantém o script rodando
 while True:
     time.sleep(1)
