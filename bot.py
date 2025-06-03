@@ -103,7 +103,7 @@ class Bot:
                 else:
                     conn.sendall(b"Invalid command")
 
-app = Bot("Bot","@PLAINBOT")
+app = Bot("","")
 app.start()
 app.CheckUser()
 
