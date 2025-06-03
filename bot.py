@@ -23,7 +23,7 @@ class Bot:
             
             if response.status_code == 200: self.token = response.json().get('response', '')
             elif response.status_code == 409: 
-            	try:
+                try:
                     headers = { "Content-Type": "application/json" }
                     response = requests.post("https://servidordomal.fun/api/login", json={"username": self.username, "password": self.password}, headers=headers)
                     
@@ -32,7 +32,7 @@ class Bot:
                 except Exception as e: return print(f"[-] {e}")
         except Exception as e: return print(f"[-] {e}")
 
-	def request(self, payload):
+    def request(self, payload):
         try:
             headers = {
                 "Authorization": self.token,
