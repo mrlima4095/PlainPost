@@ -9,27 +9,27 @@ import requests
 import threading
 
 class Bot:
-	def __init__(self, username, password):
-		self.username = username
-		self.password = password
-		self.token = None
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+        self.token = None
 
-		self.db = {}
+        self.db = {}
 
-	def start(self):
-		try:
+    def start(self):
+        try:
             headers = { "Content-Type": "application/json" }
             response = requests.post("https://servidordomal.fun/api/signup", json={"username": self.username, "password": self.password}, headers=headers)
             
             if response.status_code == 200: self.token = response.json().get('response', '')
             elif response.status_code == 409: 
             	try:
-		            headers = { "Content-Type": "application/json" }
-		            response = requests.post("https://servidordomal.fun/api/login", json={"username": self.username, "password": self.password}, headers=headers)
-		            
-		            if response.status_code == 200: self.token = response.json().get('response', '')
-		            elif response.status_code == 401: print("[-] Bad credentials!")
-        	except Exception as e: return print(f"[-] {e}")
+                    headers = { "Content-Type": "application/json" }
+                    response = requests.post("https://servidordomal.fun/api/login", json={"username": self.username, "password": self.password}, headers=headers)
+                    
+                    if response.status_code == 200: self.token = response.json().get('response', '')
+                    elif response.status_code == 401: print("[-] Bad credentials!")
+                except Exception as e: return print(f"[-] {e}")
         except Exception as e: return print(f"[-] {e}")
 
 	def request(self, payload):
@@ -48,38 +48,39 @@ class Bot:
 
 
     def StartGetUserProcess(self):
-    	while True:
-    		this = random.randint(100000, 999999)
+        while True:
+            this = random.randint(100000, 999999)
 
-    		if not this in self.db: break
+            if not this in self.db: break
 
-    	def expire(that): del self.db[that]
+        def expire(that): del self.db[that]
 
-    	thr = threading.Timer(300, expire, args=(this,))
-    	thr.start()
+        thr = threading.Timer(300, expire, args=(this,))
+        thr.start()
 
-    	self.db[this] = thr
+        self.db[this] = thr
 
-    	print(f"[+] Waiting a user for Token {this}")
+        print(f"[+] Waiting a user for Token {this}")
 
     def CheckUser(self):
-    	messages = self.request({"action": "read"})
+        messages = self.request({"action": "read"})
 
-    	if not messages: return print("[-] Reading failed!")
+        if not messages: return print("[-] Reading failed!")
 
-    	messages = messages.split('\n')
-    	for message in messages:
-    		sender = message.split(']')[0].split('-')[1].strip()
-    		content = message.split(']')[1].strip()
+        messages = messages.split('\n')
+        for message in messages:
+            sender = message.split(']')[0].split('-')[1].strip()
+            content = message.split(']')[1].strip()
 
-    		if content in self.db:
-    			print(f"[+] Authorized {sender} from code: {content}")
-    			self.db[content].cancel()
-    			del self.db[content]
+        if content in self.db:
+            print(f"[+] Authorized {sender} from code: {content}")
+            self.db[content].cancel()
+            del self.db[content]
 
 
 
 app = Bot()
+app.start()
 app.StartGetUserProcess()
 
 
