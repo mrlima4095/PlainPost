@@ -94,15 +94,24 @@ class Bot:
 
         while True:
             conn, addr = s.accept()
-            with conn:
-                print(f"[+] Connection from {addr}")
-                data = conn.recv(1024).decode().strip()
-                if data.lower() == "gen":
+            threading.Thread(target=self.handle_client, args=(conn, addr), daemon=True).start()
+
+    def handle_client(self, conn, addr):
+        with conn:
+            print(f"[+] Connection from {addr}")
+            try:
+                data = conn.recv(1024).decode().strip().lower()
+
+                if data == "gen":
                     code = self.generate_code()
                     conn.sendall(code.encode())
+                elif data == "check":
+                    threading.Thread(target=self.CheckUser, daemon=True).start()
+                    conn.sendall(b"Check triggered")
                 else:
                     conn.sendall(b"Invalid command")
-
+            except Exception as e:
+                print(f"[-] Error handling client {addr}: {e}")
 app = Bot("","")
 app.start()
 app.CheckUser()
