@@ -90,7 +90,7 @@ class Bot:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((host, port))
         s.listen(31522)
-        print(f"[+] Listening on {host}:{port}")
+        print(f"[+] Listening on {port}")
 
         while True:
             conn, addr = s.accept()
