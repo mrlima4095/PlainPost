@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BinDrop</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript">
+        const apiBase = 'https://servidordomal.fun/api/drive';
+
+        async function status() {
+            const token = localStorage.getItem("Mail-Token");
+            if (!token) { window.location.href = "/mail/login"; }
+
+            try {
+                const resposta = await fetch("https://servidordomal.fun/api/mail", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": token },
+                    body: JSON.stringify({ action: "status" })
+                });
+
+                if (resposta.status == 200) { return; }
+                else if (resposta.status == 401) { window.location.href = "/mail/login"; }
+                else { Swal.fire("Erro", "Ocorreu um erro interno!", "error"); }
+            } catch { Swal.fire('Erro', 'Erro na conexão.', 'error'); } 
+        }
+
+        async function upload() {
+            const token = localStorage.getItem("Mail-Token");
+            if (!token) { window.location.href = "/mail/login"; }
+
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return Swal.fire("Erro", "Selecione um arquivo!", "error");
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch(`${apiBase}/upload`, { method: 'POST', headers: { "Authorization": token }, body: formData });
+            const data = await res.json();
+
+            if (data.success) { Swal.fire("Sucesso", "Arquivo enviado com sucesso!", "success"); listar(); } 
+            else { Swal.fire("Erro", data.error || "Erro ao enviar.", "error"); }
+        }
+
+        async function listar() {
+            const token = localStorage.getItem("Mail-Token");
+            if (!token) { window.location.href = "/mail/login"; }
+
+            const res = await fetch(`${apiBase}/list`, { method: "GET", headers: { "Authorization": token } });
+            const arquivos = await res.json();
+
+            const tbody = document.querySelector('#arquivoTabela tbody');
+            tbody.innerHTML = '';
+
+            arquivos.forEach(arq => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${arq.filename}</td>
+                    <td class="acoes">
+                        <button onclick="baixar('${arq.file_id}')">Baixar</button>
+                        <button onclick="deletar('${arq.file_id}')">Excluir</button>
+                        <button onclick="compartilhar('${arq.file_id}')">Compartilhar</button>
+                        <button onclick='mostrarPropriedades(${JSON.stringify(arq)})'>Propriedades</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function compartilhar(fileId) { const link = `${apiBase}/download/${fileId}`; navigator.clipboard.writeText(link).then(() => { Swal.fire("Link copiado!", "O link de download foi copiado para a área de transferência.", "success"); }).catch(() => { Swal.fire("Erro", "Não foi possível copiar o link.", "error"); }); }
+        function mostrarPropriedades(arquivo) { Swal.fire({ title: 'Propriedades do Arquivo', html: `<b>Nome:</b> ${arquivo.filename}<br> <b>Tamanho:</b> ${(arquivo.size / 1024 / 1024).toFixed(2)} MB<br> <b>Enviado em:</b> ${formatarData(arquivo.upload_time)}<br> <b>Expira em:</b> ${arquivo.expire_time ? formatarData(arquivo.expire_time) : 'Permanente'} `, icon: 'info' }); }
+        function baixar(fileId) { window.open(`${apiBase}/download/${fileId}`, '_blank'); }
+
+        function plainpost() { window.location.href = "/mail"; }
+
+        async function deletar(fileId) {
+            const result = await Swal.fire({ title: "Tem certeza?", text: "Tem certeza que deseja apagar o arquivo? (Esta ação é irreversível!)", icon: "warning", showCancelButton: true, confirmButtonText: "Sim, apagar", cancelButtonText: "Cancelar" });
+            if (!result.isConfirmed) return;
+
+            const res = await fetch(`${apiBase}/delete/${fileId}`, { method: 'DELETE' });
+            const data = await res.json();
+
+            if (data.success) { Swal.fire("Sucesso", "Arquivo apagado com sucesso!", "success"); listar(); } 
+            else { Swal.fire("Erro", "Erro ao excluir o arquivo.", "error"); }
+        }
+
+        function formatarData(iso) { const dt = new Date(iso); return dt.toLocaleString('pt-BR'); }
+
+        window.onload = () => { status(); listar(); };
+    </script>
+</head>
+<body>
+    <div id="conteiner">
+        <h1>BinDrop</h1>
+
+        <label for="fileInput">Arquivo para upload:</label>
+        <input type="file" id="fileInput">
+
+        <button onclick="upload()">Enviar Arquivo</button>
+        <button onclick="listar()">Atualizar lista</button>
+        <button onclick="plainpost()">PlainPost Mail</button><br><br>
+
+        <h2>Seus Arquivos</h2>
+        <table id="arquivoTabela">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</body>
+</html>
