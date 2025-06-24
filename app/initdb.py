@@ -10,7 +10,7 @@ def PlainPostDB():
             username TEXT PRIMARY KEY,
             password TEXT NOT NULL,
             coins INTEGER DEFAULT 0,
-            role TEXT DEFAULT 'user'
+            role TEXT DEFAULT 'user',
             biography TEXT DEFAULT 'A PlainPost user',
             page TEXT
         )
