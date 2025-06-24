@@ -301,20 +301,20 @@ def detect_js(file):
 @app.route('/api/drive/upload', methods=['POST'])
 def drive_upload():
     username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "Bad credentials" }), 401
+    if not username: return jsonify({ "response": "Bad credentials!" }), 401
     
     file = request.files.get('file')
     
     file_id = str(uuid.uuid4())
 
     if not file or not username:
-        return jsonify({"success": False, "response": "Arquivo ou usuário não fornecido."}), 400
+        return jsonify({"success": False, "response": "Bad request. File or user not found!"}), 400
 
     size = len(file.read())
     file.seek(0)
 
     if size > 100 * 1024 * 1024:
-        return jsonify({"success": False, "response": "Arquivo excede o limite de 100MB."}), 413
+        return jsonify({"success": False, "response": "File is large then 100MB."}), 413
 
     saved_name = f"{file_id}.bin"
     path = os.path.join(UPLOAD_FOLDER, saved_name)
@@ -341,7 +341,7 @@ def drive_download(file_id):
     row = mailcursor.fetchone()
 
     if not row:
-        return jsonify({"response": "Arquivo não encontrado."}), 404
+        return jsonify({"response": "File not found."}), 404
 
     original_name, saved_name = row
     path = os.path.join(UPLOAD_FOLDER, saved_name)
@@ -351,7 +351,7 @@ def drive_download(file_id):
 @app.route('/api/drive/list', methods=['GET'])
 def drive_list():
     username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "Bad credentials" }), 401
+    if not username: return jsonify({ "response": "Bad credentials!" }), 401
     
     mailserver, mailcursor = getdb()
     mailcursor.execute("SELECT id, original_name, size, upload_time, expire_time FROM files WHERE owner = ?", (username,))
