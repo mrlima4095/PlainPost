@@ -26,7 +26,7 @@ class AdminPanel:
             if args[1] == "register": sellf.register(args[2], args[3])
             elif args[1] == "unregister": self.unregister(args[2])
             elif args[1] == "password": self.changepass(args[2], args[3])
-            elif args[1] == "bio": self.bio(args[2], ' '.join(args[3:]))
+            elif args[1] == "bio": self.changebio(args[2], ' '.join(args[3:]))
             elif args[1] == "list": self.list_users()
 
             elif args[1] == "send": self.send(args[2], ' '.join(args[3:]))
