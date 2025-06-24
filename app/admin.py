@@ -71,7 +71,7 @@ class AdminPanel:
         
         print(f"[+] User '{username}' bio changed to '{bio}'.")
     def changerole(self, username, role):
-        self.cursor.execute("UPDATE users SET biography = ? WHERE username = ?", (bio, username))
+        self.cursor.execute("UPDATE users SET biography = ? WHERE username = ?", (role, username))
         self.db.commit()
         
         print(f"[+] User '{username}' role changed to '{role}'.")
