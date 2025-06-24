@@ -26,6 +26,7 @@ class AdminPanel:
             if args[1] == "register": sellf.register(args[2], args[3])
             elif args[1] == "unregister": self.unregister(args[2])
             elif args[1] == "password": self.changepass(args[2], args[3])
+            elif args[1] == "role": self.changerole(args[2], args[3])
             elif args[1] == "bio": self.changebio(args[2], ' '.join(args[3:]))
             elif args[1] == "list": self.list_users()
 
@@ -49,7 +50,7 @@ class AdminPanel:
     # |
     # User credentials 
     def register(self, username, password):
-        self.cursor.execute("INSERT INTO users (username, password, coins, biography) VALUES (?, ?, 0, 'A PlainPost user')", (username, bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())))
+        self.cursor.execute("INSERT INTO users (username, password, coins, role, biography) VALUES (?, ?, 0, 'user', 'A PlainPost user')", (username, bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())))
         self.db.commit()
 
         print(f"[+] User '{username}' created.")
@@ -69,6 +70,11 @@ class AdminPanel:
         self.db.commit()
         
         print(f"[+] User '{username}' bio changed to '{bio}'.")
+    def changerole(self, username, role):
+        self.cursor.execute("UPDATE users SET biography = ? WHERE username = ?", (bio, username))
+        self.db.commit()
+        
+        print(f"[+] User '{username}' role changed to '{role}'.")
     # |
     # View all users
     def list_users(self):

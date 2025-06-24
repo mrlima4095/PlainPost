@@ -102,7 +102,7 @@ def signup():
     mailcursor.execute("SELECT * FROM users WHERE username = ?", (username,))
     if mailcursor.fetchone(): return jsonify({"response": "This username is already in use."}), 409
 
-    mailcursor.execute("INSERT INTO users (username, password, coins, biography) VALUES (?, ?, 0, 'A PlainPost user')", (username, password))
+    mailcursor.execute("INSERT INTO users (username, password, coins, role, biography) VALUES (?, ?, 0, 'user', 'A PlainPost user')", (username, password))
     mailserver.commit()
 
     return jsonify({"response": gen_token(username)}), 200
@@ -172,16 +172,16 @@ def mail():
 
         return jsonify({"response": "Password changed!"}), 200
     elif payload['action'] == "search":
-        mailcursor.execute("SELECT biography FROM users WHERE username = ?", (payload['user'],))
+        mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (payload['user'],))
         row = mailcursor.fetchone()
 
-        if row: return jsonify({"response": f"ID: {payload['user']}\nBio: {row['biography']}"}), 200 
+        if row: return jsonify({"response": f"ID: {payload['user']}\nRole: [{row['role']}]\nBio: {row['biography']}"}), 200 
         else: return jsonify({"response": "Target not found!"}), 404
     elif payload['action'] == "me":
-        mailcursor.execute("SELECT biography FROM users WHERE username = ?", (username,))
+        mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
         
-        return jsonify({"response": f"ID: {username}\nBio: {row['biography']}"}), 200
+        return jsonify({"response": f"ID: {username}\nRole: [{row['role']}]\nBio: {row['biography']}"}), 200
     elif payload['action'] == "changebio":
         if not payload['bio']: return 400
 
