@@ -23,7 +23,7 @@ class AdminPanel:
         if len(args) < 2: self.help(); sys.exit(0)
 
         try:
-            if args[1] == "register": sellf.register(args[2], args[3])
+            if args[1] == "register": self.register(args[2], args[3])
             elif args[1] == "unregister": self.unregister(args[2])
             elif args[1] == "password": self.changepass(args[2], args[3])
             elif args[1] == "role": self.changerole(args[2], args[3])
