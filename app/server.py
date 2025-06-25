@@ -232,7 +232,7 @@ def ollama_agent():
         mailserver.commit()
 
     try:
-        ollama_response = requests.post("http://localhost:11434/v1/chat/completions", json={"model": "archagent:local", "messages": [ {"role": "user", "content": prompt} ] })
+        ollama_response = requests.post("http://localhost:11434/v1/chat/completions", json={"model": "agent", "messages": [ {"role": "user", "content": prompt} ] })
 
         if ollama_response.status_code != 200: return jsonify({"response": "Ollama error"}), 502
 
