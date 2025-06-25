@@ -242,6 +242,7 @@ def ollama_agent():
         return jsonify({"response": message}), 200
 
     except Exception as e: return jsonify({"response": f"Internal error: {str(e)}"}), 500
+
 # |
 # |
 # Murals
