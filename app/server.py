@@ -204,6 +204,58 @@ def mail():
     else: return jsonify({"response": "Invalid payload!"}), 405
 # |
 # |
+
+@app.route('/api/agent', methods=['POST'])
+def ollama_agent():
+    username = get_user(request.headers.get("Authorization"))
+    if not username:
+        return jsonify({"response": "Bad credentials!"}), 401
+
+    if not request.is_json:
+        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+
+    payload = request.get_json()
+    model = payload.get("model", "llama3")
+    prompt = payload.get("prompt", "")
+
+    if not prompt.strip():
+        return jsonify({"response": "Prompt cannot be empty"}), 400
+
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
+    row = mailcursor.fetchone()
+    role = row["role"]
+    coins = row["coins"]
+
+    # Se não for Admin ou MOD, consome 1 moeda por requisição
+    if role not in ["Admin", "MOD"]:
+        if coins <= 0:
+            return jsonify({"response": "Not enough coins!"}), 403
+        mailcursor.execute("UPDATE users SET coins = coins - 1 WHERE username = ?", (username,))
+        mailserver.commit()
+
+    # Faz a requisição ao Ollama local
+    try:
+        import requests
+        ollama_response = requests.post("http://localhost:11434/v1/chat/completions", json={
+            "model": model,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ]
+        })
+
+        if ollama_response.status_code != 200:
+            return jsonify({"response": "Ollama error"}), 502
+
+        result = ollama_response.json()
+        message = result['choices'][0]['message']['content']
+
+        return jsonify({"response": message}), 200
+
+    except Exception as e:
+        return jsonify({"response": f"Internal error: {str(e)}"}), 500
+# |
+# |
 # Murals
 # |
 # Settings
