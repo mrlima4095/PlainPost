@@ -214,7 +214,7 @@ def ollama_agent():
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
-    model = payload.get("model", "gemma3:1b")
+    #model = payload.get("model", "gemma3:1b")
     prompt = payload.get("prompt", "")
 
     if not prompt.strip(): return jsonify({"response": "Prompt cannot be empty"}), 400
@@ -232,7 +232,7 @@ def ollama_agent():
         mailserver.commit()
 
     try:
-        ollama_response = requests.post("http://localhost:11434/v1/chat/completions", json={"model": model, "messages": [ {"role": "user", "content": prompt} ] })
+        ollama_response = requests.post("http://localhost:11434/v1/chat/completions", json={"model": "gemma3:1b", "messages": [ {"role": "user", "content": prompt} ] })
 
         #if ollama_response.status_code != 200: return jsonify({"response": "Ollama error"}), 502
 
