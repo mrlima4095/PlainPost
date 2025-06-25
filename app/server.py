@@ -234,7 +234,7 @@ def ollama_agent():
     try:
         ollama_response = requests.post("http://localhost:11434/v1/chat/completions", json={"model": "gemma3:1b", "messages": [ {"role": "user", "content": prompt} ] })
 
-        #if ollama_response.status_code != 200: return jsonify({"response": "Ollama error"}), 502
+        if ollama_response.status_code != 200: return jsonify({"response": "Ollama error"}), 502
 
         result = ollama_response.json()
         message = result['choices'][0]['message']['content']
