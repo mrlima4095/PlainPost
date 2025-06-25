@@ -207,6 +207,7 @@ def mail():
 # |
 # Source A.I
 # (Model requests)
+@app.route('/api/agent', methods=['POST'])
 def ollama_agent():
     username = get_user(request.headers.get("Authorization"))
     if not username: return jsonify({"response": "Bad credentials!"}), 401
