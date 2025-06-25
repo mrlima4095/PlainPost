@@ -18,12 +18,12 @@ class Bot:
     def start(self):
         try:
             headers = { "Content-Type": "application/json" }
-            response = requests.post("https://servidordomal.fun/api/signup", json={"username": self.username, "password": self.password}, headers=headers)
+            response = requests.post("https://archsource.xyz/api/signup", json={"username": self.username, "password": self.password}, headers=headers)
             
             if response.status_code == 200: 
                 self.token = response.json().get('response', '')
             elif response.status_code == 409: 
-                response = requests.post("https://servidordomal.fun/api/login", json={"username": self.username, "password": self.password}, headers=headers)
+                response = requests.post("https://archsource.xyz/api/login", json={"username": self.username, "password": self.password}, headers=headers)
                 if response.status_code == 200: 
                     self.token = response.json().get('response', '')
                 elif response.status_code == 401: return print("[-] Bad credentials!")
@@ -34,7 +34,7 @@ class Bot:
     def request(self, payload):
         try:
             headers = { "Authorization": self.token, "Content-Type": "application/json" }
-            response = requests.post("https://servidordomal.fun/api/mail", json=payload, headers=headers )
+            response = requests.post("https://archsource.xyz/api/mail", json=payload, headers=headers )
             return response.json().get('response', '')
         except Exception as e: 
             print(f"[-] {e}")
