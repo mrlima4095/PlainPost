@@ -205,8 +205,8 @@ def mail():
     else: return jsonify({"response": "Invalid payload!"}), 405
 # |
 # |
-# Chatbot Agent
-@app.route('/api/agent', methods=['POST'])
+# Source A.I
+# (Model requests)
 def ollama_agent():
     username = get_user(request.headers.get("Authorization"))
     if not username: return jsonify({"response": "Bad credentials!"}), 401
@@ -214,35 +214,56 @@ def ollama_agent():
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
-    #model = payload.get("model", "gemma3:1b")
     prompt = payload.get("prompt", "")
-
     if not prompt.strip(): return jsonify({"response": "Prompt cannot be empty"}), 400
 
     mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
+    mailcursor.execute("SELECT role FROM users WHERE username = ?", (username,))
     row = mailcursor.fetchone()
-    role = row["role"]
-    coins = row["coins"]
-    
-    if role not in ["Admin", "MOD"]:
-        if coins <= 0: return jsonify({"response": "Not enough coins!"}), 403
 
-        mailcursor.execute("UPDATE users SET coins = coins - 1 WHERE username = ?", (username,))
-        mailserver.commit()
+    if not row: return jsonify({"response": "Bad credentials!"}), 401
+
+    role = row["role"]
 
     try:
-        ollama_response = requests.post("http://localhost:11434/v1/chat/completions", json={"model": "gemma3:1b", "messages": [ {"role": "user", "content": prompt} ] })
+        debited = ollama_take_coins(mailcursor, mailserver, username, role)
+        if debited is None:
+            return jsonify({"response": "Not enough coins!"}), 403
 
-        if ollama_response.status_code != 200: return jsonify({"response": "Ollama error"}), 502
+        ollama_response = requests.post(
+            "http://localhost:11434/v1/chat/completions",
+            json={"model": "gemma3:1b", "messages": [{"role": "user", "content": prompt}]},
+            timeout=10
+        )
 
-        result = ollama_response.json()
-        message = result['choices'][0]['message']['content']
+        try:
+            result = ollama_response.json()
+            message = result['choices'][0]['message']['content']
+        except (ValueError, KeyError, IndexError):
+            raise Exception("Invalid Ollama response format")
 
         return jsonify({"response": message}), 200
 
-    except Exception as e: return jsonify({"response": f"Internal error: {str(e)}"}), 500
+    except Exception as e:
+        if debited: ollama_refund(mailcursor, mailserver, username)
+        return jsonify({"response": f"Agent error: {str(e)}"}), 500
+def ollama_take_coins(cursor, server, username, role):
+    if role in ["Admin", "MOD"]: return False 
 
+    cursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
+    row = cursor.fetchone()
+
+    if not row or row["coins"] <= 0: return None 
+
+    cursor.execute("UPDATE users SET coins = coins - 1 WHERE username = ?", (username,))
+    server.commit()
+    return True 
+def ollama_refund(cursor, server, username):
+    try:
+        cursor.execute("UPDATE users SET coins = coins + 1 WHERE username = ?", (username,))
+        server.commit()
+    except Exception as e:
+        print(f"[WARN] Falha ao devolver moeda para {username}: {e}")
 # |
 # |
 # Murals
