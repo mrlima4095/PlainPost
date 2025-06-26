@@ -315,7 +315,7 @@ def reward_user():
     mailcursor.execute("UPDATE users SET coins = coins + 5 WHERE username = ?", (username,))
     mailserver.commit()
 
-    return jsonify({"response": "5 coins recebidas!"}), 200
+    return jsonify({"response": "You get 5 coins!"}), 200
 
 # |
 # Murals
