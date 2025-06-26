@@ -235,8 +235,9 @@ def ollama_agent():
         mailserver.commit()
 
     try:
-        # Armazena a nova mensagem do usuário
+        # Armazena a nova mensagem do usuário e commit logo após
         mailcursor.execute("INSERT INTO agents (username, role, content) VALUES (?, ?, ?)", (username, 'user', prompt))
+        mailserver.commit()
 
         # Busca as últimas 64 mensagens e monta o contexto
         mailcursor.execute("SELECT role, content FROM agents WHERE username = ? ORDER BY id DESC LIMIT 64", (username,))
@@ -255,18 +256,18 @@ def ollama_agent():
         result = ollama_response.json()
         message = result['choices'][0]['message']['content']
 
-        # Armazena resposta da IA
+        # Armazena resposta da IA e commit logo após
         mailcursor.execute("INSERT INTO agents (username, role, content) VALUES (?, ?, ?)", (username, 'assistant', message))
         mailserver.commit()
 
-        # Apaga excedente (mantém no máx. 64 por usuário)
+        # Apaga excedente (mantém no máximo 64 por usuário)
         mailcursor.execute("""
             DELETE FROM agents 
             WHERE id IN (
                 SELECT id FROM agents 
                 WHERE username = ? 
                 ORDER BY id ASC 
-                LIMIT (SELECT COUNT(*) - 64 FROM agents WHERE username = ?)
+                LIMIT (SELECT MAX(0, COUNT(*) - 64) FROM agents WHERE username = ?)
             )
         """, (username, username))
         mailserver.commit()
@@ -275,7 +276,6 @@ def ollama_agent():
 
     except Exception as e:
         return jsonify({"response": f"Internal error: {str(e)}"}), 500
-
 def ollama_refund(cursor, server, username):
     try:
         cursor.execute("UPDATE users SET coins = coins + 1 WHERE username = ?", (username,))
