@@ -50,7 +50,7 @@ class AdminPanel:
     # Interactive Mode
     def chat(self):
         print("[+] Admin Panel\n[+]")
-        print("[1] Register         [7] Send mail (as admin)")
+        print("[1] Register         [7] Send mail (as admin)    [c] Exit")
         print("[2] Unregister       [8] Notify all")
         print("[3] Change passowrd  [9] Read messages")
         print("[4] Change role      [0] Clear user inbox")
@@ -59,75 +59,65 @@ class AdminPanel:
     def cmd(self):
         while True:
             try:
-                self.chat()
+                self.cleartty(); self.chat()
                 cmd = input("[+] ").strip()
 
-                if cmd == "1": 
-                    self.cleartty()
+                if cmd == "1":
                     username = input("[+] Username: ").strip()
                     password = input("[+] Password: ").strip()
 
                     self.register(username, password)
                 elif cmd == "2":
-                    self.cleartty()
                     username = input("[+] Username: ").strip()
 
                     self.unregister(username)
                 elif cmd == "3":
-                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     password = input("[+] Password: ").strip()
 
                     self.changepass(username, password)
                 elif cmd == "4":
-                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     role = input("[+] Role: ").strip()
 
                     self.changerole(username, role)
                 elif cmd == "5":
-                    self.cleartty()
                     username = input("[+] Username: ").strip()
-                    biography = input("[+] Password: ").strip()
+                    biography = input("[+] Biography: ").strip()
 
                     self.changebio(username, biography)
                 elif cmd == "6": self.cleartty(); self.list_users()
                 elif cmd == "7":
-                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     message = input("[+] Message: ").strip()
 
                     self.send(username, message)
                 elif cmd == "8":
-                    self.cleartty()
                     message = input("[+] Message: ").strip()
 
                     self.notify_all(message)
                 elif cmd == "9":
-                    self.cleartty()
                     username = input("[+] Username: ").strip()
 
                     self.read(username, password)
                 elif cmd == "0":
-                    self.cleartty()
                     username = input("[+] Username: ").strip()
 
                     self.clear(username)
                 elif cmd == "a":
-                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     amount = input("[+] Amount: ").strip()
 
                     self.give_coins(username, amount)
                 elif cmd == "b":
-                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     amount = input("[+] Amount: ").strip()
 
                     self.take_coins(username, amount)
-                else: self.cleartty(); print("[-] Unknown option!")
+                else: os.exit()
+                else: print("[-] Unknown option!")
 
-                input("Press ENTER to continue...")
+                input("\n[+] Press ENTER to continue...")
 
             except KeyboardInterrupt: break
     def cleartty(self): os.system("cls" if os.name == "nt" else "clear")
