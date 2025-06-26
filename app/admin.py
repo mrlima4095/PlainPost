@@ -114,7 +114,7 @@ class AdminPanel:
                     amount = input("[+] Amount: ").strip()
 
                     self.take_coins(username, amount)
-                else: os.exit()
+                elif cmd == "c": os.exit()
                 else: print("[-] Unknown option!")
 
                 input("\n[+] Press ENTER to continue...")
