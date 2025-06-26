@@ -40,12 +40,96 @@ class AdminPanel:
             elif args[1] == "take-coin": self.take_coins(args[2], int(args[3]))
 
             elif args[1] == "help": self.help()
+            elif args[1] == "cmd": self.cmd()
 
             else: print("[!] invalid request")
         except IndexError as e: print(f"[!] Missed arguments")
         except Exception as e: print(f"[!] Error: {e}")
     # |
-    def help(self): print("register,unregister,password,bio,list,send,read,clear,clear-all,notifyall,give-coin,take-coin")
+    # Interactive Mode
+    def chat(self):
+        print("[+] Admin Panel\n[+]")
+        print("[1] Register         [7] Send mail (as admin)")
+        print("[2] Unregister       [8] Notify all")
+        print("[3] Change passowrd  [9] Read messages")
+        print("[4] Change role      [0] Clear user inbox")
+        print("[5] Change biography [a] Give coins")
+        print("[6] List users       [b] Take coins\n[+]")
+    def cmd(self):
+        while True:
+            try:
+                self.chat()
+                cmd = input("[+] ").strip()
+
+                if cmd == "1": 
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+                    password = input("[+] Password: ").strip()
+
+                    self.register(username, password)
+                elif cmd == "2":
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+
+                    self.unregister(username)
+                elif cmd == "3":
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+                    password = input("[+] Password: ").strip()
+
+                    self.changepass(username, password)
+                elif cmd == "4":
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+                    role = input("[+] Role: ").strip()
+
+                    self.changerole(username, role)
+                elif cmd == "5":
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+                    biography = input("[+] Password: ").strip()
+
+                    self.changebio(username, biography)
+                elif cmd == "6": self.clear(); self.list_users()
+                elif cmd == "7":
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+                    message = input("[+] Message: ").strip()
+
+                    self.send(username, message)
+                elif cmd == "8":
+                    self.clear()
+                    message = input("[+] Message: ").strip()
+
+                    self.notify_all(message)
+                elif cmd == "9":
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+
+                    self.read(username, password)
+                elif cmd == "0":
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+
+                    self.clear(username)
+                elif cmd == "a":
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+                    amount = input("[+] Amount: ").strip()
+
+                    self.give_coins(username, amount)
+                elif cmd == "b":
+                    self.clear()
+                    username = input("[+] Username: ").strip()
+                    amount = input("[+] Amount: ").strip()
+
+                    self.take_coins(username, amount)
+                else: self.clear()
+
+            except KeyboardInterrupt: break
+    def clear(self): os.system("cls" if os.name == "nt" else "clear")
+    # |
+    def help(self): print("cmd,register,unregister,password,bio,list,send,read,clear,clear-all,notifyall,give-coin,take-coin")
     # |
     # |
     # User credentials 
