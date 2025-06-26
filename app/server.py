@@ -206,7 +206,7 @@ def mail():
 # |
 # |
 # Source A.I
-# (Model requests)
+# | (Requests)
 @app.route('/api/agent', methods=['POST'])
 def ollama_agent():
     username = get_user(request.headers.get("Authorization"))
@@ -278,7 +278,7 @@ def ollama_refund(cursor, server, username):
         server.commit()
     except Exception as e:
         print(f"[WARN] Falha ao devolver moeda para {username}: {e}")
-# | (Clear agent for a user)
+# | (Clear agent)
 @app.route('/api/agent/forget', methods=['POST'])
 def forget_history():
     username = get_user(request.headers.get("Authorization"))
@@ -410,8 +410,7 @@ def detect_js(file):
 # |
 # |
 # BinDrop
-# |
-# Upload API
+# | (Upload API)
 @app.route('/api/drive/upload', methods=['POST'])
 def drive_upload():
     username = get_user(request.headers.get("Authorization"))
@@ -446,8 +445,7 @@ def drive_upload():
     mailserver.commit()
 
     return jsonify({"success": True}), 200
-# |
-# Download API
+# | (Download API)
 @app.route('/api/drive/download/<file_id>', methods=['GET'])
 def drive_download(file_id):
     mailserver, mailcursor = getdb()
@@ -460,8 +458,7 @@ def drive_download(file_id):
     original_name, saved_name = row
     path = os.path.join(UPLOAD_FOLDER, saved_name)
     return send_file(path, as_attachment=True, download_name=original_name)
-# |
-# View API
+# | (View API)
 @app.route('/api/drive/list', methods=['GET'])
 def drive_list():
     username = get_user(request.headers.get("Authorization"))
@@ -481,8 +478,7 @@ def drive_list():
             "expire_time": row[4]
         })
     return jsonify(result), 200
-# |
-# Delete API
+# | (Delete API)
 @app.route('/api/drive/delete/<file_id>', methods=['DELETE'])
 def drive_delete(file_id):
     mailserver, mailcursor = getdb()
@@ -525,7 +521,6 @@ def init_expiration_checker():
 
     check_expired_files()
 init_expiration_checker()
-# |
 # |
 # |
 # |
