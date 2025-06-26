@@ -235,16 +235,13 @@ def ollama_agent():
         mailserver.commit()
 
     try:
-        # Armazena a nova mensagem do usuário e commit logo após
         mailcursor.execute("INSERT INTO agents (username, role, content) VALUES (?, ?, ?)", (username, 'user', prompt))
         mailserver.commit()
 
-        # Busca as últimas 64 mensagens e monta o contexto
         mailcursor.execute("SELECT role, content FROM agents WHERE username = ? ORDER BY id DESC LIMIT 64", (username,))
         rows = mailcursor.fetchall()
         messages = [{"role": row["role"], "content": row["content"]} for row in reversed(rows)]
 
-        # Envia pro Ollama
         ollama_response = requests.post(
             "http://localhost:11434/v1/chat/completions",
             json={"model": "agent", "messages": messages}
@@ -260,7 +257,6 @@ def ollama_agent():
         mailcursor.execute("INSERT INTO agents (username, role, content) VALUES (?, ?, ?)", (username, 'assistant', message))
         mailserver.commit()
 
-        # Apaga excedente (mantém no máximo 64 por usuário)
         mailcursor.execute("""
             DELETE FROM agents 
             WHERE id IN (
@@ -307,7 +303,6 @@ def get_agent_history():
     history = [{"role": row["role"], "content": row["content"]} for row in reversed(rows)]
 
     return jsonify({"response": history}), 200
-
 # |
 # |
 # Murals
