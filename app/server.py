@@ -210,44 +210,104 @@ def mail():
 @app.route('/api/agent', methods=['POST'])
 def ollama_agent():
     username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({"response": "Bad credentials!"}), 401
+    if not username:
+        return jsonify({"response": "Bad credentials!"}), 401
 
-    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json:
+        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     prompt = payload.get("prompt", "")
 
-    if not prompt.strip(): return jsonify({"response": "Prompt cannot be empty"}), 400
+    if not prompt.strip():
+        return jsonify({"response": "Prompt cannot be empty"}), 400
 
     mailserver, mailcursor = getdb()
     mailcursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
     row = mailcursor.fetchone()
     role = row["role"]
     coins = row["coins"]
-    
-    if role not in ["Admin", "MOD", "DEV"]:
-        if coins <= 0: return jsonify({"response": "Not enough coins!"}), 403
 
+    if role not in ["Admin", "MOD", "DEV"]:
+        if coins <= 0:
+            return jsonify({"response": "Not enough coins!"}), 403
         mailcursor.execute("UPDATE users SET coins = coins - 1 WHERE username = ?", (username,))
         mailserver.commit()
 
     try:
-        ollama_response = requests.post("http://localhost:11434/v1/chat/completions", json={"model": "agent", "messages": [ {"role": "user", "content": prompt} ] })
+        # Armazena a nova mensagem do usuário
+        mailcursor.execute("INSERT INTO agents (username, role, content) VALUES (?, ?, ?)", (username, 'user', prompt))
 
-        if ollama_response.status_code != 200: return jsonify({"response": "Ollama error"}), 502
+        # Busca as últimas 64 mensagens e monta o contexto
+        mailcursor.execute("SELECT role, content FROM agents WHERE username = ? ORDER BY id DESC LIMIT 64", (username,))
+        rows = mailcursor.fetchall()
+        messages = [{"role": row["role"], "content": row["content"]} for row in reversed(rows)]
+
+        # Envia pro Ollama
+        ollama_response = requests.post(
+            "http://localhost:11434/v1/chat/completions",
+            json={"model": "agent", "messages": messages}
+        )
+
+        if ollama_response.status_code != 200:
+            return jsonify({"response": "Ollama error"}), 502
 
         result = ollama_response.json()
         message = result['choices'][0]['message']['content']
 
+        # Armazena resposta da IA
+        mailcursor.execute("INSERT INTO agents (username, role, content) VALUES (?, ?, ?)", (username, 'assistant', message))
+        mailserver.commit()
+
+        # Apaga excedente (mantém no máx. 64 por usuário)
+        mailcursor.execute("""
+            DELETE FROM agents 
+            WHERE id IN (
+                SELECT id FROM agents 
+                WHERE username = ? 
+                ORDER BY id ASC 
+                LIMIT (SELECT COUNT(*) - 64 FROM agents WHERE username = ?)
+            )
+        """, (username, username))
+        mailserver.commit()
+
         return jsonify({"response": message}), 200
 
-    except Exception as e: return jsonify({"response": f"Internal error: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"response": f"Internal error: {str(e)}"}), 500
+
 def ollama_refund(cursor, server, username):
     try:
         cursor.execute("UPDATE users SET coins = coins + 1 WHERE username = ?", (username,))
         server.commit()
     except Exception as e:
         print(f"[WARN] Falha ao devolver moeda para {username}: {e}")
+# | (Clear agent for a user)
+@app.route('/api/agent/forget', methods=['POST'])
+def forget_history():
+    username = get_user(request.headers.get("Authorization"))
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
+
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("DELETE FROM agents WHERE username = ?", (username,))
+    mailserver.commit()
+
+    return jsonify({"response": "All agent memory cleared!"}), 200
+# | (Read history)
+@app.route('/api/agent/history', methods=['GET'])
+def get_agent_history():
+    username = get_user(request.headers.get("Authorization"))
+    if not username:
+        return jsonify({"response": "Bad credentials!"}), 401
+
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT role, content FROM agents WHERE username = ? ORDER BY id DESC LIMIT 64", (username,))
+    rows = mailcursor.fetchall()
+
+    history = [{"role": row["role"], "content": row["content"]} for row in reversed(rows)]
+
+    return jsonify({"response": history}), 200
+
 # |
 # |
 # Murals

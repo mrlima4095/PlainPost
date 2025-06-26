@@ -39,6 +39,16 @@ def PlainPostDB():
         )
     """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS agents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            role TEXT,
+            content TEXT
+        );
+
+    """)
+
     conn.commit()
     conn.close()
 
