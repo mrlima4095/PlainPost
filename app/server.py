@@ -305,19 +305,6 @@ def get_agent_history():
     return jsonify({"response": history}), 200
 # |
 # |
-# Ad rewards
-@app.route('/api/reward', methods=['POST'])
-def reward_user():
-    username = get_user(request.headers.get("Authorization"))
-    if not username: return jsonify({ "response": "Bad credentials!" }), 401
-
-    mailserver, mailcursor = getdb()
-    mailcursor.execute("UPDATE users SET coins = coins + 5 WHERE username = ?", (username,))
-    mailserver.commit()
-
-    return jsonify({"response": "You get 5 coins!"}), 200
-
-# |
 # Murals
 # |
 # Settings
