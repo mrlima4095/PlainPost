@@ -62,72 +62,74 @@ class AdminPanel:
                 cmd = input("[+] ").strip()
 
                 if cmd == "1": 
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     password = input("[+] Password: ").strip()
 
                     self.register(username, password)
                 elif cmd == "2":
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
 
                     self.unregister(username)
                 elif cmd == "3":
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     password = input("[+] Password: ").strip()
 
                     self.changepass(username, password)
                 elif cmd == "4":
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     role = input("[+] Role: ").strip()
 
                     self.changerole(username, role)
                 elif cmd == "5":
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     biography = input("[+] Password: ").strip()
 
                     self.changebio(username, biography)
-                elif cmd == "6": self.clear(); self.list_users()
+                elif cmd == "6": self.cleartty(); self.list_users()
                 elif cmd == "7":
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     message = input("[+] Message: ").strip()
 
                     self.send(username, message)
                 elif cmd == "8":
-                    self.clear()
+                    self.cleartty()
                     message = input("[+] Message: ").strip()
 
                     self.notify_all(message)
                 elif cmd == "9":
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
 
                     self.read(username, password)
                 elif cmd == "0":
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
 
                     self.clear(username)
                 elif cmd == "a":
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     amount = input("[+] Amount: ").strip()
 
                     self.give_coins(username, amount)
                 elif cmd == "b":
-                    self.clear()
+                    self.cleartty()
                     username = input("[+] Username: ").strip()
                     amount = input("[+] Amount: ").strip()
 
                     self.take_coins(username, amount)
-                else: self.clear()
+                else: self.cleartty(); print("[-] Unknown option!")
+
+                input("Press ENTER to continue...")
 
             except KeyboardInterrupt: break
-    def clear(self): os.system("cls" if os.name == "nt" else "clear")
+    def cleartty(self): os.system("cls" if os.name == "nt" else "clear")
     # |
     def help(self): print("cmd,register,unregister,password,bio,list,send,read,clear,clear-all,notifyall,give-coin,take-coin")
     # |
