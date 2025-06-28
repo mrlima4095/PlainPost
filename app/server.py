@@ -210,17 +210,14 @@ def mail():
 @app.route('/api/agent', methods=['POST'])
 def ollama_agent():
     username = get_user(request.headers.get("Authorization"))
-    if not username:
-        return jsonify({"response": "Bad credentials!"}), 401
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
 
-    if not request.is_json:
-        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     prompt = payload.get("prompt", "")
 
-    if not prompt.strip():
-        return jsonify({"response": "Prompt cannot be empty"}), 400
+    if not prompt.strip(): return jsonify({"response": "Prompt cannot be empty"}), 400
 
     mailserver, mailcursor = getdb()
     mailcursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
@@ -229,8 +226,8 @@ def ollama_agent():
     coins = row["coins"]
 
     if role not in ["Admin", "MOD", "DEV"]:
-        if coins <= 0:
-            return jsonify({"response": "Not enough coins!"}), 403
+        if coins <= 0: return jsonify({"response": "Not enough coins!"}), 403
+
         mailcursor.execute("UPDATE users SET coins = coins - 1 WHERE username = ?", (username,))
         mailserver.commit()
 
@@ -242,18 +239,15 @@ def ollama_agent():
         rows = mailcursor.fetchall()
         messages = [{"role": row["role"], "content": row["content"]} for row in reversed(rows)]
 
-        ollama_response = requests.post(
-            "http://localhost:11434/v1/chat/completions",
-            json={"model": "agent", "messages": messages}
-        )
+        ollama_response = requests.post("http://localhost:11434/v1/chat/completions", json={"model": "agent", "messages": messages} )
 
         if ollama_response.status_code != 200:
+            ollama_refund(mailcursor, mailserver)
             return jsonify({"response": "Ollama error"}), 502
 
         result = ollama_response.json()
         message = result['choices'][0]['message']['content']
 
-        # Armazena resposta da IA e commit logo após
         mailcursor.execute("INSERT INTO agents (username, role, content) VALUES (?, ?, ?)", (username, 'assistant', message))
         mailserver.commit()
 
