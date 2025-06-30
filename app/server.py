@@ -146,6 +146,17 @@ def mail():
         mailserver.commit()
 
         return jsonify({"response": "Inbox was cleared!"}), 200
+    elif payload['action'] == "delete":
+        message_id = payload.get("id")
+        if not message_id: return jsonify({"response": "Missing message ID!"}), 400
+
+        mailcursor.execute("SELECT * FROM mails WHERE id = ? AND recipient = ?", (message_id, username))
+        if not mailcursor.fetchone(): return jsonify({"response": "Message not found!"}), 404
+
+        mailcursor.execute("DELETE FROM mails WHERE id = ?", (message_id,))
+        mailserver.commit()
+
+        return jsonify({"response": "Message deleted!"}), 200
     elif payload['action'] == "transfer":
         try:
             amount = int(payload['amount'])
