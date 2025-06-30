@@ -130,18 +130,6 @@ def mail():
 
         return jsonify({"response": "Mail sent!"}), 200
     elif payload['action'] == "read":
-        """mailcursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
-                                rows = mailcursor.fetchall()
-                        
-                                decrypted_mails = []
-                                for row in rows:
-                                    encrypted_content = row["content"]
-                        
-                                    decrypted_content = fernet.decrypt(encrypted_content.encode('utf-8')).decode()
-                                    decrypted_mails.append(decrypted_content)
-                        
-                                return jsonify({"response": '\n'.join(decrypted_mails) if decrypted_mails else "No messages"}), 200"""
-
         mailcursor.execute("SELECT id, content FROM mails WHERE recipient = ?", (username,))
         rows = mailcursor.fetchall()
 
