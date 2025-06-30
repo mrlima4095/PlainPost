@@ -444,8 +444,7 @@ def drive_download(file_id):
     mailcursor.execute("SELECT original_name, saved_name FROM files WHERE id = ?", (file_id,))
     row = mailcursor.fetchone()
 
-    if not row:
-        return jsonify({"response": "File not found."}), 404
+    if not row: return jsonify({"response": "File not found."}), 404
 
     original_name, saved_name = row
     path = os.path.join(UPLOAD_FOLDER, saved_name)
