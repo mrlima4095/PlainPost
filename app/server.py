@@ -130,7 +130,7 @@ def mail():
         mailserver.commit()
 
         return jsonify({"response": "Mail sent!"}), 200
-    elif payload['action'] == "read":
+    elif payload['action'] == "read" or payload['action'] == "read_blocked":
         mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
         blocked_users = json.loads(row['blocked_users']) if row and row['blocked_users'] else []
@@ -140,7 +140,8 @@ def mail():
 
         decrypted_mails = []
         for row in rows:
-            if row['sender'] in blocked_users: continue
+            if payload['action'] == "read" and row['sender'] in blocked_users: continue
+            elif payload['action'] == "read_blocked" and row['sender'] not in blocked_users: continue
 
             decrypted_content = fernet.decrypt(row["content"].encode('utf-8')).decode()
             decrypted_mails.append({"id": row["id"], "content": decrypted_content})
