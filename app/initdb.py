@@ -12,7 +12,8 @@ def PlainPostDB():
             coins INTEGER DEFAULT 0,
             role TEXT DEFAULT 'user',
             biography TEXT DEFAULT 'A PlainPost user',
-            page TEXT
+            page TEXT,
+            blocked_users TEXT DEFAULT '[]'
         )
     """)
 
