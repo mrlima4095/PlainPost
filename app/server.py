@@ -200,6 +200,12 @@ def mail():
         row = mailcursor.fetchone()
         
         return jsonify({"response": f"ID: {username}\nRole: [{row['role']}]\nBio: {row['biography']}"}), 200
+    elif payload['action'] == "blocked_users":
+        mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
+        row = mailcursor.fetchone()
+        blocked_users = json.loads(row['blocked_users']) if row and row['blocked_users'] else []
+
+        return jsonify({"response": blocked_users}), 200
     elif payload['action'] == "changebio":
         if not payload['bio']: return 400
 
