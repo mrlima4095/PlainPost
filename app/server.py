@@ -109,6 +109,7 @@ def signup():
     return jsonify({"response": gen_token(username)}), 200
 # |
 # Social API
+# | (Main Handler)
 @app.route('/api/mail', methods=['POST'])
 def mail():
     mailserver, mailcursor = getdb()
@@ -130,11 +131,17 @@ def mail():
 
         return jsonify({"response": "Mail sent!"}), 200
     elif payload['action'] == "read":
-        mailcursor.execute("SELECT id, content FROM mails WHERE recipient = ?", (username,))
+        mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
+        row = mailcursor.fetchone()
+        blocked_users = json.loads(row['blocked_users']) if row and row['blocked_users'] else []
+
+        mailcursor.execute("SELECT id, sender, content FROM mails WHERE recipient = ?", (username,))
         rows = mailcursor.fetchall()
 
         decrypted_mails = []
         for row in rows:
+            if row['sender'] in blocked_users: continue
+
             decrypted_content = fernet.decrypt(row["content"].encode('utf-8')).decode()
             decrypted_mails.append({"id": row["id"], "content": decrypted_content})
 
@@ -212,6 +219,37 @@ def mail():
         return jsonify({"response": "Account deleted!"}), 200
     elif payload['action'] == "status": return jsonify({"response": username}), 200
     else: return jsonify({"response": "Invalid payload!"}), 405
+# | (Mark an user as spam)
+@app.route('/api/block', methods=['POST'])
+def block_user():
+    username = get_user(request.headers.get("Authorization"))
+    if not username:
+        return jsonify({"response": "Bad credentials!"}), 401
+
+    if not request.is_json:
+        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+
+    payload = request.get_json()
+    to_block = payload.get('user_to_block')
+
+    if not to_block:
+        return jsonify({"response": "Missing user to block!"}), 400
+
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
+    row = mailcursor.fetchone()
+
+    blocked_users = json.loads(row['blocked_users']) if row and row['blocked_users'] else []
+
+    if to_block in blocked_users:
+        return jsonify({"response": "User already blocked."}), 409
+
+    blocked_users.append(to_block)
+    mailcursor.execute("UPDATE users SET blocked_users = ? WHERE username = ?", (json.dumps(blocked_users), username))
+    mailserver.commit()
+
+    return jsonify({"response": f"User {to_block} blocked successfully."}), 200
+
 # |
 # |
 # Source A.I
