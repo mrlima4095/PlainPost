@@ -61,6 +61,7 @@ class AdminPanel:
             try:
                 self.cleartty(); self.chat()
                 cmd = input("[+] ").strip()
+                self.cleartty()
 
                 if cmd == "1":
                     username = input("[+] Username: ").strip()
@@ -114,7 +115,7 @@ class AdminPanel:
                     amount = input("[+] Amount: ").strip()
 
                     self.take_coins(username, amount)
-                elif cmd == "c": os.exit()
+                elif cmd == "c": sys.exit()
                 else: print("[-] Unknown option!")
 
                 input("\n[+] Press ENTER to continue...")
