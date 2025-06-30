@@ -139,7 +139,6 @@ def mail():
             decrypted_mails.append({"id": row["id"], "content": decrypted_content})
 
         return jsonify({"response": decrypted_mails if decrypted_mails else "No messages"}), 200
-
     elif payload['action'] == "clear": 
         mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         mailserver.commit()
