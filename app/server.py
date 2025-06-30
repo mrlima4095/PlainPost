@@ -219,21 +219,18 @@ def mail():
         return jsonify({"response": "Account deleted!"}), 200
     elif payload['action'] == "status": return jsonify({"response": username}), 200
     else: return jsonify({"response": "Invalid payload!"}), 405
-# | (Mark an user as spam)
+# | (Block an user - They messages will go to spam inbox)
 @app.route('/api/block', methods=['POST'])
 def block_user():
     username = get_user(request.headers.get("Authorization"))
-    if not username:
-        return jsonify({"response": "Bad credentials!"}), 401
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
 
-    if not request.is_json:
-        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     to_block = payload.get('user_to_block')
 
-    if not to_block:
-        return jsonify({"response": "Missing user to block!"}), 400
+    if not to_block: return jsonify({"response": "Missing user to block!"}), 400
 
     mailserver, mailcursor = getdb()
     mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
@@ -241,15 +238,39 @@ def block_user():
 
     blocked_users = json.loads(row['blocked_users']) if row and row['blocked_users'] else []
 
-    if to_block in blocked_users:
-        return jsonify({"response": "User already blocked."}), 409
+    if to_block in blocked_users: return jsonify({"response": "User already blocked."}), 409
 
     blocked_users.append(to_block)
     mailcursor.execute("UPDATE users SET blocked_users = ? WHERE username = ?", (json.dumps(blocked_users), username))
     mailserver.commit()
 
     return jsonify({"response": f"User {to_block} blocked successfully."}), 200
+# | (Unblock an user)
+@app.route('/api/unblock', methods=['POST'])
+def unblock_user():
+    username = get_user(request.headers.get("Authorization"))
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
 
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+
+    payload = request.get_json()
+    to_unblock = payload.get('user_to_unblock')
+
+    if not to_unblock: return jsonify({"response": "Missing user to unblock!"}), 400
+
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
+    row = mailcursor.fetchone()
+
+    blocked_users = json.loads(row['blocked_users']) if row and row['blocked_users'] else []
+
+    if to_unblock not in blocked_users: return jsonify({"response": "User is not blocked."}), 404
+
+    blocked_users.remove(to_unblock)
+    mailcursor.execute("UPDATE users SET blocked_users = ? WHERE username = ?", (json.dumps(blocked_users), username))
+    mailserver.commit()
+
+    return jsonify({"response": f"User {to_unblock} unblocked successfully."}), 200
 # |
 # |
 # Source A.I
@@ -485,6 +506,25 @@ def drive_download(file_id):
     original_name, saved_name = row
     path = os.path.join(UPLOAD_FOLDER, saved_name)
     return send_file(path, as_attachment=True, download_name=original_name)
+# | (Delete API)
+@app.route('/api/drive/delete/<file_id>', methods=['DELETE'])
+def drive_delete(file_id):
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
+    row = mailcursor.fetchone()
+
+    if not row: return jsonify({"success": False}), 404
+
+    saved_name = row[0]
+    try:
+        os.remove(os.path.join(UPLOAD_FOLDER, saved_name))
+    except FileNotFoundError:
+        pass
+
+    mailcursor.execute("DELETE FROM files WHERE id = ?", (file_id,))
+    mailserver.commit()
+
+    return jsonify({"success": True}), 200
 # | (View API)
 @app.route('/api/drive/list', methods=['GET'])
 def drive_list():
@@ -505,25 +545,6 @@ def drive_list():
             "expire_time": row[4]
         })
     return jsonify(result), 200
-# | (Delete API)
-@app.route('/api/drive/delete/<file_id>', methods=['DELETE'])
-def drive_delete(file_id):
-    mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
-    row = mailcursor.fetchone()
-
-    if not row: return jsonify({"success": False}), 404
-
-    saved_name = row[0]
-    try:
-        os.remove(os.path.join(UPLOAD_FOLDER, saved_name))
-    except FileNotFoundError:
-        pass
-
-    mailcursor.execute("DELETE FROM files WHERE id = ?", (file_id,))
-    mailserver.commit()
-
-    return jsonify({"success": True}), 200
 # |
 # |
 # Thread - Clear expired files
