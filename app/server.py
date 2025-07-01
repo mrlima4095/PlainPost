@@ -537,6 +537,47 @@ def drive_list():
         })
     return jsonify(result), 200
 # | (Extend File expire time API)
+@app.route('/api/drive/extend_expires', methods=['POST'])
+def extend_expires():
+    username = get_user(request.headers.get("Authorization"))
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
+
+    data = request.get_json()
+    if not data or "file_id" not in data: return jsonify({"response": "Missing file_id"}), 400
+    
+    file_id = data["file_id"]
+
+    mailserver, mailcursor = getdb()
+
+    # Verificar se o arquivo pertence ao usuário e se tem expire_time
+    mailcursor.execute("SELECT expire_time FROM files WHERE id = ? AND owner = ?", (file_id, username))
+    row = mailcursor.fetchone()
+    if not row:
+        return jsonify({"response": "File not found or access denied."}), 404
+
+    current_expire = row[0]
+    if current_expire is None:
+        return jsonify({"response": "This file does not expire. Cannot extend expiration."}), 400
+
+    # Verificar saldo do usuário
+    mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
+    user_row = mailcursor.fetchone()
+    if not user_row or user_row[0] < 1:
+        return jsonify({"response": "Not enough coins."}), 402
+
+    # Subtrair 1 moeda
+    mailcursor.execute("UPDATE users SET coins = coins - 1 WHERE username = ?", (username,))
+
+    # Calcular nova expiração
+    current_dt = datetime.fromisoformat(current_expire).astimezone(SAO_PAULO_TZ)
+    new_expire = current_dt + timedelta(hours=2)
+
+    # Atualizar expire_time no banco
+    mailcursor.execute("UPDATE files SET expire_time = ? WHERE id = ?", (new_expire.isoformat(), file_id))
+    mailserver.commit()
+
+    return jsonify({"success": True, "new_expire_time": new_expire.isoformat()}), 200
+
 # |
 # |
 # Thread - Clear expired files
