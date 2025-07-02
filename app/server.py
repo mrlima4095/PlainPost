@@ -224,7 +224,7 @@ def mail():
         if not to_block: return jsonify({"response": "Missing user to block!"}), 400
 
         mailserver, mailcursor = getdb()
-        mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['to'],))
+        mailcursor.execute("SELECT * FROM users WHERE username = ?", (to_block,))
         if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
         mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
