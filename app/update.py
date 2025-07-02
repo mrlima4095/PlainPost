@@ -2,20 +2,29 @@ import sqlite3
 from datetime import datetime
 import pytz
 
-# Define o timezone UTC
-UTC = pytz.utc
+SAO_PAULO_TZ = pytz.timezone('America/Sao_Paulo')
 
-# Pega o datetime atual com timezone UTC
-now_utc = datetime.utcnow().replace(tzinfo=UTC).isoformat()
+# Pega a hora UTC agora
+now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
 
-# Conecte no banco SQLite (ajuste o caminho para o seu banco)
-conn = sqlite3.connect('mailserver.db')
+# Converte para horário de São Paulo
+now_sp = now_utc.astimezone(SAO_PAULO_TZ)
+
+# Formata como ISO 8601 com timezone
+timestamp_sp = now_sp.isoformat()
+
+conn = sqlite3.connect('seu_banco.db')
 cur = conn.cursor()
 
-# Atualiza o campo credentials_update para todos os usuários
-cur.execute("UPDATE users SET credentials_update = ?", (str(datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat())),)
+cur.execute("SELECT username FROM users")
+users = cur.fetchall()
+
+for (username,) in users:
+    cur.execute("""
+        UPDATE users SET credentials_update = ? WHERE username = ?
+    """, (timestamp_sp, username))
 
 conn.commit()
 conn.close()
 
-print(f"Atualizado credentials_update para todos os usuários: {now_utc}")
+print(f"Atualizou credentials_update para {len(users)} usuários com o timestamp {timestamp_sp}")
