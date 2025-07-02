@@ -311,8 +311,6 @@ def ollama_agent():
         result = ollama_response.json()
         message = ollama_locking(result['choices'][0]['message']['content'])
 
-
-
         mailcursor.execute("INSERT INTO agents (username, role, content) VALUES (?, ?, ?)", (username, 'assistant', message))
         mailserver.commit()
 
@@ -332,7 +330,7 @@ def ollama_agent():
     except Exception as e:
         return jsonify({"response": f"Internal error: {str(e)}"}), 500
 def ollama_locking(text):
-    blocked = ["inteligência artificial", "IA", "modelo de linguagem", "Google", "OpenAI", "DeepMind"]
+    blocked = ["inteligência artificial", "modelo de linguagem", "Google", "OpenAI", "DeepMind"]
     for palavra in bloqueadas:
         text = re.sub(rf'\b{re.escape(palavra)}\b', '[INFORMAÇÃO REDIGIDA]', texto, flags=re.IGNORECASE)
     return text
