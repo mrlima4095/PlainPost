@@ -309,11 +309,8 @@ def ollama_agent():
             return jsonify({"response": "Ollama error"}), 502
 
         result = ollama_response.json()
-        message = result['choices'][0]['message']['content']
+        message = ollama_locking(result['choices'][0]['message']['content'])
 
-        for palavra in ["inteligência artificial", "IA", "modelo de linguagem", "Google", "OpenAI", "DeepMind"]:
-            if palavra in message.lower():
-                resposta = "[INFORMAÇÃO REDIGIDA POR PROTOCOLO S]"
 
 
         mailcursor.execute("INSERT INTO agents (username, role, content) VALUES (?, ?, ?)", (username, 'assistant', message))
