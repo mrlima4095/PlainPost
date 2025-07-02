@@ -51,8 +51,14 @@ def getdb():
 # JWT Tokens
 # |
 def gen_token(username):
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT password_changed_at FROM users WHERE username = ?", (username,))
+    row = mailcursor.fetchone()
+    password_changed_at = row['password_changed_at'] if row else None
+
     payload = {
         'username': username,
+        'password_changed_at': password_changed_at,
         'exp': datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
@@ -114,6 +120,38 @@ def signup():
     mailserver.commit()
 
     return jsonify({"response": gen_token(username)}), 200
+# |
+# | (Refresh Token)
+@app.route('/api/refresh', methods=['POST'])
+def refresh():
+    if not request.is_json:
+        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+
+    payload = request.get_json()
+    token = payload.get("refresh_token")
+    if not token:
+        return jsonify({"response": "Missing refresh token!"}), 400
+
+    try:
+        decoded = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        if decoded.get("type") != "refresh":
+            return jsonify({"response": "Invalid token type!"}), 403
+
+        username = decoded["username"]
+        credentials_update = decoded["credentials_update"]
+
+        # Verifica se o token ainda bate com a versão atual da senha
+        current = get_credentials_update(username)
+        if current != credentials_update:
+            return jsonify({"response": "Token expired (password changed)."}), 403
+
+        return jsonify({
+            "access_token": gen_token(username, credentials_update)
+        }), 200
+
+    except (ExpiredSignatureError, InvalidTokenError):
+        return jsonify({"response": "Invalid or expired refresh token!"}), 401
+
 # |
 # Social API
 # | (Main Handler)
