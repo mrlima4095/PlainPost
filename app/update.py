@@ -13,7 +13,7 @@ now_sp = now_utc.astimezone(SAO_PAULO_TZ)
 # Formata como ISO 8601 com timezone
 timestamp_sp = now_sp.isoformat()
 
-conn = sqlite3.connect('seu_banco.db')
+conn = sqlite3.connect('mailserver.db')
 cur = conn.cursor()
 
 cur.execute("SELECT username FROM users")
