@@ -13,7 +13,8 @@ def PlainPostDB():
             role TEXT DEFAULT 'user',
             biography TEXT DEFAULT 'A PlainPost user',
             page TEXT,
-            blocked_users TEXT DEFAULT '[]'
+            blocked_users TEXT DEFAULT '[]',
+            credentials_update TEXT DEFAULT (datetime('now'))
         )
     """)
 

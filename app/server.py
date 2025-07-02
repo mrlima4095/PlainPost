@@ -58,18 +58,25 @@ def gen_token(username):
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
 def get_user(token):
-    if not token: return None
+    if not token:
+        return None
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        username = payload['username']
+        token_pass_time = payload.get('password_changed_at')
 
         mailserver, mailcursor = getdb()
-        mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['username'],))
-        status = mailcursor.fetchone() is not None
+        mailcursor.execute("SELECT password_changed_at FROM users WHERE username = ?", (username,))
+        row = mailcursor.fetchone()
 
-        if status: return payload['username']
-        else: return None
-    except ExpiredSignatureError: return None
-    except InvalidTokenError: return None
+        if row is None:
+            return None
+
+        db_pass_time = row['password_changed_at']
+        if token_pass_time != db_pass_time: return None 
+
+        return username
+    except (ExpiredSignatureError, InvalidTokenError): return None
 # |
 # |
 # PlainPost
@@ -185,7 +192,7 @@ def mail():
     elif payload['action'] == "changepass":
         if not payload['newpass']: return jsonify({"response": "Blank new password!"}), 400
 
-        mailcursor.execute("UPDATE users SET password = ? WHERE username = ?", (bcrypt.hashpw(payload['newpass'].encode('utf-8'), bcrypt.gensalt()), username))
+        mailcursor.execute("UPDATE users SET password = ?, credentials_update = ? WHERE username = ?", (bcrypt.hashpw(payload['newpass'].encode('utf-8'), bcrypt.gensalt()), datetime.utcnow().isoformat(), username))
         mailserver.commit() 
 
         return jsonify({"response": "Password changed!"}), 200
