@@ -9,7 +9,7 @@ UTC = pytz.utc
 now_utc = datetime.utcnow().replace(tzinfo=UTC).isoformat()
 
 # Conecte no banco SQLite (ajuste o caminho para o seu banco)
-conn = sqlite3.connect('seu_banco.db')
+conn = sqlite3.connect('mailserver.db')
 cur = conn.cursor()
 
 # Atualiza o campo credentials_update para todos os usuários
