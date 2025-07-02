@@ -130,8 +130,8 @@ def signup():
         return jsonify({"response": "This username is already in use."}), 409
 
     mailcursor.execute(
-        "INSERT INTO users (username, password, coins, role, biography) VALUES (?, ?, 0, 'user', 'A PlainPost user')",
-        (username, password)
+        "INSERT INTO users (username, password, coins, role, biography, credentials_update) VALUES (?, ?, 0, 'user', 'A PlainPost user')",
+        (username, password, )
     )
     mailserver.commit()
 
@@ -597,7 +597,6 @@ def extend_expires():
 
     mailserver, mailcursor = getdb()
 
-    # Verificar se o arquivo pertence ao usuário e se tem expire_time
     mailcursor.execute("SELECT expire_time FROM files WHERE id = ? AND owner = ?", (file_id, username))
     row = mailcursor.fetchone()
     if not row: return jsonify({"response": "File not found or access denied."}), 404
@@ -605,15 +604,12 @@ def extend_expires():
     current_expire = row[0]
     if current_expire is None: return jsonify({"response": "This file does not expire. Cannot extend expiration."}), 400
 
-    # Verificar saldo do usuário
     mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
     user_row = mailcursor.fetchone()
     if not user_row or user_row[0] < 1: return jsonify({"response": "Not enough coins."}), 402
 
-    # Subtrair 1 moeda
     mailcursor.execute("UPDATE users SET coins = coins - 1 WHERE username = ?", (username,))
 
-    # Calcular nova expiração
     current_dt = datetime.fromisoformat(current_expire).astimezone(SAO_PAULO_TZ)
     new_expire = current_dt + timedelta(hours=2)
 
