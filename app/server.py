@@ -222,6 +222,7 @@ def mail():
         to_block = payload.get('user_to_block')
 
         if not to_block: return jsonify({"response": "Missing user to block!"}), 400
+        if to_block == username: return jsonify("response": "You cant block your self!"), 405
 
         mailserver, mailcursor = getdb()
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to_block,))
