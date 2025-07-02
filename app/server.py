@@ -52,20 +52,20 @@ def getdb():
 # |
 def gen_token(username):
     mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT password_changed_at FROM users WHERE username = ?", (username,))
+    mailcursor.execute("SELECT credentials_update FROM users WHERE username = ?", (username,))
     row = mailcursor.fetchone()
-    password_changed_at = row['password_changed_at'] if row else None
+    credentials_update = row['credentials_update'] if row else None
 
     payload = {
         'username': username,
-        'password_changed_at': password_changed_at,
+        'credentials_update': credentials_update,
         'exp': datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
 def get_user(token):
-    if not token:
-        return None
+    if not token: return None
+
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         username = payload['username']
@@ -75,8 +75,7 @@ def get_user(token):
         mailcursor.execute("SELECT credentials_update FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
 
-        if row is None:
-            return None
+        if row is None: return None
 
         db_pass_time = row['credentials_update']
         if token_pass_time != db_pass_time: return None 
@@ -101,25 +100,52 @@ def login():
     mailcursor.execute("SELECT password FROM users WHERE username = ?", (username,))
     row = mailcursor.fetchone()
 
-    if row and bcrypt.checkpw(payload.get('password').encode('utf-8'), row['password']): return jsonify({"response": gen_token(username)}), 200
-    else: return jsonify({"response": "Bad credentials"}), 401
+    if row and bcrypt.checkpw(payload.get('password').encode('utf-8'), row['password']):
+        token = gen_token(username)
+        response = make_response(jsonify({"response": "Login successful"}), 200)
+        response.set_cookie(
+            'token', 
+            token, 
+            httponly=True, 
+            secure=True,
+            samesite='Lax', 
+            max_age=60*60*24*7
+        )
+        return response
+    else:
+        return jsonify({"response": "Bad credentials"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
     mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json:
+        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     username = payload['username']
     password = bcrypt.hashpw(payload['password'].encode('utf-8'), bcrypt.gensalt())
 
     mailcursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    if mailcursor.fetchone(): return jsonify({"response": "This username is already in use."}), 409
+    if mailcursor.fetchone():
+        return jsonify({"response": "This username is already in use."}), 409
 
-    mailcursor.execute("INSERT INTO users (username, password, coins, role, biography) VALUES (?, ?, 0, 'user', 'A PlainPost user')", (username, password))
+    mailcursor.execute(
+        "INSERT INTO users (username, password, coins, role, biography) VALUES (?, ?, 0, 'user', 'A PlainPost user')",
+        (username, password)
+    )
     mailserver.commit()
 
-    return jsonify({"response": gen_token(username)}), 200
+    token = gen_token(username)
+    response = make_response(jsonify({"response": "Signup successful"}), 200)
+    response.set_cookie(
+        'token',
+        token,
+        httponly=True,
+        secure=True,
+        samesite='Lax',
+        max_age=60*60*24*7
+    )
+    return response
 # |
 # Social API
 # | (Main Handler)
