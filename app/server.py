@@ -112,8 +112,7 @@ def login():
             max_age=60*60*24*7
         )
         return response
-    else:
-        return jsonify({"response": "Bad credentials"}), 401
+    else: return jsonify({"response": "Bad credentials"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -131,7 +130,7 @@ def signup():
 
     mailcursor.execute(
         "INSERT INTO users (username, password, coins, role, biography, credentials_update) VALUES (?, ?, 0, 'user', 'A PlainPost user')",
-        (username, password, )
+        (username, password, datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat())
     )
     mailserver.commit()
 
@@ -224,7 +223,7 @@ def mail():
     elif payload['action'] == "changepass":
         if not payload['newpass']: return jsonify({"response": "Blank new password!"}), 400
 
-        mailcursor.execute("UPDATE users SET password = ?, credentials_update = ? WHERE username = ?", (bcrypt.hashpw(payload['newpass'].encode('utf-8'), bcrypt.gensalt()), datetime.utcnow().isoformat(), username))
+        mailcursor.execute("UPDATE users SET password = ?, credentials_update = ? WHERE username = ?", (bcrypt.hashpw(payload['newpass'].encode('utf-8'), bcrypt.gensalt()), datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat(), username))
         mailserver.commit() 
 
         return jsonify({"response": "Password changed!"}), 200
