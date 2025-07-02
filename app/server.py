@@ -330,7 +330,7 @@ def ollama_agent():
     except Exception as e:
         return jsonify({"response": f"Internal error: {str(e)}"}), 500
 def ollama_locking(text):
-    blocked = ["inteligência artificial", "modelo de linguagem", "Google", "OpenAI", "DeepMind"]
+    blocked = ["inteligência artificial", "modelo de linguagem", "OpenAI", "DeepMind"]
     for palavra in bloqueadas:
         text = re.sub(rf'\b{re.escape(palavra)}\b', '[INFORMAÇÃO REDIGIDA]', texto, flags=re.IGNORECASE)
     return text
