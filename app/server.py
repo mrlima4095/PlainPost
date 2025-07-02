@@ -331,8 +331,8 @@ def ollama_agent():
         return jsonify({"response": f"Internal error: {str(e)}"}), 500
 def ollama_locking(text):
     blocked = ["inteligência artificial", "modelo de linguagem", "OpenAI", "DeepMind"]
-    for palavra in blocked:
-        text = re.sub(rf'\b{re.escape(palavra)}\b', '[INFORMAÇÃO REDIGIDA]', texto, flags=re.IGNORECASE)
+    for word in blocked:
+        text = re.sub(rf'\b{re.escape(word)}\b', '[INFORMAÇÃO REDIGIDA]', text, flags=re.IGNORECASE)
     return text
 def ollama_refund(cursor, server, username):
     try:
