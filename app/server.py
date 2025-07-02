@@ -159,7 +159,6 @@ def logout():
         path='/'
     )
     return response
-
 # |
 # Social API
 # | (Main Handler)
