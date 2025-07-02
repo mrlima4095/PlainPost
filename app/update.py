@@ -13,9 +13,7 @@ conn = sqlite3.connect('mailserver.db')
 cur = conn.cursor()
 
 # Atualiza o campo credentials_update para todos os usuários
-cur.execute("""
-    UPDATE users SET credentials_update = ?
-""", (datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat()))
+cur.execute("UPDATE users SET credentials_update = ?", (datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat()),)
 
 conn.commit()
 conn.close()
