@@ -92,8 +92,7 @@ def get_user(token):
 @app.route('/api/login', methods=['POST'])
 def login():
     mailserver, mailcursor = getdb()
-    if not request.is_json:
-        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     username = payload.get('username')
