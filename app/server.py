@@ -500,6 +500,7 @@ def detect_js(file):
         for tag in tags:
             for pattern in js_patterns:
                 if re.search(pattern, tag, re.IGNORECASE): return True
+        
         return False
     except UnicodeDecodeError: return True
 # |
