@@ -693,7 +693,6 @@ def extend_expires():
     current_dt = datetime.fromisoformat(current_expire).astimezone(SAO_PAULO_TZ)
     new_expire = current_dt + timedelta(hours=2)
 
-    # Atualizar expire_time no banco
     mailcursor.execute("UPDATE files SET expire_time = ? WHERE id = ?", (new_expire.isoformat(), file_id))
     mailserver.commit()
 
