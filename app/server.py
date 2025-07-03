@@ -305,6 +305,11 @@ def mail():
         response.set_cookie('token', '', max_age=0, httponly=True, secure=True, samesite='Lax', path='/')
         
         return response
+    elif payload['action'] == "logout":
+        response = make_response(jsonify({"response": "Logged out successfully."}), 200)
+        response.set_cookie('token', '', max_age=0, httponly=True, secure=True, samesite='Lax', path='/')
+
+        return response
     elif payload['action'] == "status": return jsonify({"response": username}), 200
     else: return jsonify({"response": "Invalid payload!"}), 405
 # |
