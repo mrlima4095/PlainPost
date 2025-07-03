@@ -551,8 +551,7 @@ def short_links_handler():
         while True:
             short_id = str(randint(10000, 99999))
             mailcursor.execute("SELECT 1 FROM short_links WHERE id = ?", (short_id,))
-            if not mailcursor.fetchone():
-                break 
+            if not mailcursor.fetchone(): break 
 
         mailcursor.execute("INSERT INTO short_links (id, owner, original_url) VALUES (?, ?, ?)", (short_id, username, url))
         mailserver.commit()
