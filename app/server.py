@@ -3,7 +3,7 @@
 # |
 # Imports
 # | (Flask)
-from flask import Flask, request, jsonify, send_from_directory, make_response
+from flask import Flask, request, jsonify, send_from_directory, make_response, render_template
 from flask_cors import CORS
 from flask import send_file
 # | (Others) 
