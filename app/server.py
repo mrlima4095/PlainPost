@@ -626,8 +626,7 @@ def drive_download(file_id):
 @app.route('/api/drive/delete/<file_id>', methods=['DELETE'])
 def drive_delete(file_id):
     username = get_user(request.cookies.get('token'))
-    if not username:
-        return jsonify({"success": False, "response": "Bad credentials!"}), 401
+    if not username: return jsonify({"success": False, "response": "Bad credentials!"}), 401
 
     mailserver, mailcursor = getdb()
 
