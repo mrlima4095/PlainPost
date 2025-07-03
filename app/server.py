@@ -536,7 +536,7 @@ def short_links_handler():
         mailcursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
         role = row['role']
-        coins = row['coins'] 44
+        coins = row['coins'] 45
 
         if role == "user":
             mailcursor.execute("SELECT COUNT(*) FROM short_links WHERE owner = ?", (username,))
