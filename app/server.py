@@ -576,7 +576,7 @@ def drive_delete(file_id):
 # | (View API)
 @app.route('/api/drive/list', methods=['GET'])
 def drive_list():
-    username = get_user(request.headers.get("Authorization"))
+    username = get_user(request.cookies.get('token'))
     if not username: return jsonify({ "response": "Bad credentials!" }), 401
     
     mailserver, mailcursor = getdb()
