@@ -400,7 +400,7 @@ def forget_history():
 # | (Read history)
 @app.route('/api/agent/history', methods=['GET'])
 def get_agent_history():
-    username = get_user(request.headers.get("Authorization"))
+    username = get_user(request.cookies.get('token'))
     if not username:
         return jsonify({"response": "Bad credentials!"}), 401
 
@@ -422,7 +422,7 @@ def mural_settings():
     mailserver, mailcursor = getdb()
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
-    username = get_user(request.headers.get("Authorization"))
+    username = get_user(request.cookies.get('token'))
     if not username: return jsonify({"response": "Bad credentials!"}), 401
     payload = request.get_json()
     file_id = payload['file_id']
@@ -508,7 +508,7 @@ def detect_js(file):
 # | (Upload API)
 @app.route('/api/drive/upload', methods=['POST'])
 def drive_upload():
-    username = get_user(request.headers.get("Authorization"))
+    username = get_user(request.cookies.get('token'))
     if not username: return jsonify({ "response": "Bad credentials!" }), 401
     
     file = request.files.get('file')
@@ -592,7 +592,7 @@ def drive_list():
 # | (Extend File expire time API)
 @app.route('/api/drive/extend_expires', methods=['POST'])
 def extend_expires():
-    username = get_user(request.headers.get("Authorization"))
+    username = get_user(request.cookies.get('token'))
     if not username: return jsonify({"response": "Bad credentials!"}), 401
 
     data = request.get_json()
