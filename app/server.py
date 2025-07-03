@@ -529,7 +529,7 @@ def short_links_handler():
 
     mailserver, mailcursor = getdb()
 
-    if action == "create":
+    if payload['action'] == "create":
         url = payload.get("url", "").strip()
         if not url: return jsonify({"response": "Missing URL!"}), 400
 
