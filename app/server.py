@@ -453,16 +453,16 @@ def mural(username):
     mailcursor.execute("SELECT page FROM users WHERE username = ?", (username,))
     row = mailcursor.fetchone()
 
-    if not row: return render_template('html/404.html', message="Usuário não encontrado."), 404
+    if not row: return render_template('404.html', message="Usuário não encontrado."), 404
 
     file_id = row[0]
 
-    if not file_id: return render_template('html/404.html', message="Usuário não encontrado."), 404
+    if not file_id: return render_template('404.html', message="Usuário não encontrado."), 404
 
     mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
     row = mailcursor.fetchone()
 
-    if not row: return render_template('html/404.html', message="Usuário não encontrado."), 404
+    if not row: return render_template('404.html', message="Usuário não encontrado."), 404
 
     saved_name = row[0]
     file_path = os.path.join(UPLOAD_FOLDER, saved_name)
