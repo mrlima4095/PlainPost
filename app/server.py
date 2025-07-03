@@ -588,8 +588,7 @@ def drive_upload():
     
     file_id = str(uuid.uuid4())
 
-    if not file or not username:
-        return jsonify({"success": False, "response": "Bad request. File or user not found!"}), 400
+    if not file or not username: return jsonify({"success": False, "response": "Bad request. File or user not found!"}), 400
 
     size = len(file.read())
     file.seek(0)
