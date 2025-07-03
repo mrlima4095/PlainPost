@@ -552,16 +552,23 @@ def drive_download(file_id):
     original_name, saved_name = row
     path = os.path.join(UPLOAD_FOLDER, saved_name)
     return send_file(path, as_attachment=True, download_name=original_name)
-# | (Delete API)
 @app.route('/api/drive/delete/<file_id>', methods=['DELETE'])
 def drive_delete(file_id):
+    username = get_user(request.cookies.get('token'))
+    if not username:
+        return jsonify({"success": False, "response": "Bad credentials!"}), 401
+
     mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
+
+    # Busca o arquivo garantindo que o dono é o usuário logado
+    mailcursor.execute("SELECT saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
     row = mailcursor.fetchone()
 
-    if not row: return jsonify({"success": False}), 404
+    if not row:
+        return jsonify({"success": False, "response": "File not found or permission denied."}), 404
 
     saved_name = row[0]
+
     try: os.remove(os.path.join(UPLOAD_FOLDER, saved_name))
     except FileNotFoundError: pass
 
@@ -569,6 +576,7 @@ def drive_delete(file_id):
     mailserver.commit()
 
     return jsonify({"success": True}), 200
+
 # | (View API)
 @app.route('/api/drive/list', methods=['GET'])
 def drive_list():
