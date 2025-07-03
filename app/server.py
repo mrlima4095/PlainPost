@@ -145,13 +145,6 @@ def signup():
         max_age=60*60*24*7
     )
     return response
-# | (Logout)
-@app.route('/api/logout', methods=['POST'])
-def logout():
-    response = make_response(jsonify({"response": "Logged out successfully."}), 200)
-    response.set_cookie('token', '', max_age=0, httponly=True, secure=True, samesite='Lax', path='/')
-
-    return response
 # |
 # Social API
 # | (Main Handler)
