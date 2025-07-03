@@ -160,7 +160,7 @@ def mail():
     mailserver, mailcursor = getdb()
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
-    username = get_user(request.headers.get("Authorization"))
+    username = get_user(request.cookies.get('token'))
     if not username: return jsonify({ "response": "Bad credentials!" }), 401
     payload = request.get_json()
 
