@@ -568,7 +568,6 @@ def short_links_handler():
         mailserver.commit()
 
         return jsonify({"response": "Short link deleted."}), 200
-
     else: return jsonify({"response": "Invalid action!"}), 405
 # |
 # |
