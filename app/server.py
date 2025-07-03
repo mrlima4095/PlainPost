@@ -504,6 +504,8 @@ def detect_js(file):
     except UnicodeDecodeError: return True
 # |
 # |
+# URL Shorter
+# |
 # BinDrop
 # | (Upload API)
 @app.route('/api/drive/upload', methods=['POST'])
