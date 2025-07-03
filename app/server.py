@@ -593,8 +593,7 @@ def drive_upload():
     size = len(file.read())
     file.seek(0)
 
-    if size > 100 * 1024 * 1024:
-        return jsonify({"success": False, "response": "File is large then 100MB."}), 413
+    if size > 100 * 1024 * 1024: return jsonify({"success": False, "response": "File is large then 100MB."}), 413
 
     saved_name = f"{file_id}.bin"
     path = os.path.join(UPLOAD_FOLDER, saved_name)
