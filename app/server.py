@@ -389,7 +389,7 @@ def ollama_refund(cursor, server, username):
 # | (Clear agent)
 @app.route('/api/agent/forget', methods=['POST'])
 def forget_history():
-    username = get_user(request.headers.get("Authorization"))
+    username = get_user(request.cookies.get('token'))
     if not username: return jsonify({"response": "Bad credentials!"}), 401
 
     mailserver, mailcursor = getdb()
