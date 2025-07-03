@@ -631,7 +631,6 @@ def extend_expires():
     mailserver.commit()
 
     return jsonify({"success": True, "new_expire_time": new_expire.isoformat()}), 200
-
 # |
 # |
 # Thread - Clear expired files
