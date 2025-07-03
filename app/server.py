@@ -228,6 +228,27 @@ def mail():
         mailserver.commit() 
 
         return jsonify({"response": "Password changed!"}), 200
+    elif payload['action'] == "changepage":
+        file_id = payload['file_id']
+        file_id = file_id if not "/" in file_id else file_id.split("/")[6]
+
+        if not file_id: return jsonify({"response": ""}), 400
+
+        mailcursor.execute("SELECT saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
+        row = mailcursor.fetchone()
+
+        if not row: return jsonify({"response": "File not found or you arent owner of it."}), 404
+
+        saved_name = row[0]
+        file_path = os.path.join(UPLOAD_FOLDER, saved_name)
+        if not os.path.exists(file_path): return jsonify({"response": "File not found."}), 410
+
+        if detect_js(file_path) == True: return jsonify({"response": "Binary file or JavaScript have been blocked!"}), 406
+
+        mailcursor.execute("UPDATE users SET page = ? WHERE username = ?", (file_id, username))
+        mailserver.commit()
+
+        return jsonify({"response": "Page changed with sucess."}), 200
     elif payload['action'] == "search":
         mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (payload['user'],))
         row = mailcursor.fetchone()
@@ -425,36 +446,6 @@ def get_agent_history():
 # |
 # Murals
 # |
-# Settings
-# | (Change HTML page)
-@app.route('/api/mural', methods=['POST'])
-def mural_settings():
-    mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
-
-    username = get_user(request.cookies.get('token'))
-    if not username: return jsonify({"response": "Bad credentials!"}), 401
-    payload = request.get_json()
-    file_id = payload['file_id']
-    file_id = file_id if not "/" in file_id else file_id.split("/")[6]
-
-    if not file_id: return jsonify({"response": ""}), 400
-
-    mailcursor.execute("SELECT saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
-    row = mailcursor.fetchone()
-
-    if not row: return jsonify({"response": "File not found or you arent owner of it."}), 404
-
-    saved_name = row[0]
-    file_path = os.path.join(UPLOAD_FOLDER, saved_name)
-    if not os.path.exists(file_path): return jsonify({"response": "File not found."}), 410
-
-    if detect_js(file_path) == True: return jsonify({"response": "Binary file or JavaScript have been blocked!"}), 406
-
-    mailcursor.execute("UPDATE users SET page = ? WHERE username = ?", (file_id, username))
-    mailserver.commit()
-
-    return jsonify({"response": "Page changed with sucess."}), 200
 # | (Access mural from an user)
 @app.route('/mural/<username>', methods=['GET'])
 def mural(username):
