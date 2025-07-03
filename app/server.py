@@ -544,7 +544,12 @@ def short_links_handler():
                 return jsonify({"response": "Not enough coins!"}), 402
             mailcursor.execute("UPDATE users SET coins = coins - 5 WHERE username = ?", (username,))
 
-        short_id = uuid.uuid4().hex[:6]
+        while True:
+            short_id = str(randint(10000, 99999))
+            mailcursor.execute("SELECT 1 FROM short_links WHERE id = ?", (short_id,))
+            if not mailcursor.fetchone():
+                break 
+                
         mailcursor.execute("INSERT INTO short_links (id, owner, original_url) VALUES (?, ?, ?)", (short_id, username, url))
         mailserver.commit()
 
