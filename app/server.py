@@ -505,6 +505,7 @@ def detect_js(file):
 # |
 # |
 # URL Shorter
+# | (Main API)
 # |
 # BinDrop
 # | (Upload API)

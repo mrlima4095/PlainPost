@@ -48,7 +48,14 @@ def PlainPostDB():
             role TEXT,
             content TEXT
         );
+    """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS short_links (
+            id TEXT PRIMARY KEY,
+            owner TEXT NOT NULL,
+            original_url TEXT NOT NULL
+        );
     """)
 
     conn.commit()
