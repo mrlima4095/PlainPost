@@ -710,10 +710,9 @@ def init_expiration_checker():
         expired = mailcursor.fetchall()
 
         for file_id, saved_name in expired:
-            try:
-                os.remove(os.path.join(UPLOAD_FOLDER, saved_name))
-            except FileNotFoundError:
-                pass
+            try: os.remove(os.path.join(UPLOAD_FOLDER, saved_name))
+            except FileNotFoundError: pass
+        
             mailcursor.execute("DELETE FROM files WHERE id = ?", (file_id,))
         
         mailserver.commit()
