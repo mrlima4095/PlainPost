@@ -547,8 +547,7 @@ def short_links_handler():
                 return jsonify({"response": "Short link limit reached (5 links for user)."}), 429
 
         if role not in ["Admin", "MOD", "DEV"]:
-            if coins < 5:
-                return jsonify({"response": "Not enough coins!"}), 402
+            if coins < 5: return jsonify({"response": "Not enough coins!"}), 402
             mailcursor.execute("UPDATE users SET coins = coins - 5 WHERE username = ?", (username,))
 
         while True:
