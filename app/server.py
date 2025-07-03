@@ -513,8 +513,8 @@ def redirect_short_link(short_id):
     mailcursor.execute("SELECT original_url FROM short_links WHERE id = ?", (short_id,))
     row = mailcursor.fetchone()
 
-    if row:
-        return flask.redirect(row['original_url'])
+    if row: return flask.redirect(row['original_url'])
+    
     return jsonify({"response": "Short link not found."}), 404
 
 # | (Requests Handler API)
