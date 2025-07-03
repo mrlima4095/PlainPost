@@ -564,10 +564,8 @@ def drive_delete(file_id):
     if not row: return jsonify({"success": False}), 404
 
     saved_name = row[0]
-    try:
-        os.remove(os.path.join(UPLOAD_FOLDER, saved_name))
-    except FileNotFoundError:
-        pass
+    try: os.remove(os.path.join(UPLOAD_FOLDER, saved_name))
+    except FileNotFoundError: pass
 
     mailcursor.execute("DELETE FROM files WHERE id = ?", (file_id,))
     mailserver.commit()
