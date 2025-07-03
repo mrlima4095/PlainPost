@@ -559,13 +559,11 @@ def drive_delete(file_id):
         return jsonify({"success": False, "response": "Bad credentials!"}), 401
 
     mailserver, mailcursor = getdb()
-
-    # Busca o arquivo garantindo que o dono é o usuário logado
+    
     mailcursor.execute("SELECT saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
     row = mailcursor.fetchone()
 
-    if not row:
-        return jsonify({"success": False, "response": "File not found or permission denied."}), 404
+    if not row: return jsonify({"success": False, "response": "File not found or permission denied."}), 404
 
     saved_name = row[0]
 
