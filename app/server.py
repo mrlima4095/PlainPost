@@ -506,7 +506,7 @@ def detect_js(file):
 # |
 # |
 # URL Shorter
-# | (Redirection)
+# | (Redirection APO)
 @app.route('/s/<short_id>', methods=['GET'])
 def redirect_short_link(short_id):
     mailserver, mailcursor = getdb()
