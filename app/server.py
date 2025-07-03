@@ -559,7 +559,7 @@ def drive_delete(file_id):
         return jsonify({"success": False, "response": "Bad credentials!"}), 401
 
     mailserver, mailcursor = getdb()
-    
+
     mailcursor.execute("SELECT saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
     row = mailcursor.fetchone()
 
@@ -574,7 +574,6 @@ def drive_delete(file_id):
     mailserver.commit()
 
     return jsonify({"success": True}), 200
-
 # | (View API)
 @app.route('/api/drive/list', methods=['GET'])
 def drive_list():
