@@ -542,7 +542,7 @@ def short_links_handler():
             mailcursor.execute("SELECT COUNT(*) FROM short_links WHERE owner = ?", (username,))
             count = mailcursor.fetchone()[0]
             if count >= 5: return jsonify({"response": "Short link limit reached (5 links for user)."}), 429
-
+        
         if role not in ["Admin", "MOD", "DEV"]:
             if coins < 5: return jsonify({"response": "Not enough coins!"}), 402
             mailcursor.execute("UPDATE users SET coins = coins - 5 WHERE username = ?", (username,))
