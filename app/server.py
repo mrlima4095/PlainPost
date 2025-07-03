@@ -603,8 +603,7 @@ def drive_upload():
 
     now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ)
     expire_time = None
-    if size > 20 * 1024 * 1024:
-        expire_time = now + timedelta(hours=5)
+    if size > 20 * 1024 * 1024: expire_time = now + timedelta(hours=5)
 
     mailserver, mailcursor = getdb()
     mailcursor.execute("INSERT INTO files (id, owner, original_name, saved_name, size, upload_time, expire_time) VALUES (?, ?, ?, ?, ?, ?, ?)",
