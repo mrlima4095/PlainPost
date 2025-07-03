@@ -453,21 +453,21 @@ def mural(username):
     mailcursor.execute("SELECT page FROM users WHERE username = ?", (username,))
     row = mailcursor.fetchone()
 
-    if not row: return jsonify({"response": "User not found!."}), 404
+    if not row: return render_template('html/404.html', message="Usuário não encontrado."), 404
 
     file_id = row[0]
 
-    if not file_id: return jsonify({"response": "User dont have mural."}), 404
+    if not file_id: return render_template('html/404.html', message="Usuário não encontrado."), 404
 
     mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (file_id,))
     row = mailcursor.fetchone()
 
-    if not row: return jsonify({"response": "Mural file not found."}), 404
+    if not row: return render_template('html/404.html', message="Usuário não encontrado."), 404
 
     saved_name = row[0]
     file_path = os.path.join(UPLOAD_FOLDER, saved_name)
 
-    if not os.path.exists(file_path): return jsonify({"response": "Mural file is not avaliable."}), 410
+    if not os.path.exists(file_path): return render_template('410.html', message="O mural não está mais disponível."), 410
 
     return send_file(file_path, mimetype='text/html')
 # | (Detect JavaScript)
