@@ -549,11 +549,11 @@ def short_links_handler():
             mailcursor.execute("SELECT 1 FROM short_links WHERE id = ?", (short_id,))
             if not mailcursor.fetchone():
                 break 
-                
+
         mailcursor.execute("INSERT INTO short_links (id, owner, original_url) VALUES (?, ?, ?)", (short_id, username, url))
         mailserver.commit()
 
-        return jsonify({"response": f"/s/{short_id}"}), 200
+        return jsonify({"response": short_id}), 200
 
     elif action == "list":
         mailcursor.execute("SELECT id, original_url FROM short_links WHERE owner = ?", (username,))
