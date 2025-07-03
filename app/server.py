@@ -318,7 +318,7 @@ def mail():
 # | (Requests)
 @app.route('/api/agent', methods=['POST'])
 def ollama_agent():
-    username = get_user(request.headers.get("Authorization"))
+    username = get_user(request.cookies.get('token'))
     if not username: return jsonify({"response": "Bad credentials!"}), 401
 
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
