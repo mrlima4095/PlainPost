@@ -505,7 +505,72 @@ def detect_js(file):
 # |
 # |
 # URL Shorter
-# | (Main API)
+# | (Redirection)
+@app.route('/s/<short_id>', methods=['GET'])
+def redirect_short_link(short_id):
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT original_url FROM short_links WHERE id = ?", (short_id,))
+    row = mailcursor.fetchone()
+
+    if row:
+        return flask.redirect(row['original_url'])
+    return jsonify({"response": "Short link not found."}), 404
+
+# | (API to create/list/delete short links)
+@app.route('/api/short', methods=['POST'])
+def short_links_handler():
+    username = get_user(request.cookies.get('token'))
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
+
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+
+    payload = request.get_json()
+    action = payload.get("action")
+
+    mailserver, mailcursor = getdb()
+
+    if action == "create":
+        url = payload.get("url", "").strip()
+        if not url:
+            return jsonify({"response": "Missing URL!"}), 400
+
+        mailcursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
+        row = mailcursor.fetchone()
+        role = row['role']
+        coins = row['coins']
+
+        if role not in ["Admin", "MOD", "DEV"]:
+            if coins < 5:
+                return jsonify({"response": "Not enough coins!"}), 402
+            mailcursor.execute("UPDATE users SET coins = coins - 5 WHERE username = ?", (username,))
+
+        short_id = uuid.uuid4().hex[:6]
+        mailcursor.execute("INSERT INTO short_links (id, owner, original_url) VALUES (?, ?, ?)", (short_id, username, url))
+        mailserver.commit()
+
+        return jsonify({"response": f"/s/{short_id}"}), 200
+
+    elif action == "list":
+        mailcursor.execute("SELECT id, original_url FROM short_links WHERE owner = ?", (username,))
+        rows = mailcursor.fetchall()
+
+        result = [{"id": row["id"], "url": row["original_url"], "short": f"/s/{row['id']}"} for row in rows]
+        return jsonify({"response": result}), 200
+    elif action == "delete":
+        short_id = payload.get("id")
+        if not short_id: return jsonify({"response": "Missing short link ID!"}), 400
+
+        mailcursor.execute("SELECT * FROM short_links WHERE id = ? AND owner = ?", (short_id, username))
+        row = mailcursor.fetchone()
+        if not row: return jsonify({"response": "Link not found or access denied."}), 404
+
+        mailcursor.execute("DELETE FROM short_links WHERE id = ?", (short_id,))
+        mailserver.commit()
+
+        return jsonify({"response": "Short link deleted."}), 200
+
+    else: return jsonify({"response": "Invalid action!"}), 405
+# |
 # |
 # BinDrop
 # | (Upload API)
