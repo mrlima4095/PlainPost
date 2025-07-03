@@ -402,8 +402,7 @@ def forget_history():
 @app.route('/api/agent/history', methods=['GET'])
 def get_agent_history():
     username = get_user(request.cookies.get('token'))
-    if not username:
-        return jsonify({"response": "Bad credentials!"}), 401
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
 
     mailserver, mailcursor = getdb()
     mailcursor.execute("SELECT role, content FROM agents WHERE username = ? ORDER BY id DESC LIMIT 64", (username,))
