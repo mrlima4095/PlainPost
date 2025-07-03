@@ -297,14 +297,24 @@ def mail():
         mailserver.commit()
 
         return jsonify({"response": f"User {to_unblock} unblocked successfully."}), 200
-    elif payload['action'] == "signoff": 
+    elif payload['action'] == "signoff":
         mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
+        mailcursor.execute("DELETE FROM agents WHERE username = ?", (username,))
+
+        mailcursor.execute("SELECT saved_name FROM files WHERE owner = ?", (username,))
+        arquivos = mailcursor.fetchall()
+        for row in arquivos:
+            try: os.remove(os.path.join(UPLOAD_FOLDER, row['saved_name']))
+            except FileNotFoundError: pass
+        mailcursor.execute("DELETE FROM files WHERE owner = ?", (username,))
+
+        mailcursor.execute("DELETE FROM short_links WHERE owner = ?", (username,))
+
         mailcursor.execute("DELETE FROM users WHERE username = ?", (username,))
         mailserver.commit()
-        
+
         response = make_response(jsonify({"response": "Account deleted!"}), 200)
         response.set_cookie('token', '', max_age=0, httponly=True, secure=True, samesite='Lax', path='/')
-        
         return response
     elif payload['action'] == "logout":
         response = make_response(jsonify({"response": "Logged out successfully."}), 200)
