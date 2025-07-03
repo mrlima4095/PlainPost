@@ -386,8 +386,7 @@ def ollama_refund(cursor, server, username):
     try:
         cursor.execute("UPDATE users SET coins = coins + 1 WHERE username = ?", (username,))
         server.commit()
-    except Exception as e:
-        print(f"[WARN] Refounding error to '{username}': {e}")
+    except Exception as e: print(f"[WARN] Refounding error to '{username}': {e}")
 # | (Clear agent)
 @app.route('/api/agent/forget', methods=['POST'])
 def forget_history():
