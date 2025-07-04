@@ -170,7 +170,6 @@ def mail():
         body = payload.get("content", "")
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
 
-        # Enviar e-mail externo (com @)
         if "@" in to:
             import smtplib
             from email.mime.text import MIMEText
@@ -188,12 +187,10 @@ def mail():
             except Exception as e:
                 return jsonify({"response": f"SMTP error: {str(e)}"}), 500
 
-        # Envio interno para outro usuário do PlainPost
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
-        if mailcursor.fetchone() is None:
-            return jsonify({"response": "Target not found!"}), 404
+        if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
-        content = f"[{timestamp} - {username}] Assunto: {subject}\n{body}"
+        content = f"[{timestamp} - {username}] {body}"
         encrypted = fernet.encrypt(content.encode()).decode()
 
         mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (to, username, encrypted, timestamp))
