@@ -110,23 +110,23 @@ def login():
     if row and bcrypt.checkpw(payload.get('password').encode('utf-8'), row['password']):
         token = gen_token(username)
 
-        response = make_response(jsonify({ "response": "Login successful" }), 200)
+        response = make_response(jsonify({"response": "Login successful"}), 200)
         response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*71)
 
         return response
-    else: return jsonify({ "response": "Bad credentials" }), 401
+    else: return jsonify({"response": "Bad credentials"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
     mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({ "response": "Invalid content type. Must be JSON." }), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
-    username = payload.get('username')
+    username = payload['username']
     password = bcrypt.hashpw(payload['password'].encode('utf-8'), bcrypt.gensalt())
 
     mailcursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    if mailcursor.fetchone(): return jsonify({ "response": "This username is already in use." }), 409
+    if mailcursor.fetchone(): return jsonify({"response": "This username is already in use."}), 409
 
     mailcursor.execute(
         "INSERT INTO users (username, password, coins, role, biography, credentials_update) VALUES (?, ?, 0, 'user', 'A PlainPost user', ?)",
@@ -135,7 +135,7 @@ def signup():
     mailserver.commit()
 
     token = gen_token(username)
-    response = make_response(jsonify({ "response": "Signup successful" }), 200)
+    response = make_response(jsonify({"response": "Signup successful"}), 200)
     response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*7)
 
     return response
@@ -145,35 +145,41 @@ def signup():
 @app.route('/api/mail', methods=['POST'])
 def mail():
     mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({ "response": "Invalid content type. Must be JSON." }), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     username = get_user(request.cookies.get('token'))
     if not username: return jsonify({ "response": "Bad credentials!" }), 401
     payload = request.get_json()
 
     if payload['action'] == "send":
-        to = payload.get("to", ""); subject = payload.get("subject", "(sem assunto)"); body = payload.get("content", "");
+        to = payload.get("to", "")
+        subject = payload.get("subject", "(sem assunto)")
+        body = payload.get("content", "")
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
 
         if "@" in to:
+            sender = f"{username}@archsource.xyz"
             msg = MIMEText(body, "plain", "utf-8")
-            msg["To"] = to; msg["From"] = sender; msg["Subject"] = subject;
+            msg["Subject"] = subject
+            msg["From"] = sender
+            msg["To"] = to
 
             try:
-                with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(f"{username}@archsource.xyz", [to], msg.as_string())
+                with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(sender, [to], msg.as_string())
 
-                return jsonify({ "response": "Mail sent!" }), 200
+                return jsonify({"response": "Mail sent!"}), 200
             except Exception as e: return jsonify({"response": f"SMTP error: {str(e)}"}), 500
 
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
-        if mailcursor.fetchone() is None: return jsonify({ "response": "Target not found!" }), 404
+        if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
-        content = fernet.encrypt(f"[{timestamp} - {username}] {body}".encode()).decode()
+        content = f"[{timestamp} - {username}] {body}"
+        encrypted = fernet.encrypt(content.encode()).decode()
 
         mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (to, username, encrypted, timestamp))
         mailserver.commit()
 
-        return jsonify({ "response": "Mail sent!" }), 200
+        return jsonify({"response": "Mail sent!"}), 200
     elif payload['action'] == "read" or payload['action'] == "read_blocked":
         mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
@@ -208,11 +214,8 @@ def mail():
 
         return jsonify({"response": "Message deleted!"}), 200
     elif payload['action'] == "transfer":
-        to = payload.get('to'); amount = payload['amount'];
-
-        if "@" in to: return jsonify({"response": "Only available with PlainPost users"}), 405
         try:
-            amount = int()
+            amount = int(payload['amount'])
             if amount <= 0: return jsonify({"response": "Invalid amount!"}), 406
         except ValueError: return jsonify({"response": "Invalid amount!"}), 406
 
