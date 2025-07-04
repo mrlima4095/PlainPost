@@ -209,8 +209,8 @@ def mail():
         return jsonify({"response": "Message deleted!"}), 200
     elif payload['action'] == "transfer":
         try:
-            amount = int(payload['amount'])
-            if amount <= 0: return jsonify({"response": "Invalid amount!"}), 406
+            amount = int(payload.get('amount'))
+            if amount <= 0: raise ValueError("Invalid amount!")
         except ValueError: return jsonify({"response": "Invalid amount!"}), 406
 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (payload['to'],))
