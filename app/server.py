@@ -156,11 +156,13 @@ def mail():
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
 
         if "@" in to:
+            sender = f"{username}@archsource.xyz"
+
             msg = MIMEText(body, "plain", "utf-8")
             msg["To"] = to; msg["From"] = sender; msg["Subject"] = subject;
 
             try:
-                with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(f"{username}@archsource.xyz", [to], msg.as_string())
+                with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(sender, [to], msg.as_string())
 
                 return jsonify({"response": "OK"}), 200
             except Exception as e: return jsonify({"response": f"SMTP error: {str(e)}"}), 500
