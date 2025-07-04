@@ -156,14 +156,11 @@ def mail():
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
 
         if "@" in to:
-            sender = f"{username}@archsource.xyz"
             msg = MIMEText(body, "plain", "utf-8")
-            msg["Subject"] = subject
-            msg["From"] = sender
-            msg["To"] = to
+            msg["To"] = to; msg["From"] = sender; msg["Subject"] = subject;
 
             try:
-                with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(sender, [to], msg.as_string())
+                with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(f"{username}@archsource.xyz", [to], msg.as_string())
 
                 return jsonify({"response": "Mail sent!"}), 200
             except Exception as e: return jsonify({"response": f"SMTP error: {str(e)}"}), 500
@@ -171,10 +168,9 @@ def mail():
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
         if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
-        content = f"[{timestamp} - {username}] {body}"
-        encrypted = fernet.encrypt(content.encode()).decode()
+        content = fernet.encrypt(f"[{timestamp} - {username}] {body}".encode()).decode()
 
-        mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (to, username, encrypted, timestamp))
+        mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (to, username, content, timestamp))
         mailserver.commit()
 
         return jsonify({"response": "Mail sent!"}), 200
