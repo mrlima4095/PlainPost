@@ -92,6 +92,12 @@ def get_user(token):
     except (ExpiredSignatureError, InvalidTokenError): return None
 # |
 # |
+# Application Logs
+def printf(message, file="logs.txt"):
+    with open(file, "a", encoding="utf-8") as f:
+        f.write(f"[{datetime.now().strftime('%H:%M %d/%m/%Y')}] {message}")
+# |
+# |
 # PlainPost
 # |
 # Auth API
@@ -113,8 +119,8 @@ def login():
         response = make_response(jsonify({"response": "Login successful"}), 200)
         response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*71)
 
-        return response
-    else: return jsonify({"response": "Bad credentials"}), 401
+        printf(f""); return response
+    else: printf(f"Bad credentials! Somebody tried to access '{username}' account."); return jsonify({"response": "Bad credentials!"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
