@@ -328,7 +328,7 @@ def mail():
         return jsonify({"response": "OK"}), 200
     elif payload['action'] == "unblock":
         to_unblock = payload.get('user_to_unblock')
-        if to_unblock.endswith("@archsource.xyz") or to_unblock.endswith("@mail.archsource.xyz"): to_unblock = to_unblock.replace("@archsource.xyz", ""); to_unblock = to_unblock.replace("@mail.archsource.xyz", "")
+        if to_unblock.endswith("@archsource.xyz") or to_unblock.endswith("@mail.archsource.xyz"): to_unblock = to_unblock.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
 
         if not to_unblock: return jsonify({"response": "Missing user to unblock!"}), 400
 
