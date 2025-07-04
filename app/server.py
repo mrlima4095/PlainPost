@@ -92,12 +92,6 @@ def get_user(token):
     except (ExpiredSignatureError, InvalidTokenError): return None
 # |
 # |
-# Application Logs
-def printf(message, file="logs.txt"):
-    with open(file, "a", encoding="utf-8") as f:
-        f.write(f"[{datetime.now().strftime('%H:%M %d/%m/%Y')}] {message}")
-# |
-# |
 # PlainPost
 # |
 # Auth API
@@ -119,8 +113,8 @@ def login():
         response = make_response(jsonify({"response": "Login successful"}), 200)
         response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*71)
 
-        printf(f"Logged new session to '{username}'."); return response
-    else: printf(f"Bad credentials! Somebody tried to access '{username}' account."); return jsonify({"response": "Bad credentials!"}), 401
+        return response
+    else: return jsonify({"response": "Bad credentials"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -132,11 +126,11 @@ def signup():
     password = bcrypt.hashpw(payload['password'].encode('utf-8'), bcrypt.gensalt())
 
     mailcursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    if mailcursor.fetchone(): printf(f"Somebody tried to create an account with ID '{username}', but it already exists."); return jsonify({"response": "This username is already in use."}), 409
+    if mailcursor.fetchone(): return jsonify({"response": "This username is already in use."}), 409
 
     mailcursor.execute(
         "INSERT INTO users (username, password, coins, role, biography, credentials_update) VALUES (?, ?, 0, 'user', 'A PlainPost user', ?)",
-        (username, password, datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ).isoformat())
+        (username, password, datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat())
     )
     mailserver.commit()
 
@@ -144,7 +138,7 @@ def signup():
     response = make_response(jsonify({"response": "Signup successful"}), 200)
     response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*7)
 
-    printf(f"Account '{username}' created."); return response
+    return response
 # |
 # Social API
 # | (Main Handler)
@@ -166,12 +160,14 @@ def mail():
         if "@" in to:
             sender = f"{username}@archsource.xyz"
             msg = MIMEText(body, "plain", "utf-8")
-            msg["To"] = to; msg["From"] = sender; msg["Subject"] = subject
+            msg["Subject"] = subject
+            msg["From"] = sender
+            msg["To"] = to
 
             try:
                 with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(sender, [to], msg.as_string())
 
-                printf(f"User '{username}' sent a "); return jsonify({"response": "Mail sent!"}), 200
+                return jsonify({"response": "Mail sent!"}), 200
             except Exception as e: return jsonify({"response": f"SMTP error: {str(e)}"}), 500
 
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
