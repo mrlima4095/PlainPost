@@ -174,7 +174,7 @@ def mail():
             import smtplib
             from email.mime.text import MIMEText
 
-            sender = f"{username}@opentty.xyz"
+            sender = f"{username}@archsource.xyz"
             msg = MIMEText(body, "plain", "utf-8")
             msg["Subject"] = subject
             msg["From"] = sender
@@ -182,7 +182,7 @@ def mail():
 
             try:
                 with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(sender, [to], msg.as_string())
-                
+
                 return jsonify({"response": "Mail sent!"}), 200
             except Exception as e: return jsonify({"response": f"SMTP error: {str(e)}"}), 500
 
