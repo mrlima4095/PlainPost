@@ -25,7 +25,7 @@ class PlainPostSMTPHandler:
             body = msg.get_payload(decode=True).decode(errors='replace')
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
-        content = f"[{timestamp} - {from_addr}] Assunto: {subject}\n{body}"
+        content = f"[{timestamp} - {from_addr}] Assunto: {subject} - {body}"
         encrypted = fernet.encrypt(content.encode()).decode()
 
         mailserver, mailcursor = getdb()
