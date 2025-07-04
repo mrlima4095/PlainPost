@@ -301,7 +301,7 @@ def mail():
 
         mailserver, mailcursor = getdb()
 
-        if to.endswith("@archsource.xyz"): to = to.replace("@archsource.xyz", "");
+        if to_block.endswith("@archsource.xyz"): to_block = to_block.replace("@archsource.xyz", "");
         
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to_block,))
         if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
