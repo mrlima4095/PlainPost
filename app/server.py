@@ -181,7 +181,7 @@ def mail():
             msg["To"] = to
 
             try:
-                with smtplib.SMTP("localhost", 25) as smtp:
+                with smtplib.SMTP("localhost", 2525) as smtp:
                     smtp.sendmail(sender, [to], msg.as_string())
                 return jsonify({"response": "External mail sent!"}), 200
             except Exception as e:
