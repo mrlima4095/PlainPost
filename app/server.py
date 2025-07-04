@@ -764,7 +764,12 @@ init_expiration_checker()
 # |
 # Start API
 if __name__ == '__main__':
-    smtp = Controller(PlainPostSMTPHandler(), hostname='0.0.0.0', port=25)
-    smtp.start(); print(" * Running SMTP Proxy at port 25")
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        # Este é o processo reiniciado (ignora SMTP)
+        app.run(port=9834, debug=True, host="127.0.0.1")
+    else:
+        # Processo original, inicia o SMTP
+        smtp = Controller(PlainPostSMTPHandler(), hostname='0.0.0.0', port=25)
+        smtp.start(); print(" * Running SMTP Proxy at port 25")
 
-    app.run(port = 9834, debug=True, host="127.0.0.1")
+        app.run(port=9834, debug=True, host="127.0.0.1")
