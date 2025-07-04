@@ -186,8 +186,8 @@ def mail():
 
         decrypted_mails = []
         for row in rows:
-            if payload['action'] == "read" and row['sender'] in blocked_users and row['sender'] in blocked_users + "@archsource.xyz": continue
-            elif payload['action'] == "read_blocked" and row['sender'] not in blocked_users and row['sender'] not in blocked_users + "@archsource.xyz": continue
+            if payload['action'] == "read" and row['sender'] in blocked_users and row['sender'] + "@archsource.xyz" in blocked_users: continue
+            elif payload['action'] == "read_blocked" and row['sender'] not in blocked_users and row['sender'] + "@archsource.xyz"not in blocked_users: continue
 
             decrypted_content = fernet.decrypt(row["content"].encode('utf-8')).decode()
             decrypted_mails.append({"id": row["id"], "content": decrypted_content})
