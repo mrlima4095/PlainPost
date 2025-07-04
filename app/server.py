@@ -162,7 +162,7 @@ def mail():
             try:
                 with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(f"{username}@archsource.xyz", [to], msg.as_string())
 
-                return jsonify({"response": "Mail sent!"}), 200
+                return jsonify({"response": "OK"}), 200
             except Exception as e: return jsonify({"response": f"SMTP error: {str(e)}"}), 500
 
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
@@ -173,7 +173,7 @@ def mail():
         mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (to, username, content, timestamp))
         mailserver.commit()
 
-        return jsonify({"response": "Mail sent!"}), 200
+        return jsonify({"response": "OK"}), 200
     elif payload['action'] == "read" or payload['action'] == "read_blocked":
         mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
@@ -195,7 +195,7 @@ def mail():
         mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         mailserver.commit()
 
-        return jsonify({"response": "Inbox was cleared!"}), 200
+        return jsonify({"response": "OK"}), 200
     elif payload['action'] == "delete":
         message_id = payload.get("id")
         if not message_id: return jsonify({"response": "Missing message ID!"}), 400
@@ -206,16 +206,16 @@ def mail():
         mailcursor.execute("DELETE FROM mails WHERE id = ?", (message_id,))
         mailserver.commit()
 
-        return jsonify({"response": "Message deleted!"}), 200
+        return jsonify({"response": "OK"}), 200
     elif payload['action'] == "transfer":
-        to = payload.get("to"); amount = payload.get("amount");
+        try: 
+            to = payload.get("to"); amount = int(payload.get("amount"))
+            if amount <= 0: raise ValueError("Invalid amount!")
+        except ValueError: return jsonify({"response": "Invalid amount!"}), 406
 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (payload['to'],))
         recipient_row = mailcursor.fetchone()
         if recipient_row is None: return jsonify({"response": "Target not found!"}), 404
-
-        try: amount = int(amount); if amount <= 0: raise ValueError("Invalid amount!");
-        except ValueError: return jsonify({"response": "Invalid amount!"}), 406
 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
         sender_row = mailcursor.fetchone()
@@ -227,12 +227,12 @@ def mail():
         
         return jsonify({"response": "OK"}), 200
     elif payload['action'] == "changepass":
-        if not payload['newpass']: return jsonify({"response": "Blank new password!"}), 400
+        if not payload.get('newpass'): return jsonify({"response": "Blank new password!"}), 400
 
         mailcursor.execute("UPDATE users SET password = ?, credentials_update = ? WHERE username = ?", (bcrypt.hashpw(payload['newpass'].encode('utf-8'), bcrypt.gensalt()), datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat(), username))
         mailserver.commit() 
 
-        return jsonify({"response": "Password changed!"}), 200
+        return jsonify({"response": "OK"}), 200
     elif payload['action'] == "changepage":
         file_id = payload['file_id']
         file_id = file_id if not "/" in file_id else file_id.split("/")[6]
@@ -253,7 +253,7 @@ def mail():
         mailcursor.execute("UPDATE users SET page = ? WHERE username = ?", (file_id, username))
         mailserver.commit()
 
-        return jsonify({"response": "Page changed with sucess."}), 200
+        return jsonify({"response": "OK"}), 200
     elif payload['action'] == "search":
         mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (payload['user'],))
         row = mailcursor.fetchone()
@@ -277,7 +277,7 @@ def mail():
         mailcursor.execute("UPDATE users SET biography = ? WHERE username = ?", (payload['bio'], username))
         mailserver.commit()
 
-        return jsonify({"response": "Bio changed!"}), 200
+        return jsonify({"response": "OK"}), 200
     elif payload['action'] == "coins": 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
@@ -304,7 +304,7 @@ def mail():
         mailcursor.execute("UPDATE users SET blocked_users = ? WHERE username = ?", (json.dumps(blocked_users), username))
         mailserver.commit()
 
-        return jsonify({"response": f"User {to_block} blocked successfully."}), 200
+        return jsonify({"response": "OK"}), 200
     elif payload['action'] == "unblock":
         to_unblock = payload.get('user_to_unblock')
 
@@ -322,7 +322,7 @@ def mail():
         mailcursor.execute("UPDATE users SET blocked_users = ? WHERE username = ?", (json.dumps(blocked_users), username))
         mailserver.commit()
 
-        return jsonify({"response": f"User {to_unblock} unblocked successfully."}), 200
+        return jsonify({"response": "OK"}), 200
     elif payload['action'] == "signoff":
         mailcursor.execute("DELETE FROM mails WHERE recipient = ?", (username,))
         mailcursor.execute("DELETE FROM agents WHERE username = ?", (username,))
@@ -339,11 +339,12 @@ def mail():
         mailcursor.execute("DELETE FROM users WHERE username = ?", (username,))
         mailserver.commit()
 
-        response = make_response(jsonify({"response": "Account deleted!"}), 200)
+        response = make_response(jsonify({"response": "OK"}), 200)
         response.set_cookie('token', '', max_age=0, httponly=True, secure=True, samesite='Lax', path='/')
+
         return response
     elif payload['action'] == "logout":
-        response = make_response(jsonify({"response": "Logged out successfully."}), 200)
+        response = make_response(jsonify({"response": "OK"}), 200)
         response.set_cookie('token', '', max_age=0, httponly=True, secure=True, samesite='Lax', path='/')
 
         return response
