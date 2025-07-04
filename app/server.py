@@ -374,16 +374,15 @@ class PlainPostSMTPHandler:
         mailserver, mailcursor = getdb()
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (username,))
         if not mailcursor.fetchone():
-            print(f"[✖] E-mail para usuário inexistente: {username}")
+            print(f"[-] E-mail para usuário inexistente: {username}")
             return '550 Usuário não encontrado no PlainPost'
 
         mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
                            (username, from_addr, encrypted, timestamp))
         mailserver.commit()
 
-        print(f"[✔] Mensagem recebida para '{username}' de {from_addr} com assunto: {subject}")
+        print(f"[+] Mensagem recebida para '{username}' de {from_addr} com assunto: {subject}")
         return '250 Mensagem recebida com sucesso'
-
 # | 
 # |
 # |
