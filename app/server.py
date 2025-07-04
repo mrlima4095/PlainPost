@@ -369,7 +369,7 @@ def mail():
     elif payload['action'] == "status": return jsonify({"response": username}), 200
     else: return jsonify({"response": "Invalid payload!"}), 405
 # | (SMTP Proxy)
-class PlainPostSMTPHandler:
+class ProxySMTP:
     async def handle_DATA(self, server, session, envelope):
         raw = envelope.original_content or envelope.content
         msg = message_from_bytes(raw)
@@ -783,7 +783,7 @@ init_expiration_checker()
 if __name__ == '__main__':
     if os.environ.get("WERKZEUG_RUN_MAIN") == "true": app.run(port=9834, debug=True, host="127.0.0.1")
     else:
-        smtp = Controller(PlainPostSMTPHandler(), hostname='0.0.0.0', port=25)
-        smtp.start(); print(" * Running SMTP Proxy at port 25")
+        proxy = Controller(ProxySMTP(), hostname='0.0.0.0', port=25)
+        proxy.start(); print(" * Running SMTP Proxy at port 25")
 
         app.run(port=9834, debug=True, host="127.0.0.1")
