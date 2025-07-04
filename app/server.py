@@ -92,12 +92,6 @@ def get_user(token):
     except (ExpiredSignatureError, InvalidTokenError): return None
 # |
 # |
-# Application Logs
-def log(message, file="logs.txt"):
-    with open(file, "a", encoding="utf-8") as f:
-        f.write(message + "\n")
-# |
-# |
 # PlainPost
 # |
 # Auth API
@@ -119,8 +113,8 @@ def login():
         response = make_response(jsonify({"response": "Login successful"}), 200)
         response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*71)
 
-        log(f"[+] User '{username}' logged."); return response
-    else: log(f"[!] Bad credentials! Somebody tried to login as '{username}'."); return jsonify({"response": "Bad credentials"}), 401
+        return response
+    else: return jsonify({"response": "Bad credentials"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -132,7 +126,7 @@ def signup():
     password = bcrypt.hashpw(payload['password'].encode('utf-8'), bcrypt.gensalt())
 
     mailcursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    if mailcursor.fetchone(): log(f"[+] Somebody tried to create an account with ID '{username}', but it's already in use."); return jsonify({"response": "This username is already in use."}), 409
+    if mailcursor.fetchone(): return jsonify({"response": "This username is already in use."}), 409
 
     mailcursor.execute(
         "INSERT INTO users (username, password, coins, role, biography, credentials_update) VALUES (?, ?, 0, 'user', 'A PlainPost user', ?)",
@@ -144,7 +138,7 @@ def signup():
     response = make_response(jsonify({"response": "Signup successful"}), 200)
     response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*7)
 
-    log(f"[+] Account '{username}' created!"); return response
+    return response
 # |
 # Social API
 # | (Main Handler)
@@ -154,7 +148,7 @@ def mail():
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     username = get_user(request.cookies.get('token'))
-    if not username: log(f"[+] Bad credentials! Somebody"); return jsonify({ "response": "Bad credentials!" }), 401
+    if not username: return jsonify({ "response": "Bad credentials!" }), 401
     payload = request.get_json()
 
     if payload['action'] == "send":
