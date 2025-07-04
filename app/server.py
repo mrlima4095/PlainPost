@@ -145,16 +145,14 @@ def signup():
 @app.route('/api/mail', methods=['POST'])
 def mail():
     mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json: return jsonify({ "response": "Invalid content type. Must be JSON." }), 400
 
     username = get_user(request.cookies.get('token'))
     if not username: return jsonify({ "response": "Bad credentials!" }), 401
     payload = request.get_json()
 
     if payload['action'] == "send":
-        to = payload.get("to", "")
-        subject = payload.get("subject", "(sem assunto)")
-        body = payload.get("content", "")
+        to = payload.get("to", ""); subject = payload.get("subject", "(sem assunto)"); body = payload.get("content", "");
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
 
         if "@" in to:
@@ -164,11 +162,11 @@ def mail():
             try:
                 with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(f"{username}@archsource.xyz", [to], msg.as_string())
 
-                return jsonify({"response": "Mail sent!"}), 200
+                return jsonify({ "response": "Mail sent!" }), 200
             except Exception as e: return jsonify({"response": f"SMTP error: {str(e)}"}), 500
 
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
-        if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
+        if mailcursor.fetchone() is None: return jsonify({ "response": "Target not found!" }), 404
 
         content = f"[{timestamp} - {username}] {body}"
         encrypted = fernet.encrypt(content.encode()).decode()
@@ -211,9 +209,9 @@ def mail():
 
         return jsonify({"response": "Message deleted!"}), 200
     elif payload['action'] == "transfer":
-        to = payload['to']; amount = payload['amount'];
+        to = payload.get('to'); amount = payload['amount'];
 
-        if "@" in to: return jsonify({"response": })
+        if "@" in to: return jsonify({"response": "Only available with PlainPost users"}), 405
         try:
             amount = int()
             if amount <= 0: return jsonify({"response": "Invalid amount!"}), 406
