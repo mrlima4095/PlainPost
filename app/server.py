@@ -99,7 +99,7 @@ def get_user(token):
 @app.route('/api/login', methods=['POST'])
 def login():
     mailserver, mailcursor = getdb()
-    if not request.is_json: return jsonify({ "response": "Invalid content type. Must be JSON." }), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
     username = payload.get('username')
@@ -168,13 +168,12 @@ def mail():
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
         if mailcursor.fetchone() is None: return jsonify({ "response": "Target not found!" }), 404
 
-        content = f"[{timestamp} - {username}] {body}"
-        encrypted = fernet.encrypt(content.encode()).decode()
+        content = fernet.encrypt(f"[{timestamp} - {username}] {body}".encode()).decode()
 
         mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (to, username, encrypted, timestamp))
         mailserver.commit()
 
-        return jsonify({"response": "Mail sent!"}), 200
+        return jsonify({ "response": "Mail sent!" }), 200
     elif payload['action'] == "read" or payload['action'] == "read_blocked":
         mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
