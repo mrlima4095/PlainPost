@@ -301,18 +301,23 @@ def mail():
         return jsonify({"response": f"{row['coins']}"}), 200
     elif payload['action'] == "block":
         to_block = payload.get('user_to_block')
-        if to_block.endswith("@archsource.xyz") or to_block.endswith("@mail.archsource.xyz"): to_block = to_block.replace("@archsource.xyz", ""); to_block = to_block.replace("@mail.archsource.xyz", "")
-
         if not to_block: return jsonify({"response": "Missing user to block!"}), 400
-        if to_block == username: return jsonify({"response": "You cant block your self!"}), 405
 
-        mailserver, mailcursor = getdb()
-        mailcursor.execute("SELECT * FROM users WHERE username = ?", (to_block,))
-        if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
+        is_internal = False
+        if to_block.endswith("@archsource.xyz") or to_block.endswith("@mail.archsource.xyz"):
+            to_block = to_block.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
+            is_internal = True
+
+        if to_block == username: return jsonify({"response": "You can't block yourself!"}), 405
+
+        if is_internal:
+            mailserver, mailcursor = getdb()
+            mailcursor.execute("SELECT * FROM users WHERE username = ?", (to_block,))
+            if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
+        else: mailserver, mailcursor = getdb()
 
         mailcursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
-
         blocked_users = json.loads(row['blocked_users']) if row and row['blocked_users'] else []
 
         if to_block in blocked_users: return jsonify({"response": "User already blocked."}), 409
