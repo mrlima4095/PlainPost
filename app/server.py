@@ -110,11 +110,11 @@ def login():
     if row and bcrypt.checkpw(payload.get('password').encode('utf-8'), row['password']):
         token = gen_token(username)
 
-        response = make_response(jsonify({"response": "Login successful"}), 200)
+        response = make_response(jsonify({"response": "Login successful!"}), 200)
         response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*71)
 
         return response
-    else: return jsonify({"response": "Bad credentials"}), 401
+    else: return jsonify({"response": "Bad credentials!"}), 401
 # | (Register)
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -122,7 +122,7 @@ def signup():
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
-    username = payload['username']
+    username = payload.get('username')
     password = bcrypt.hashpw(payload['password'].encode('utf-8'), bcrypt.gensalt())
 
     mailcursor.execute("SELECT * FROM users WHERE username = ?", (username,))
