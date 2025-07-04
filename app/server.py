@@ -130,7 +130,7 @@ def signup():
 
     mailcursor.execute(
         "INSERT INTO users (username, password, coins, role, biography, credentials_update) VALUES (?, ?, 0, 'user', 'A PlainPost user', ?)",
-        (username, password, datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat())
+        (username, password, datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ).isoformat())
     )
     mailserver.commit()
 
