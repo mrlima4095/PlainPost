@@ -186,11 +186,17 @@ def mail():
 
         decrypted_mails = []
         for row in rows:
-            if payload['action'] == "read" and (row['sender'] in blocked_users or row['sender'] + "@archsource.xyz" in blocked_users): continue
-            elif payload['action'] == "read_blocked" and (row['sender'] not in blocked_users or row['sender'] + "@archsource.xyz" not in blocked_users): continue
+            sender_email = row['sender']
+            if sender_email.endswith("@archsource.xyz"):
+                sender_user = sender_email.split('@')[0]
+                is_blocked = sender_user in blocked_users
+            else: is_blocked = sender_email in blocked_users
+
+            if payload['action'] == "read" and is_blocked: continue 
+            elif payload['action'] == "read_blocked" and not is_blocked: continue
 
             decrypted_content = fernet.decrypt(row["content"].encode('utf-8')).decode()
-            decrypted_mails.append({"id": row["id"], "content": decrypted_content})
+            decrypted_mails.append({ "id": row["id"], "content": decrypted_content })
 
         return jsonify({"response": decrypted_mails if decrypted_mails else "No messages"}), 200
     elif payload['action'] == "clear": 
