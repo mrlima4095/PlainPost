@@ -303,10 +303,9 @@ def mail():
         to_block = payload.get('user_to_block')
         if not to_block: return jsonify({"response": "Missing user to block!"}), 400
 
-        is_internal = False
-        if to_block.endswith("@archsource.xyz") or to_block.endswith("@mail.archsource.xyz"):
-            to_block = to_block.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
-            is_internal = True
+        is_internal = True
+        if to_block.endswith("@archsource.xyz") or to_block.endswith("@mail.archsource.xyz"): to_block = to_block.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
+        if "@" in to_block: is_internal = False
 
         if to_block == username: return jsonify({"response": "You can't block yourself!"}), 405
 
