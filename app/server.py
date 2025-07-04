@@ -135,7 +135,7 @@ def signup():
     mailserver.commit()
 
     token = gen_token(username)
-    response = make_response(jsonify({"response": "Signup successful"}), 200)
+    response = make_response(jsonify({"response": "Signup successful!"}), 200)
     response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*7)
 
     return response
