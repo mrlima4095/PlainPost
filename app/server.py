@@ -213,7 +213,7 @@ def mail():
 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (username,))
         sender_row = mailcursor.fetchone()
-        if sender_row["coins"] < amount: return jsonify({"response": "No enough money!"}), 401
+        if sender_row["coins"] < amount: return jsonify({"response": "No enough money!"}), 402
 
         mailcursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (amount, username))
         mailcursor.execute("UPDATE users SET coins = coins + ? WHERE username = ?", (amount, payload['to']))
@@ -366,7 +366,7 @@ def ollama_agent():
     coins = row["coins"]
 
     if role not in ["Admin", "MOD", "DEV"]:
-        if coins <= 0: return jsonify({"response": "Not enough coins!"}), 403
+        if coins <= 0: return jsonify({"response": "Not enough coins!"}), 402
 
         mailcursor.execute("UPDATE users SET coins = coins - 1 WHERE username = ?", (username,))
         mailserver.commit()
