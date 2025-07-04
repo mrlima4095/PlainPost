@@ -301,14 +301,12 @@ def mail():
         return jsonify({"response": f"{row['coins']}"}), 200
     elif payload['action'] == "block":
         to_block = payload.get('user_to_block')
+        if to_block.endswith("@archsource.xyz") or to_block.endswith("@mail.archsource.xyz"): to_block = to_block.replace("@archsource.xyz", ""); to_block = to_block.replace("@mail.archsource.xyz", "")
 
         if not to_block: return jsonify({"response": "Missing user to block!"}), 400
         if to_block == username: return jsonify({"response": "You cant block your self!"}), 405
 
         mailserver, mailcursor = getdb()
-
-        if to_block.endswith("@archsource.xyz"): to_block = to_block.replace("@archsource.xyz", "");
-        
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to_block,))
         if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
@@ -326,6 +324,7 @@ def mail():
         return jsonify({"response": "OK"}), 200
     elif payload['action'] == "unblock":
         to_unblock = payload.get('user_to_unblock')
+        if to_unblock.endswith("@archsource.xyz") or to_unblock.endswith("@mail.archsource.xyz"): to_unblock = to_unblock.replace("@archsource.xyz", ""); to_unblock = to_unblock.replace("@mail.archsource.xyz", "")
 
         if not to_unblock: return jsonify({"response": "Missing user to unblock!"}), 400
 
