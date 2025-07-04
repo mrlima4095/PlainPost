@@ -152,9 +152,7 @@ def mail():
     payload = request.get_json()
 
     if payload['action'] == "send":
-        to = payload.get("to", "")
-        subject = payload.get("subject", "(sem assunto)")
-        body = payload.get("content", "")
+        to = payload.get("to", ""); subject = payload.get("subject", "(sem assunto)"); body = payload.get("content", "");
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
 
         if "@" in to:
