@@ -181,11 +181,10 @@ def mail():
             msg["To"] = to
 
             try:
-                with smtplib.SMTP("localhost", 2525) as smtp:
-                    smtp.sendmail(sender, [to], msg.as_string())
-                return jsonify({"response": "External mail sent!"}), 200
-            except Exception as e:
-                return jsonify({"response": f"SMTP error: {str(e)}"}), 500
+                with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(sender, [to], msg.as_string())
+                
+                return jsonify({"response": "Mail sent!"}), 200
+            except Exception as e: return jsonify({"response": f"SMTP error: {str(e)}"}), 500
 
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
         if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
