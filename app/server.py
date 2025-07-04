@@ -186,8 +186,8 @@ def mail():
 
         decrypted_mails = []
         for row in rows:
-            if payload['action'] == "read" and row['sender'] in blocked_users: continue
-            elif payload['action'] == "read_blocked" and row['sender'] not in blocked_users: continue
+            if payload['action'] == "read" and row['sender'] in blocked_users and row['sender'] in blocked_users + "@archsource.xyz": continue
+            elif payload['action'] == "read_blocked" and row['sender'] not in blocked_users and row['sender'] not in blocked_users + "@archsource.xyz": continue
 
             decrypted_content = fernet.decrypt(row["content"].encode('utf-8')).decode()
             decrypted_mails.append({"id": row["id"], "content": decrypted_content})
@@ -215,7 +215,7 @@ def mail():
             if amount <= 0: raise ValueError("Invalid amount!")
         except ValueError: return jsonify({"response": "Invalid amount!"}), 406
 
-        if to.endswith("@archsource.xyz"): to = to.replace("@archsource.xyz", "")
+        if to.endswith("@archsource.xyz"): to = to.replace("@archsource.xyz", "");
         elif "@" in to: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (to,))
@@ -262,7 +262,7 @@ def mail():
     elif payload['action'] == "search":
         user = payload.get('user')
 
-        if user.endswith("@archsource.xyz"): user = user.replace("@archsource.xyz", "")
+        if to.endswith("@archsource.xyz") or to.endswith("@mail.archsource.xyz"): to = to.replace("@archsource.xyz", ""); to = to.replace("@mail.archsource.xyz", "");
         elif "@" in user: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
         mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (user,))
@@ -300,6 +300,9 @@ def mail():
         if to_block == username: return jsonify({"response": "You cant block your self!"}), 405
 
         mailserver, mailcursor = getdb()
+
+        if to.endswith("@archsource.xyz"): to = to.replace("@archsource.xyz", "");
+        
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (to_block,))
         if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
