@@ -262,13 +262,13 @@ def mail():
     elif payload['action'] == "search":
         user = payload.get('user')
 
-        if to.endswith("@archsource.xyz"): to = to.replace("@archsource.xyz", "")
-        elif "@" in to: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
+        if user.endswith("@archsource.xyz"): user = user.replace("@archsource.xyz", "")
+        elif "@" in user: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
         mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (,))
         row = mailcursor.fetchone()
 
-        if row: return jsonify({"response": f"ID: {payload['user']}\nRole: [{row['role']}]\nBio: {row['biography']}"}), 200 
+        if row: return jsonify({"response": f"ID: {user}\nRole: [{row['role']}]\nBio: {row['biography']}"}), 200 
         else: return jsonify({"response": "Target not found!"}), 404
     elif payload['action'] == "me":
         mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (username,))
