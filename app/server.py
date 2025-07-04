@@ -171,9 +171,6 @@ def mail():
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
 
         if "@" in to:
-            import smtplib
-            from email.mime.text import MIMEText
-
             sender = f"{username}@opentty.xyz"
             msg = MIMEText(body, "plain", "utf-8")
             msg["Subject"] = subject
