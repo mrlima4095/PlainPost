@@ -265,7 +265,7 @@ def mail():
         if user.endswith("@archsource.xyz"): user = user.replace("@archsource.xyz", "")
         elif "@" in user: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
-        mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (,))
+        mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (user,))
         row = mailcursor.fetchone()
 
         if row: return jsonify({"response": f"ID: {user}\nRole: [{row['role']}]\nBio: {row['biography']}"}), 200 
