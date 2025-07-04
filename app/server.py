@@ -165,13 +165,38 @@ def mail():
     payload = request.get_json()
 
     if payload['action'] == "send":
-        mailcursor.execute("SELECT * FROM users WHERE username = ?", (payload['to'],))
-        if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
-
+        to = payload.get("to", "")
+        subject = payload.get("subject", "(sem assunto)")
+        body = payload.get("content", "")
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
-        content = fernet.encrypt(f"[{timestamp} - {username}] {payload['content']}".encode()).decode('utf-8')
 
-        mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (payload['to'], username, content, timestamp))
+        # Enviar e-mail externo (com @)
+        if "@" in to:
+            import smtplib
+            from email.mime.text import MIMEText
+
+            sender = f"{username}@plainpost.xyz"
+            msg = MIMEText(body, "plain", "utf-8")
+            msg["Subject"] = subject
+            msg["From"] = sender
+            msg["To"] = to
+
+            try:
+                with smtplib.SMTP("localhost", 25) as smtp:
+                    smtp.sendmail(sender, [to], msg.as_string())
+                return jsonify({"response": "External mail sent!"}), 200
+            except Exception as e:
+                return jsonify({"response": f"SMTP error: {str(e)}"}), 500
+
+        # Envio interno para outro usuário do PlainPost
+        mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
+        if mailcursor.fetchone() is None:
+            return jsonify({"response": "Target not found!"}), 404
+
+        content = f"[{timestamp} - {username}] Assunto: {subject}\n{body}"
+        encrypted = fernet.encrypt(content.encode()).decode()
+
+        mailcursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (to, username, encrypted, timestamp))
         mailserver.commit()
 
         return jsonify({"response": "Mail sent!"}), 200
