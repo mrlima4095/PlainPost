@@ -136,7 +136,7 @@ def signup():
 
     mailcursor.execute(
         "INSERT INTO users (username, password, coins, role, biography, credentials_update) VALUES (?, ?, 0, 'user', 'A PlainPost user', ?)",
-        (username, password, datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat())
+        (username, password, datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ).isoformat())
     )
     mailserver.commit()
 
@@ -144,7 +144,7 @@ def signup():
     response = make_response(jsonify({"response": "Signup successful"}), 200)
     response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*7)
 
-    return response
+    printf(f"Account '{username}' created."); return response
 # |
 # Social API
 # | (Main Handler)
