@@ -171,7 +171,7 @@ def mail():
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
 
         if "@" in to:
-            sender = f"{username}@opentty.xyz"
+            sender = f"{username}@archsource.xyz"
             msg = MIMEText(body, "plain", "utf-8")
             msg["Subject"] = subject
             msg["From"] = sender
