@@ -385,8 +385,7 @@ class PlainPostSMTPHandler:
                 if part.get_content_type() == 'text/plain':
                     body = part.get_payload(decode=True).decode(errors='replace')
                     break
-        else:
-            body = msg.get_payload(decode=True).decode(errors='replace')
+        else: body = msg.get_payload(decode=True).decode(errors='replace')
 
         timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
         content = f"[{timestamp} - {from_addr}] Assunto: {subject} - {body}"
