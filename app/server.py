@@ -163,7 +163,7 @@ def mail():
 
             try:
                 with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(sender, [to], msg.as_string())
-
+                print(msg.as_string())
                 return jsonify({"response": "OK"}), 200
             except Exception as e: return jsonify({"response": f"SMTP error: {str(e)}"}), 500
 
