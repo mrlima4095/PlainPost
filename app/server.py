@@ -213,7 +213,10 @@ def mail():
             if amount <= 0: raise ValueError("Invalid amount!")
         except ValueError: return jsonify({"response": "Invalid amount!"}), 406
 
-        mailcursor.execute("SELECT coins FROM users WHERE username = ?", (payload['to'],))
+        if to.endswith("@archsource.xyz"): to = to.replace("@archsource.xyz", "")
+        elif "@" in to: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
+
+        mailcursor.execute("SELECT coins FROM users WHERE username = ?", (to,))
         recipient_row = mailcursor.fetchone()
         if recipient_row is None: return jsonify({"response": "Target not found!"}), 404
 
@@ -222,7 +225,7 @@ def mail():
         if sender_row["coins"] < amount: return jsonify({"response": "No enough money!"}), 402
 
         mailcursor.execute("UPDATE users SET coins = coins - ? WHERE username = ?", (amount, username))
-        mailcursor.execute("UPDATE users SET coins = coins + ? WHERE username = ?", (amount, payload['to']))
+        mailcursor.execute("UPDATE users SET coins = coins + ? WHERE username = ?", (amount, to))
         mailserver.commit()
         
         return jsonify({"response": "OK"}), 200
