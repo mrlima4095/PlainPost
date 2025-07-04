@@ -6,10 +6,13 @@
 from flask import Flask, request, jsonify, send_from_directory, make_response, render_template
 from flask_cors import CORS
 from flask import send_file
-# | (SMTP)
+# | (SMTP Proxy)
 from aiosmtpd.controller import Controller
 from email import message_from_bytes
 import asyncio
+# |
+import smtplib
+from email.mime.text import MIMEText
 # | (Others) 
 import jwt
 import time
