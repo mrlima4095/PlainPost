@@ -174,7 +174,7 @@ def mail():
             import smtplib
             from email.mime.text import MIMEText
 
-            sender = f"{username}@plainpost.xyz"
+            sender = f"{username}@opentty.xyz"
             msg = MIMEText(body, "plain", "utf-8")
             msg["Subject"] = subject
             msg["From"] = sender
