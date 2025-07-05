@@ -415,7 +415,8 @@ def submit_report():
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     data = request.get_json()
-    required_fields = ["type", "sender", "description", "links", "date", "time"]
+    data['sender'] = username
+    required_fields = ["type", "description", "links", "date", "time"]
     if not all(field in data for field in required_fields): return jsonify({"response": "Missing fields!"}), 400
 
     target = data.get("target")
