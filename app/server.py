@@ -593,7 +593,6 @@ def short_links_handler():
     if payload['action'] == "create":
         url = payload.get("url", "").strip()
         if not url: return jsonify({"response": "Missing URL!"}), 400
-        if not url.startswith("http"): return jsonify({"response": "Invalid URL"}), 405
 
         mailcursor.execute("SELECT role, coins FROM users WHERE username = ?", (username,))
         row = mailcursor.fetchone()
