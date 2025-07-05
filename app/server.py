@@ -406,6 +406,33 @@ class ProxySMTP:
 
         return '250 Mensagem recebida com sucesso'
 # | 
+# Reports
+@app.route('/api/report', methods=['POST'])
+def submit_report():
+    username = get_user(request.cookies.get('token'))
+    if not username:
+        return jsonify({"response": "Bad credentials!"}), 401
+
+    if not request.is_json:
+        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+
+    data = request.get_json()
+    required_fields = ["type", "sender", "description", "links", "date", "time"]
+    if not all(field in data for field in required_fields):
+        return jsonify({"response": "Missing fields!"}), 400
+
+    target = data.get("target")
+    if not target:
+        return jsonify({"response": "Missing target user!"}), 400
+
+    report_id = str(uuid.uuid4())
+    save_path = os.path.join("reports", secure_filename(target))
+    os.makedirs(save_path, exist_ok=True)
+
+    with open(os.path.join(save_path, f"{report_id}.json"), "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    return jsonify({"response": "Report saved successfully!"}), 200
 # |
 # |
 # Source A.I
