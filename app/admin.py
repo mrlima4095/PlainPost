@@ -149,7 +149,7 @@ class AdminPanel:
                 label = f"[{i+1:2}]"
                 grid[i % rows].append(label)
 
-            for row in grid: print("\t".join(f"{item}" for item in row))
+            for row in grid: print("    ".join(f"{item}" for item in row))
 
             print("[ 0] Sair")
 
