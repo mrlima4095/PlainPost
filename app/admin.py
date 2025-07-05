@@ -52,6 +52,7 @@ class AdminPanel:
 
                 case "block": self.block(args[2], args[3])
                 case "unblock": self.unblock(args[2], args[3])
+                case "list-blocks": self.list_spam_blocks(args[2])
 
                 case "mural": self.view_mural(args[2])
 
@@ -216,7 +217,7 @@ class AdminPanel:
             self.cursor.execute("UPDATE users SET blocked_users = ? WHERE username = ?", (json.dumps(blocked), user))
             self.db.commit()
         print(f"[-] '{target}' unblocked by '{user}'.")
-    # | (Listar bloqueios de spam de um usuário)
+    # | (List user blocks)
     def list_spam_blocks(self, username):
         self.cursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
         row = self.cursor.fetchone()
