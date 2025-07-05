@@ -465,8 +465,7 @@ def submit_report():
         link_found = False
         for link in payload['links']:
             short_id = link.strip().split("/")[-1]
-            if short_id.startswith("https://"): short_id = short_id if not "/" in short_id else short_id.split("/")[5]
-            elif short_id.startswith("/s/"): short_id = short_id.replace("/s/", "")
+            short_id = short_id.replace("https://archsource.xyz/s/", "").replace("/s/", "")
 
             mailcursor.execute("SELECT original_url, owner FROM short_links WHERE id = ?", (short_id,))
             row = mailcursor.fetchone()
