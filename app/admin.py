@@ -42,7 +42,7 @@ class AdminPanel:
 
                 case "send": self.send(args[2], ' '.join(args[3:]))
                 case "notifyall": self.notify_all(' '.join(args[2:]))
-                case "read": self.list_all_mails(args[2] if len(args) > 2 else None)
+                case "read": self.read(args[2] if len(args) > 2 else None)
                 case "del-msg": self.delete_message(args[2])
                 case "clear": self.clear(args[2])
                 case "clear-all": self.clear_all()
