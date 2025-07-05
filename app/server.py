@@ -422,10 +422,10 @@ def submit_report():
     target = data.get("target")
     if not target: return jsonify({"response": "Missing target user!"}), 400
 
-    if to.endswith("@archsource.xyz") or to.endswith("@mail.archsource.xyz"): to = to.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
-    elif "@" in to: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
+    if target.endswith("@archsource.xyz") or target.endswith("@mail.archsource.xyz"): target = target.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
+    elif "@" in target: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
-    mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
+    mailcursor.execute("SELECT * FROM users WHERE username = ?", (target,))
     if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
     report_id = str(uuid.uuid4())
