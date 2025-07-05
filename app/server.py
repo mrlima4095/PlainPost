@@ -492,6 +492,48 @@ class POP3Handler(socketserver.BaseRequestHandler):
             except Exception as e:
                 print(f"[POP3 ERROR] {e}")
                 break
+class AuthSMTPHandler:
+    async def handle_AUTH(self, server, session, envelope, mechanism, auth_data):
+        if mechanism != "LOGIN":
+            return "504 Auth mechanism not supported"
+
+        username, password = auth_data
+        conn, cur = getdb()
+        cur.execute("SELECT password FROM users WHERE username = ?", (username,))
+        row = cur.fetchone()
+        if row and bcrypt.checkpw(password.encode(), row["password"]):
+            session.username = username
+            return "235 Authentication successful"
+        return "535 Authentication failed"
+
+    async def handle_MAIL(self, server, session, envelope, address, mail_options):
+        if not hasattr(session, "username"):
+            return "530 Authentication required"
+        envelope.mail_from = address
+        return "250 OK"
+
+    async def handle_RCPT(self, server, session, envelope, address, rcpt_options):
+        envelope.rcpt_tos.append(address)
+        return "250 OK"
+
+    async def handle_DATA(self, server, session, envelope):
+        msg = EmailMessage()
+        msg.set_content(envelope.content.decode())
+        msg["From"] = envelope.mail_from
+        msg["To"] = ", ".join(envelope.rcpt_tos)
+        msg["Subject"] = "(sem assunto)"
+
+        from_addr = envelope.mail_from
+        to_addr = envelope.rcpt_tos[0]
+        username = session.username
+
+        # Ou envia para fora usando SMTP real (opcional)
+        try:
+            with smtplib.SMTP("localhost", 2525) as smtp:
+                smtp.sendmail(from_addr, envelope.rcpt_tos, envelope.content)
+            return "250 Mensagem enviada externamente"
+        except Exception as e:
+            return f"550 Falha ao enviar: {str(e)}"
 def run_pop3():
     pop3server = socketserver.TCPServer(("0.0.0.0", 110), POP3Handler)
     pop3server.serve_forever(); print(" * Running POP3 Proxy at port 100.")
