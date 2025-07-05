@@ -436,15 +436,22 @@ def submit_report():
     payload['sender'] = username
     with open(report_json_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=4, ensure_ascii=False)
-
+    # |
+    # | (Save a copy of reporter inbox)
     if payload['type'] == "mail":
-        mailcursor.execute("SELECT content FROM mails WHERE recipient = ?", (target,))
+        mailcursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
         messages = mailcursor.fetchall()
         with open(os.path.join(report_dir, "inbox.txt"), "w", encoding="utf-8") as inbox:
             for msg in messages:
                 try: inbox.write(fernet.decrypt(msg['content'].encode()).decode() + "\n")
                 except: pass
-
+        mailcursor.execute("SELECT content FROM mails WHERE recipient = ?", (target,))
+        messages = mailcursor.fetchall()
+        with open(os.path.join(report_dir, "reported_inbox.txt"), "w", encoding="utf-8") as inbox:
+            for msg in messages:
+                try: inbox.write(fernet.decrypt(msg['content'].encode()).decode() + "\n")
+                except: pass
+    # | (Save a copy of reported mural file)
     elif payload['type'] == "mural":
         mailcursor.execute("SELECT page FROM users WHERE username = ?", (target,))
         row = mailcursor.fetchone()
@@ -454,31 +461,18 @@ def submit_report():
             if file_row:
                 file_path = os.path.join(UPLOAD_FOLDER, file_row['saved_name'])
                 if os.path.exists(file_path): shutil.copy(file_path, os.path.join(report_dir, file_row['saved_name']))
-
+    # | (Save a copy of reported file)
     elif payload['type'] == "file":
         mailcursor.execute("SELECT saved_name FROM files WHERE owner = ?", (target,))
         for row in mailcursor.fetchall():
             file_path = os.path.join(UPLOAD_FOLDER, row['saved_name'])
             if os.path.exists(file_path): shutil.copy(file_path, os.path.join(report_dir, row['saved_name']))
-
+    # | (Save a copy of all short links)
     elif payload['type'] == "short_link":
-        link_found = False
-        for link in payload['links']:
-            short_id = link.strip().split("/")[-1]
-            short_id = short_id.replace("https://archsource.xyz/s/", "").replace("/s/", "")
-
-            mailcursor.execute("SELECT original_url, owner FROM short_links WHERE id = ?", (short_id,))
-            row = mailcursor.fetchone()
-            if row:
-                with open(os.path.join(report_dir, "short_link_target.txt"), "w", encoding="utf-8") as f: f.write(f"Short ID: {short_id}\nOwner: {row['owner']}\nTarget URL: {row['original_url']}\n")
-                link_found = True
-                break
-
-        if not link_found:
-            mailcursor.execute("SELECT * FROM short_links")
-            with open(os.path.join(report_dir, "short_links.txt"), "w", encoding="utf-8") as f:
-                for row in mailcursor.fetchall(): f.write(f"ID: {row['id']} | Owner: {row['owner']} | Target: {row['original_url']}\n")
-
+        mailcursor.execute("SELECT * FROM short_links")
+        with open(os.path.join(report_dir, "short_links.txt"), "w", encoding="utf-8") as f:
+            for row in mailcursor.fetchall(): f.write(f"ID: {row['id']} | Owner: {row['owner']} | Target: {row['original_url']}\n")
+    # | (Save all DB)
     else: shutil.copy("mailserver.db", os.path.join(report_dir, "mailserver_copy.db"))
 
     return jsonify({"response": "Report saved successfully!"}), 200
