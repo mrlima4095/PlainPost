@@ -434,6 +434,7 @@ def submit_report():
 
     report_json_path = os.path.join(report_dir, "report.json")
     payload['sender'] = username
+    payload['report-time'] = datetime.now().strftime("%H:%M %d/%m/%Y")
     with open(report_json_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=4, ensure_ascii=False)
     # |
