@@ -132,53 +132,55 @@ class AdminPanel:
         ]
 
         while True:
-            os.system("cls" if os.name == "nt" else "clear")
-            print("=====[ Admin Panel ]=====\n")
-
-            term_width = shutil.get_terminal_size().columns
-            col_width = 35
-            col_count = max(1, term_width // col_width)
-            rows = (len(actions) + col_count - 1) // col_count
-
-            columns = [[] for _ in range(col_count)]
-            for idx, (desc, _, _) in enumerate(actions):
-                col = idx // rows
-                label = f"[{idx + 1:2}] {desc:<28}"
-                columns[col].append(label)
-
-            for row in range(rows):
-                line = []
-                for col in range(col_count):
-                    if row < len(columns[col]):
-                        line.append(columns[col][row])
-                    else:
-                        line.append(" " * col_width)
-                print("  ".join(line))
-
-            print("\n[ x] Exit")
-
-            choice = input("[+] Choice an option: ").strip()
-            if choice == "0" or choice.lower() == "x": break
-
             try:
-                idx = int(choice) - 1
-                desc, func, params = actions[idx]
-            except (ValueError, IndexError):
-                print("[!] Invalid option.")
+                os.system("cls" if os.name == "nt" else "clear")
+                print("=====[ Admin Panel ]=====\n")
+
+                term_width = shutil.get_terminal_size().columns
+                col_width = 35
+                col_count = max(1, term_width // col_width)
+                rows = (len(actions) + col_count - 1) // col_count
+
+                columns = [[] for _ in range(col_count)]
+                for idx, (desc, _, _) in enumerate(actions):
+                    col = idx // rows
+                    label = f"[{idx + 1:2}] {desc:<28}"
+                    columns[col].append(label)
+
+                for row in range(rows):
+                    line = []
+                    for col in range(col_count):
+                        if row < len(columns[col]):
+                            line.append(columns[col][row])
+                        else:
+                            line.append(" " * col_width)
+                    print("  ".join(line))
+
+                print("\n[ x] Exit")
+
+                choice = input("[+] Choice an option: ").strip()
+                if choice == "0" or choice.lower() == "x": break
+
+                try:
+                    idx = int(choice) - 1
+                    desc, func, params = actions[idx]
+                except (ValueError, IndexError):
+                    print("[!] Invalid option.")
+                    input("Press ENTER para continue...")
+                    continue
+
+                args = []
+                for p in params:
+                    val = input(f"  {p}: ").strip()
+                    args.append(val)
+
+                try:
+                    func(*args)
+                except Exception as e:
+                    print(f"[!] {e}")
+
                 input("Press ENTER para continue...")
-                continue
-
-            args = []
-            for p in params:
-                val = input(f"  {p}: ").strip()
-                args.append(val)
-
-            try:
-                func(*args)
-            except Exception as e:
-                print(f"[!] {e}")
-
-            input("Press ENTER para continue...")
+            except KeyboardInterrupt: continue
 
     # Users
     # | (Register an user)
