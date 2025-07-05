@@ -128,12 +128,56 @@ class AdminPanel:
             print(f"[{row['role']}] {row['username']} ({row['coins']}): {row['biography']} | Mural: {mural}")
     # |
     # |
-    # User informations
+    # User information
     def user_info(self, username):
         self.cursor.execute("SELECT role, biography, coins, page FROM users WHERE username = ?", (username,))
         row = self.cursor.fetchone()
         mural = "yes" if row["page"] else "no"
         print(f"[{row['role']}] {username} (Coins: {row['coins']}) - {row['biography']} | Mural: {mural}")
+    # |
+    # |
+    # Reports Managing
+    # | (Print all reports)
+    def list_reports(self):
+        root = "reports"
+        if not os.path.exists(root):
+            print("[!] No reports found."); return
+        for user in os.listdir(root):
+            for file in os.listdir(os.path.join(root, user)):
+                with open(os.path.join(root, user, file), "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    print(f"[{file.replace('.json','')}] {data['type']} > {data['target']} - by: {data['sender']}")
+    # | (Print reports to a user)
+    def user_reports(self, username):
+        path = os.path.join("reports", username)
+        if not os.path.exists(path):
+            print("[!] No reports for this user."); return
+        for file in os.listdir(path):
+            with open(os.path.join(path, file), "r", encoding="utf-8") as f:
+                data = json.load(f)
+                print(f"[{file.replace('.json','')}] {data['type']} - by: {data['sender']}\n{data['description']}\n")
+    # | (Delete a report)
+    def delete_report(self, report_id):
+        root = "reports"
+        found = False
+        for user in os.listdir(root):
+            file_path = os.path.join(root, user, f"{report_id}.json")
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"[-] Report {report_id} deleted.")
+                found = True
+                break
+        if not found:
+            print("[!] Report ID not found.")
+    # | (Clear all reports for an user)
+    def clear_user_reports(self, username):
+        path = os.path.join("reports", username)
+        if not os.path.exists(path):
+            print("[!] No reports found for this user."); return
+        for file in os.listdir(path):
+            os.remove(os.path.join(path, file))
+        os.rmdir(path)
+        print(f"[~] All reports for '{username}' have been deleted.")
     # | 
     # | 
     # Mails
