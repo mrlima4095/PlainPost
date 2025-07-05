@@ -415,7 +415,7 @@ def submit_report():
     username = get_user(request.cookies.get('token'))
     if not username: return jsonify({ "response": "Bad credentials!" }), 401
     payload = request.get_json()
-    
+
     payload['sender'] = username
     required_fields = ["type", "description", "links", "date", "time"]
     if not all(field in payload for field in required_fields): return jsonify({"response": "Missing fields!"}), 400
@@ -428,6 +428,11 @@ def submit_report():
 
     mailcursor.execute("SELECT * FROM users WHERE username = ?", (target,))
     if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
+
+    if payload['type'] == "mail":
+    elif payload['type'] == "mural":
+    elif payload['type'] == "file":
+    elif payload['type'] == "short_link":
 
     report_id = str(uuid.uuid4())
     save_path = os.path.join("reports", secure_filename(target))
