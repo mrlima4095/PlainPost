@@ -527,7 +527,6 @@ class AuthSMTPHandler:
         to_addr = envelope.rcpt_tos[0]
         username = session.username
 
-        # Ou envia para fora usando SMTP real (opcional)
         try:
             with smtplib.SMTP("localhost", 2525) as smtp:
                 smtp.sendmail(from_addr, envelope.rcpt_tos, envelope.content)
