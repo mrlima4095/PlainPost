@@ -424,7 +424,7 @@ def submit_report():
     if target.endswith("@archsource.xyz") or target.endswith("@mail.archsource.xyz"): target = target.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
     elif "@" in target: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
-    if target not in ["desconhecido", "unknown"]
+    if target not in ["desconhecido", "unknown"]:
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (target,))
         if not mailcursor.fetchone(): return jsonify({"response": "Target not found!"}), 404
 
