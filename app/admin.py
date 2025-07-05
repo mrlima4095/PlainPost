@@ -55,7 +55,6 @@ class AdminPanel:
                 case "unblock": self.unblock(args[2], args[3])
                 case "list-blocks": self.list_spam_blocks(args[2])
 
-
                 case "list-reports": self.list_reports()
                 case "user-reports": self.user_reports(args[2])
                 case "rm-report": self.delete_report(args[2])
@@ -96,89 +95,6 @@ class AdminPanel:
         print("    list-links  link-owner  rm-link")
         print("    clear-agent  read-agent")
         print("    block-id  unblock-id  used-ids")
-
-    def interactive_mode(self):
-        actions = [ ("Exit", sys.exit, []),
-            ("Register", self.register, ["username", "password"]), ("Unregister", self.unregister, ["username"]),
-            ("Change password", self.changepass, ["username", "new password"]), ("Change biography", self.changebio, ["username", "biography"]), ("Change role", self.changerole, ["username", "role"]),
-            ("List users", self.list_users, []),
-            ("Send mail (as admin)", self.send, ["username", "mail content"]),
-            ("Notify all", self.notify_all, ["mail content"]),
-            ("Read message", self.read, ["(username or empty)"]),
-            ("Remove message", self.delete_message, ["id"]),
-            ("Clear user inbox", self.clear, ["username"]),
-            ("Clear all mails", self.clear_all, []),
-            ("Give coins", self.give_coins, ["username", "amount"]), ("Take coins", self.take_coins, ["username", "amount"]),
-            ("Block user", self.block, ["username", "target"]),
-            ("Unblock user", self.unblock, ["username", "target"]),
-            ("View user blocks", self.list_spam_blocks, ["username"]),
-            ("View reports", self.list_reports, []),
-            ("View reports for a user", self.user_reports, ["username"]),
-            ("Remove a report", self.delete_report, ["id"]),
-            ("Remove reports for a user", self.clear_user_reports, ["username"]),
-            ("About an user", self.user_info, ["username"]),
-            ("View mural", self.view_mural, ["username"]),
-            ("View user files", self.list_user_files, ["username"]),
-            ("About a file", self.file_info, ["id"]),
-            ("Extend file lifetime", self.extend_file, ["id"]),
-            ("View user short links", self.list_short_links, ["username"]),
-            ("View link owner", self.link_owner, ["link_id"]),
-            ("Remove a link", self.delete_link, ["link_id"]),
-            ("Clear user AI history", self.clear_ai, ["username"]),
-            ("Read AI history", self.read_ai, ["username"]),
-            ("Block ID", self.block_username, ["username"]),
-            ("Unblock ID", self.unblock_username, ["username"]),
-            ("View blocked IDs", self.list_blocked_usernames, [])
-        ]
-
-        while True:
-            try:
-                os.system("cls" if os.name == "nt" else "clear")
-                print("=====[ Admin Panel ]=====\n")
-
-                term_width = shutil.get_terminal_size().columns
-                col_width = 35
-                col_count = max(1, term_width // col_width)
-                rows = (len(actions) + col_count - 1) // col_count
-
-                columns = [[] for _ in range(col_count)]
-                for idx, (desc, _, _) in enumerate(actions):
-                    col = idx // rows
-                    label = f"[{idx + 1:2}] {desc:<28}"
-                    columns[col].append(label)
-
-                for row in range(rows):
-                    line = []
-                    for col in range(col_count):
-                        if row < len(columns[col]):
-                            line.append(columns[col][row])
-                        else:
-                            line.append(" " * col_width)
-                    print("  ".join(line))
-
-                choice = input("[+] Choice an option: ").strip()
-                if choice == "0" or choice.lower() == "x": break
-
-                try:
-                    idx = int(choice) - 1
-                    desc, func, params = actions[idx]
-                except (ValueError, IndexError):
-                    print("[!] Invalid option.")
-                    input("Press ENTER para continue...")
-                    continue
-
-                args = []
-                for p in params:
-                    val = input(f"  {p}: ").strip()
-                    args.append(val)
-
-                try:
-                    func(*args)
-                except Exception as e:
-                    print(f"[!] {e}")
-
-                input("Press ENTER para continue...")
-            except KeyboardInterrupt: continue
 
     # Users
     # | (Register an user)
@@ -452,7 +368,7 @@ class AdminPanel:
     def unblock_username(self, username):
         self.cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
         if self.cursor.fetchone(): return print("[!] User is registered")
-        
+
         self.cursor.execute("DELETE FROM used_usernames WHERE username = ?", (username,))
         self.db.commit()
         print(f"[-] Username '{username}' removed from used list.")
