@@ -125,13 +125,14 @@ def signup():
     username = payload.get('username')
     password = bcrypt.hashpw(payload['password'].encode('utf-8'), bcrypt.gensalt())
 
-    mailcursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    if mailcursor.fetchone(): return jsonify({"response": "This username is already in use."}), 409
+    mailcursor.execute("SELECT 1 FROM used_usernames WHERE username = ?", (username,))
+    if mailcursor.fetchone(): return jsonify({"response": "This username is unavailable."}), 409
 
     mailcursor.execute(
         "INSERT INTO users (username, password, coins, role, biography, credentials_update) VALUES (?, ?, 0, 'user', 'A PlainPost user', ?)",
         (username, password, datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ).isoformat())
     )
+    mailcursor.execute("INSERT OR IGNORE INTO used_usernames (username) VALUES (?)", (username,))
     mailserver.commit()
 
     token = gen_token(username)

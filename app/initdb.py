@@ -58,6 +58,12 @@ def PlainPostDB():
         );
     """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS used_usernames (
+            username TEXT PRIMARY KEY
+        )
+    """)
+
     conn.commit()
     conn.close()
 
