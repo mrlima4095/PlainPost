@@ -491,6 +491,9 @@ class POP3Handler(socketserver.BaseRequestHandler):
             except Exception as e:
                 print(f"[POP3 ERROR] {e}")
                 break
+def run_pop3():
+    pop3server = socketserver.TCPServer(("0.0.0.0", 110), POP3Handler)
+    pop3server.serve_forever(); print(" * Running POP3 Proxy at port 100.")
 # | 
 # Reports
 @app.route('/api/report', methods=['POST'])
@@ -947,4 +950,6 @@ if __name__ == '__main__':
         proxy = Controller(ProxySMTP(), hostname='0.0.0.0', port=25)
         proxy.start(); print(" * Running SMTP Proxy at port 25")
 
+        Thread(target=run_pop3, daemon=True).start()
         app.run(port=9834, debug=True, host="127.0.0.1")
+    
