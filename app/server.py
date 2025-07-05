@@ -429,7 +429,7 @@ def submit_report():
         if not mailcursor.fetchone(): return jsonify({"response": "Target not found!"}), 404
 
     report_id = str(uuid.uuid4())
-    report_dir = os.path.join("reports", username, report_id)
+    report_dir = os.path.join("reports", target, report_id)
     os.makedirs(report_dir, exist_ok=True)
 
     report_json_path = os.path.join(report_dir, "report.json")
