@@ -26,6 +26,7 @@ import bcrypt
 import shutil
 import sqlite3
 import requests
+import socketserver
 import threading, pytz
 from random import randint
 from threading import Timer
@@ -406,6 +407,90 @@ class ProxySMTP:
         mailserver.commit()
 
         return '250 Mensagem recebida com sucesso'
+# | (Third-party clients)
+class POP3Handler(socketserver.BaseRequestHandler):
+    def handle(self):
+        self.conn = self.request
+        self.conn.sendall(b"+OK PlainPost POP3 Ready\r\n")
+        self.username = None
+        self.logged_in = False
+        self.mails = []
+
+        while True:
+            try:
+                data = self.conn.recv(1024).decode().strip()
+                if not data:
+                    break
+
+                print(f"[POP3] {self.client_address[0]} >> {data}")
+
+                cmd, *args = data.split()
+                cmd = cmd.upper()
+
+                if cmd == "USER":
+                    self.username = args[0]
+                    self.conn.sendall(b"+OK user accepted\r\n")
+
+                elif cmd == "PASS":
+                    if not self.username:
+                        self.conn.sendall(b"-ERR USER required first\r\n")
+                        continue
+
+                    conn, cur = getdb()
+                    cur.execute("SELECT password FROM users WHERE username = ?", (self.username,))
+                    row = cur.fetchone()
+
+                    if row and bcrypt.checkpw(args[0].encode(), row["password"]):
+                        self.logged_in = True
+                        cur.execute("SELECT id, content FROM mails WHERE recipient = ?", (self.username,))
+                        self.mails = cur.fetchall()
+                        self.conn.sendall(b"+OK maildrop ready\r\n")
+                    else:
+                        self.conn.sendall(b"-ERR authentication failed\r\n")
+
+                elif cmd == "STAT":
+                    if not self.logged_in:
+                        self.conn.sendall(b"-ERR not logged in\r\n")
+                        continue
+                    size = sum(len(fernet.decrypt(row["content"])) for row in self.mails)
+                    self.conn.sendall(f"+OK {len(self.mails)} {size}\r\n".encode())
+
+                elif cmd == "LIST":
+                    if not self.logged_in:
+                        self.conn.sendall(b"-ERR not logged in\r\n")
+                        continue
+                    self.conn.sendall(f"+OK {len(self.mails)} messages\r\n".encode())
+                    for i, row in enumerate(self.mails, 1):
+                        self.conn.sendall(f"{i} {len(fernet.decrypt(row['content']))}\r\n".encode())
+                    self.conn.sendall(b".\r\n")
+
+                elif cmd == "RETR":
+                    if not self.logged_in:
+                        self.conn.sendall(b"-ERR not logged in\r\n")
+                        continue
+                    try:
+                        index = int(args[0]) - 1
+                        if 0 <= index < len(self.mails):
+                            msg = fernet.decrypt(self.mails[index]["content"]).decode(errors="replace")
+                            self.conn.sendall(b"+OK message follows\r\n")
+                            for line in msg.splitlines():
+                                self.conn.sendall((line + "\r\n").encode())
+                            self.conn.sendall(b".\r\n")
+                        else:
+                            self.conn.sendall(b"-ERR no such message\r\n")
+                    except:
+                        self.conn.sendall(b"-ERR invalid RETR command\r\n")
+
+                elif cmd == "QUIT":
+                    self.conn.sendall(b"+OK PlainPost POP3 goodbye\r\n")
+                    break
+
+                else:
+                    self.conn.sendall(b"-ERR unknown command\r\n")
+
+            except Exception as e:
+                print(f"[POP3 ERROR] {e}")
+                break
 # | 
 # Reports
 @app.route('/api/report', methods=['POST'])
