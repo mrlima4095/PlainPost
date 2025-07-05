@@ -23,6 +23,7 @@ import os, re
 import socket
 import random
 import bcrypt
+import shutil
 import sqlite3
 import requests
 import threading, pytz
@@ -409,37 +410,83 @@ class ProxySMTP:
 # Reports
 @app.route('/api/report', methods=['POST'])
 def submit_report():
+
     mailserver, mailcursor = getdb()
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     username = get_user(request.cookies.get('token'))
-    if not username: return jsonify({ "response": "Bad credentials!" }), 401
+    if not username:
+        return jsonify({"response": "Bad credentials!"}), 401
+
     payload = request.get_json()
+    required_fields = ["type", "description", "links", "date", "time", "target"]
+    if not all(field in payload for field in required_fields):
+        return jsonify({"response": "Missing fields!"}), 400
 
-    payload['sender'] = username
-    required_fields = ["type", "description", "links", "date", "time"]
-    if not all(field in payload for field in required_fields): return jsonify({"response": "Missing fields!"}), 400
-
-    target = payload.get("target")
-    if not target: return jsonify({"response": "Missing target user!"}), 400
-
-    if target.endswith("@archsource.xyz") or target.endswith("@mail.archsource.xyz"): target = target.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
-    elif "@" in target: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
+    target = payload['target']
+    if target.endswith("@archsource.xyz") or target.endswith("@mail.archsource.xyz"):
+        target = target.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
+    elif "@" in target:
+        return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
     mailcursor.execute("SELECT * FROM users WHERE username = ?", (target,))
-    if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
-
-    if payload['type'] == "mail":
-    elif payload['type'] == "mural":
-    elif payload['type'] == "file":
-    elif payload['type'] == "short_link":
+    if not mailcursor.fetchone():
+        return jsonify({"response": "Target not found!"}), 404
 
     report_id = str(uuid.uuid4())
-    save_path = os.path.join("reports", secure_filename(target))
-    os.makedirs(save_path, exist_ok=True)
+    report_dir = os.path.join("reports", username, report_id)
+    os.makedirs(report_dir, exist_ok=True)
 
-    with open(os.path.join(save_path, f"{report_id}.json"), "w", encoding="utf-8") as f:
+    report_json_path = os.path.join(report_dir, "report.json")
+    payload['sender'] = username
+    with open(report_json_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=4, ensure_ascii=False)
+
+    if payload['type'] == "mail":
+        mailcursor.execute("SELECT content FROM mails WHERE recipient = ?", (target,))
+        messages = mailcursor.fetchall()
+        with open(os.path.join(report_dir, "inbox.txt"), "w", encoding="utf-8") as inbox:
+            for msg in messages:
+                try:
+                    inbox.write(fernet.decrypt(msg['content'].encode()).decode() + "\n")
+                except: pass
+
+    elif payload['type'] == "mural":
+        mailcursor.execute("SELECT page FROM users WHERE username = ?", (target,))
+        row = mailcursor.fetchone()
+        if row and row['page']:
+            mailcursor.execute("SELECT saved_name FROM files WHERE id = ?", (row['page'],))
+            file_row = mailcursor.fetchone()
+            if file_row:
+                file_path = os.path.join(UPLOAD_FOLDER, file_row['saved_name'])
+                if os.path.exists(file_path):
+                    shutil.copy(file_path, os.path.join(report_dir, file_row['saved_name']))
+
+    elif payload['type'] == "file":
+        mailcursor.execute("SELECT saved_name FROM files WHERE owner = ?", (target,))
+        for row in mailcursor.fetchall():
+            file_path = os.path.join(UPLOAD_FOLDER, row['saved_name'])
+            if os.path.exists(file_path):
+                shutil.copy(file_path, os.path.join(report_dir, row['saved_name']))
+
+    elif payload['type'] == "short_link":
+        link_found = False
+        for link in payload['links']:
+            mailcursor.execute("SELECT original_url FROM short_links WHERE id = ?", (link.strip().split("/")[-1],))
+            row = mailcursor.fetchone()
+            if row:
+                with open(os.path.join(report_dir, "short_link_target.txt"), "w", encoding="utf-8") as f:
+                    f.write(row['original_url'])
+                link_found = True
+                break
+
+        if not link_found:
+            mailcursor.execute("SELECT id, original_url FROM short_links WHERE owner = ?", (target,))
+            with open(os.path.join(report_dir, "short_links.txt"), "w", encoding="utf-8") as f:
+                for row in mailcursor.fetchall():
+                    f.write(f"{row['id']} -> {row['original_url']}\n")
+
+    else: shutil.copy("mailserver.db", os.path.join(report_dir, "mailserver_copy.db"))
 
     return jsonify({"response": "Report saved successfully!"}), 200
 # |
