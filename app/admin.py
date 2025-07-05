@@ -56,6 +56,11 @@ class AdminPanel:
 
                 case "mural": self.view_mural(args[2])
 
+                case "list-reports": self.list_reports()
+                case "user-reports": self.user_reports(args[2])
+                case "del-report": self.delete_report(args[2])
+                case "clear-reports": self.clear_user_reports(args[2])
+                
                 case "user-info": self.user_info(args[2])
                 case "user-files": self.list_user_files(args[2])
                 case "file-info": self.file_info(args[2])
