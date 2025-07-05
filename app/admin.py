@@ -450,6 +450,8 @@ class AdminPanel:
         print(f"[+] Username '{username}' added to used list.")
     # | (Unblock)
     def unblock_username(self, username):
+        mailcursor.execute("SELECT * FROM users WHERE username = ?", (target,))
+        if not mailcursor.fetchone(): return print("[!] User is registered")
         self.cursor.execute("DELETE FROM used_usernames WHERE username = ?", (username,))
         self.db.commit()
         print(f"[-] Username '{username}' removed from used list.")
