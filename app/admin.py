@@ -78,6 +78,7 @@ class AdminPanel:
                 case "used-ids": self.list_blocked_usernames()
 
                 case "help": self.help()
+                case "cmd": self.interactive_mode() 
                 case _: print("[!] Invalid command")
         except IndexError: print("[!] Missing arguments")
         except Exception as e: print(f"[!] Error: {e}")
