@@ -71,6 +71,7 @@ class AdminPanel:
 
                 case "block-name": self.block_username(args[2])
                 case "unblock-name": self.unblock_username(args[2])
+                case "list-blocked-names": self.list_blocked_usernames()
 
                 case "help": self.help()
                 case _: print("[!] Invalid command")
