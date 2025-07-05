@@ -41,9 +41,9 @@ class AdminPanel:
                 case "list": self.list_users()
 
                 case "send": self.send(args[2], ' '.join(args[3:]))
-                case "notifyall": self.notify_all(' '.join(args[2:]))
+                case "notify-all": self.notify_all(' '.join(args[2:]))
                 case "read": self.read(args[2] if len(args) > 2 else None)
-                case "del-msg": self.delete_message(args[2])
+                case "rm-msg": self.delete_message(args[2])
                 case "clear": self.clear(args[2])
                 case "clear-all": self.clear_all()
 
@@ -54,29 +54,28 @@ class AdminPanel:
                 case "unblock": self.unblock(args[2], args[3])
                 case "list-blocks": self.list_spam_blocks(args[2])
 
-                case "mural": self.view_mural(args[2])
 
                 case "list-reports": self.list_reports()
                 case "user-reports": self.user_reports(args[2])
-                case "del-report": self.delete_report(args[2])
+                case "rm-report": self.delete_report(args[2])
                 case "clear-reports": self.clear_user_reports(args[2])
-                
-                case "user-info": self.user_info(args[2])
+
+                case "user": self.user_info(args[2])
+                case "mural": self.view_mural(args[2])
                 case "user-files": self.list_user_files(args[2])
                 case "file-info": self.file_info(args[2])
                 case "extend-file": self.extend_file(args[2])
-                case "clear-expired": self.clear_expired_files()
 
                 case "list-links": self.list_short_links(args[2])
                 case "link-owner": self.link_owner(args[2])
-                case "link-owner": self.delete_link(args[2])
+                case "rm-owner": self.delete_link(args[2])
 
-                case "clear-ai": self.clear_ai(args[2])
-                case "read-ai": self.read_ai(args[2])
+                case "clear-agent": self.clear_ai(args[2])
+                case "read-agent": self.read_ai(args[2])
 
-                case "block-name": self.block_username(args[2])
-                case "unblock-name": self.unblock_username(args[2])
-                case "list-blocked-names": self.list_blocked_usernames()
+                case "block-id": self.block_username(args[2])
+                case "unblock-id": self.unblock_username(args[2])
+                case "used-ids": self.list_blocked_usernames()
 
                 case "help": self.help()
                 case _: print("[!] Invalid command")
@@ -84,10 +83,17 @@ class AdminPanel:
         except Exception as e: print(f"[!] Error: {e}")
 
     def help(self):
-        print("register, unregister, password, role, bio, list, send, notifyall, read, del-msg, list-msg")
-        print("clear, clear-all, give-coin, take-coin, block, unblock, mural, user-info, user-files")
-        print("file-info, extend-file, clear-expired, list-links, link-owner, clear-ai, read-ai")
-        print("block-name, unblock-name")
+        print("Usage: python admin.py [OPTIONS] <username> ...")
+        print("       python admin.py cmd - Interactive mode\n")
+        print("OPTIONS:")
+        print("    register  unregister  password  role  bio  list")
+        print("    send  notify-all  read  rm-msg  clear  clear-all")
+        print("    give-coin  take-coin")
+        print("    block  unblock  list-blocks")
+        print("    user  mural  user-files  file-info  extend-file")
+        print("    list-links  link-owner  rm-owner")
+        print("    clear-agent  read-agent")
+        print("    block-id  unblock-id  used-ids")
 
     # Users
     # | (Register an user)
@@ -320,16 +326,6 @@ class AdminPanel:
         self.cursor.execute("UPDATE files SET expire_time = ? WHERE id = ?", (dt.isoformat(), file_id))
         self.db.commit()
         print(f"[~] Expiration extended to {dt}")
-    # | (Clear expired files forced)
-    def clear_expired_files(self):
-        now = datetime.now().isoformat()
-        self.cursor.execute("SELECT id, saved_name FROM files WHERE expire_time IS NOT NULL AND expire_time <= ?", (now,))
-        for row in self.cursor.fetchall():
-            try: os.remove(os.path.join("uploads", row["saved_name"]))
-            except: pass
-            self.cursor.execute("DELETE FROM files WHERE id = ?", (row["id"],))
-        self.db.commit()
-        print("[~] Cleared expired files.")
     # |
     # |
     # Short Links
