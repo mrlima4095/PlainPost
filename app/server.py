@@ -410,28 +410,22 @@ class ProxySMTP:
 # Reports
 @app.route('/api/report', methods=['POST'])
 def submit_report():
-
     mailserver, mailcursor = getdb()
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     username = get_user(request.cookies.get('token'))
-    if not username:
-        return jsonify({"response": "Bad credentials!"}), 401
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
 
     payload = request.get_json()
     required_fields = ["type", "description", "links", "date", "time", "target"]
-    if not all(field in payload for field in required_fields):
-        return jsonify({"response": "Missing fields!"}), 400
+    if not all(field in payload for field in required_fields): return jsonify({"response": "Missing fields!"}), 400
 
     target = payload['target']
-    if target.endswith("@archsource.xyz") or target.endswith("@mail.archsource.xyz"):
-        target = target.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
-    elif "@" in target:
-        return jsonify({"response": "Only supported to other PlainPost users!"}), 405
+    if target.endswith("@archsource.xyz") or target.endswith("@mail.archsource.xyz"): target = target.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
+    elif "@" in target: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
     mailcursor.execute("SELECT * FROM users WHERE username = ?", (target,))
-    if not mailcursor.fetchone():
-        return jsonify({"response": "Target not found!"}), 404
+    if not mailcursor.fetchone(): return jsonify({"response": "Target not found!"}), 404
 
     report_id = str(uuid.uuid4())
     report_dir = os.path.join("reports", username, report_id)
@@ -447,8 +441,7 @@ def submit_report():
         messages = mailcursor.fetchall()
         with open(os.path.join(report_dir, "inbox.txt"), "w", encoding="utf-8") as inbox:
             for msg in messages:
-                try:
-                    inbox.write(fernet.decrypt(msg['content'].encode()).decode() + "\n")
+                try: inbox.write(fernet.decrypt(msg['content'].encode()).decode() + "\n")
                 except: pass
 
     elif payload['type'] == "mural":
@@ -459,32 +452,32 @@ def submit_report():
             file_row = mailcursor.fetchone()
             if file_row:
                 file_path = os.path.join(UPLOAD_FOLDER, file_row['saved_name'])
-                if os.path.exists(file_path):
-                    shutil.copy(file_path, os.path.join(report_dir, file_row['saved_name']))
+                if os.path.exists(file_path): shutil.copy(file_path, os.path.join(report_dir, file_row['saved_name']))
 
     elif payload['type'] == "file":
         mailcursor.execute("SELECT saved_name FROM files WHERE owner = ?", (target,))
         for row in mailcursor.fetchall():
             file_path = os.path.join(UPLOAD_FOLDER, row['saved_name'])
-            if os.path.exists(file_path):
-                shutil.copy(file_path, os.path.join(report_dir, row['saved_name']))
+            if os.path.exists(file_path): shutil.copy(file_path, os.path.join(report_dir, row['saved_name']))
 
     elif payload['type'] == "short_link":
         link_found = False
         for link in payload['links']:
-            mailcursor.execute("SELECT original_url FROM short_links WHERE id = ?", (link.strip().split("/")[-1],))
+            short_id = link.strip().split("/")[-1]
+            if short_id.startswith("https://"): short_id = short_id if not "/" in short_id else short_id.split("/")[5]
+            elif short_id.startswith("/s/"): short_id = short_id.replace("/s/", "")
+
+            mailcursor.execute("SELECT original_url, owner FROM short_links WHERE id = ?", (short_id,))
             row = mailcursor.fetchone()
             if row:
-                with open(os.path.join(report_dir, "short_link_target.txt"), "w", encoding="utf-8") as f:
-                    f.write(row['original_url'])
+                with open(os.path.join(report_dir, "short_link_target.txt"), "w", encoding="utf-8") as f: f.write(f"Short ID: {short_id}\nOwner: {row['owner']}\nTarget URL: {row['original_url']}\n")
                 link_found = True
                 break
 
         if not link_found:
-            mailcursor.execute("SELECT id, original_url FROM short_links WHERE owner = ?", (target,))
+            mailcursor.execute("SELECT * FROM short_links")
             with open(os.path.join(report_dir, "short_links.txt"), "w", encoding="utf-8") as f:
-                for row in mailcursor.fetchall():
-                    f.write(f"{row['id']} -> {row['original_url']}\n")
+                for row in mailcursor.fetchall(): f.write(f"ID: {row['id']} | Owner: {row['owner']} | Target: {row['original_url']}\n")
 
     else: shutil.copy("mailserver.db", os.path.join(report_dir, "mailserver_copy.db"))
 
