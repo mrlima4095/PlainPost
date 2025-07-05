@@ -409,17 +409,18 @@ class ProxySMTP:
 # Reports
 @app.route('/api/report', methods=['POST'])
 def submit_report():
-    username = get_user(request.cookies.get('token'))
-    if not username: return jsonify({"response": "Bad credentials!"}), 401
-
+    mailserver, mailcursor = getdb()
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
-    data = request.get_json()
-    data['sender'] = username
+    username = get_user(request.cookies.get('token'))
+    if not username: return jsonify({ "response": "Bad credentials!" }), 401
+    payload = request.get_json()
+    
+    payload['sender'] = username
     required_fields = ["type", "description", "links", "date", "time"]
-    if not all(field in data for field in required_fields): return jsonify({"response": "Missing fields!"}), 400
+    if not all(field in payload for field in required_fields): return jsonify({"response": "Missing fields!"}), 400
 
-    target = data.get("target")
+    target = payload.get("target")
     if not target: return jsonify({"response": "Missing target user!"}), 400
 
     if target.endswith("@archsource.xyz") or target.endswith("@mail.archsource.xyz"): target = target.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
@@ -433,7 +434,7 @@ def submit_report():
     os.makedirs(save_path, exist_ok=True)
 
     with open(os.path.join(save_path, f"{report_id}.json"), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
+        json.dump(payload, f, indent=4, ensure_ascii=False)
 
     return jsonify({"response": "Report saved successfully!"}), 200
 # |
