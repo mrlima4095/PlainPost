@@ -312,6 +312,11 @@ class AdminPanel:
         self.cursor.execute("DELETE FROM used_usernames WHERE username = ?", (username,))
         self.db.commit()
         print(f"[-] Username '{username}' removed from used list.")
+    # | (Print used IDs)
+    def list_blocked_usernames(self):
+        self.cursor.execute("SELECT username FROM used_usernames")
+        for row in self.cursor.fetchall(): print(f"- {row['username']}")
+
 
 
 if __name__ == "__main__":
