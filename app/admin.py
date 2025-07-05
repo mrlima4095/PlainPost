@@ -451,7 +451,8 @@ class AdminPanel:
     # | (Unblock)
     def unblock_username(self, username):
         self.cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-        if not self.cursor.fetchone(): return print("[!] User is registered")
+        if self.cursor.fetchone(): return print("[!] User is registered")
+        
         self.cursor.execute("DELETE FROM used_usernames WHERE username = ?", (username,))
         self.db.commit()
         print(f"[-] Username '{username}' removed from used list.")
