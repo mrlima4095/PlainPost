@@ -222,7 +222,7 @@ def mail():
             if amount <= 0: raise ValueError("Invalid amount!")
         except ValueError: return jsonify({"response": "Invalid amount!"}), 406
 
-        if to.endswith("@archsource.xyz"): to = to.replace("@archsource.xyz", "");
+        if to.endswith("@archsource.xyz") or to.endswith("@mail.archsource.xyz"): to = to.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
         elif "@" in to: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
         mailcursor.execute("SELECT coins FROM users WHERE username = ?", (to,))
@@ -410,27 +410,29 @@ class ProxySMTP:
 @app.route('/api/report', methods=['POST'])
 def submit_report():
     username = get_user(request.cookies.get('token'))
-    if not username:
-        return jsonify({"response": "Bad credentials!"}), 401
+    if not username: return jsonify({"response": "Bad credentials!"}), 401
 
-    if not request.is_json:
-        return jsonify({"response": "Invalid content type. Must be JSON."}), 400
+    if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     data = request.get_json()
     required_fields = ["type", "sender", "description", "links", "date", "time"]
-    if not all(field in data for field in required_fields):
-        return jsonify({"response": "Missing fields!"}), 400
+    if not all(field in data for field in required_fields): return jsonify({"response": "Missing fields!"}), 400
 
     target = data.get("target")
-    if not target:
-        return jsonify({"response": "Missing target user!"}), 400
+    if not target: return jsonify({"response": "Missing target user!"}), 400
+
+    if to.endswith("@archsource.xyz") or to.endswith("@mail.archsource.xyz"): to = to.replace("@archsource.xyz", "").replace("@mail.archsource.xyz", "")
+    elif "@" in to: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
+
+    mailcursor.execute("SELECT * FROM users WHERE username = ?", (to,))
+    if mailcursor.fetchone() is None: return jsonify({"response": "Target not found!"}), 404
 
     report_id = str(uuid.uuid4())
     save_path = os.path.join("reports", secure_filename(target))
     os.makedirs(save_path, exist_ok=True)
 
     with open(os.path.join(save_path, f"{report_id}.json"), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
     return jsonify({"response": "Report saved successfully!"}), 200
 # |
