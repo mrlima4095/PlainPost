@@ -137,48 +137,51 @@ class AdminPanel:
         ]
 
         while True:
-            os.system("cls" if os.name == "nt" else "clear")
-            print("--- Painel Admin Interativo ---\n")
+            try: 
+                os.system("cls" if os.name == "nt" else "clear")
+                print("--- Painel Admin Interativo ---\n")
 
-            # tamanho do terminal
-            term_width = shutil.get_terminal_size().columns
-            col_width = 30 
-            cols = max(1, term_width // col_width)
+                # tamanho do terminal
+                term_width = shutil.get_terminal_size().columns
+                col_width = 30 
+                cols = max(1, term_width // col_width)
 
-            # imprime ações formatadas
-            for i, (desc, _, _) in enumerate(actions):
-                entry = f"[{i+1:2}] {desc:<22}"
-                end_char = "\n" if (i + 1) % cols == 0 else ""
-                print(entry, end=end_char)
-            if len(actions) % cols != 0:
-                print()
+                # imprime ações formatadas
+                for i, (desc, _, _) in enumerate(actions):
+                    entry = f"[{i+1:2}] {desc:<22}"
+                    end_char = "\n" if (i + 1) % cols == 0 else ""
+                    print(entry, end=end_char)
+                if len(actions) % cols != 0:
+                    print()
 
-            print("\n[ 0] Sair")
+                print("\n[ 0] Sair")
 
-            choice = input("\nEscolha uma opção: ").strip()
-            if choice == "0" or choice.lower() == "x":
-                print("Saindo.")
-                break
+                choice = input("\nEscolha uma opção: ").strip()
+                if choice == "0" or choice.lower() == "x":
+                    print("Saindo.")
+                    break
 
-            try:
-                idx = int(choice) - 1
-                desc, func, params = actions[idx]
-            except (ValueError, IndexError):
-                print("[!] Opção inválida.")
+                try:
+                    idx = int(choice) - 1
+                    desc, func, params = actions[idx]
+                except (ValueError, IndexError):
+                    print("[!] Opção inválida.")
+                    input("Pressione ENTER para continuar...")
+                    continue
+
+                args = []
+                for p in params:
+                    val = input(f"  {p}: ").strip()
+                    args.append(val)
+
+                try:
+                    func(*args)
+                except Exception as e:
+                    print(f"[!] Erro ao executar '{desc}': {e}")
+
                 input("Pressione ENTER para continuar...")
+            except KeyboardInterrupt:
                 continue
-
-            args = []
-            for p in params:
-                val = input(f"  {p}: ").strip()
-                args.append(val)
-
-            try:
-                func(*args)
-            except Exception as e:
-                print(f"[!] Erro ao executar '{desc}': {e}")
-
-            input("Pressione ENTER para continuar...")
 
 
     # Users
