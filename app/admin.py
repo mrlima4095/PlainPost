@@ -98,19 +98,19 @@ class AdminPanel:
         print("    block-id  unblock-id  used-ids")
 
     def interactive_mode(self):
-        actions = [
+        actions = [ ("Exit", sys.exit, []),
             ("Register", self.register, ["username", "password"]), ("Unregister", self.unregister, ["username"]),
             ("Change password", self.changepass, ["username", "new password"]), ("Change biography", self.changebio, ["username", "biography"]), ("Change role", self.changerole, ["username", "role"]),
             ("List users", self.list_users, []),
             ("Send mail (as admin)", self.send, ["username", "mail content"]),
             ("Notify all", self.notify_all, ["mail content"]),
-            ("Read message", self.read, ["(username ou empty)"]),
+            ("Read message", self.read, ["(username or empty)"]),
             ("Remove message", self.delete_message, ["id"]),
             ("Clear user inbox", self.clear, ["username"]),
             ("Clear all mails", self.clear_all, []),
             ("Give coins", self.give_coins, ["username", "amount"]), ("Take coins", self.take_coins, ["username", "amount"]),
-            ("Block user", self.block, ["username", "alvo"]),
-            ("Unblock user", self.unblock, ["username", "alvo"]),
+            ("Block user", self.block, ["username", "target"]),
+            ("Unblock user", self.unblock, ["username", "target"]),
             ("View user blocks", self.list_spam_blocks, ["username"]),
             ("View reports", self.list_reports, []),
             ("View reports for a user", self.user_reports, ["username"]),
@@ -155,8 +155,6 @@ class AdminPanel:
                         else:
                             line.append(" " * col_width)
                     print("  ".join(line))
-
-                print("\n[ x] Exit")
 
                 choice = input("[+] Choice an option: ").strip()
                 if choice == "0" or choice.lower() == "x": break
