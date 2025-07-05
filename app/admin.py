@@ -216,6 +216,16 @@ class AdminPanel:
             self.cursor.execute("UPDATE users SET blocked_users = ? WHERE username = ?", (json.dumps(blocked), user))
             self.db.commit()
         print(f"[-] '{target}' unblocked by '{user}'.")
+    # | (Listar bloqueios de spam de um usuário)
+    def list_spam_blocks(self, username):
+        self.cursor.execute("SELECT blocked_users FROM users WHERE username = ?", (username,))
+        row = self.cursor.fetchone()
+        if row is None:
+            print("[!] User not found."); return
+        blocked = json.loads(row["blocked_users"])
+        print(f"[+] Blocks from '{username}':\n")
+        for user in blocked:
+            print(f"- {user}")
     # |
     # |
     # Mural
