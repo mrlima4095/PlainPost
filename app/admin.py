@@ -137,23 +137,34 @@ class AdminPanel:
 
         while True:
             os.system("cls" if os.name == "nt" else "clear")
-            print("===[ Admin Panel ]===\n")
+            print("--- Painel Admin Interativo ---\n")
 
+            # Definições de layout
             term_width = shutil.get_terminal_size().columns
-            col_width = 15 
+            col_width = 35  # espaço reservado por coluna
             col_count = max(1, term_width // col_width)
-
             rows = (len(actions) + col_count - 1) // col_count
-            grid = [[] for _ in range(rows)]
-            for i, (desc, _, _) in enumerate(actions):
-                label = f"[{i+1:2}]"
-                grid[i % rows].append(label)
 
-            for row in grid: print("    ".join(f"{item}" for item in row))
+            # Cria estrutura em colunas verticais
+            columns = [[] for _ in range(col_count)]
+            for idx, (desc, _, _) in enumerate(actions):
+                col = idx // rows
+                label = f"[{idx + 1:2}] {desc:<28}"
+                columns[col].append(label)
 
-            print("[ 0] Sair")
+            # Imprime linha por linha (cada linha contém várias colunas)
+            for row in range(rows):
+                line = []
+                for col in range(col_count):
+                    if row < len(columns[col]):
+                        line.append(columns[col][row])
+                    else:
+                        line.append(" " * col_width)
+                print("  ".join(line))
 
-            choice = input("[+] Choice an option: ").strip()
+            print("\n[ 0] Sair")
+
+            choice = input("\nEscolha uma opção: ").strip()
             if choice == "0" or choice.lower() == "x":
                 print("Saindo.")
                 break
@@ -177,7 +188,6 @@ class AdminPanel:
                 print(f"[!] Erro ao executar '{desc}': {e}")
 
             input("Pressione ENTER para continuar...")
-
 
     # Users
     # | (Register an user)
