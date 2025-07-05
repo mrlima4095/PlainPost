@@ -68,7 +68,7 @@ class AdminPanel:
 
                 case "list-links": self.list_short_links(args[2])
                 case "link-owner": self.link_owner(args[2])
-                case "rm-owner": self.delete_link(args[2])
+                case "rm-link": self.delete_link(args[2])
 
                 case "clear-agent": self.clear_ai(args[2])
                 case "read-agent": self.read_ai(args[2])
@@ -91,7 +91,7 @@ class AdminPanel:
         print("    give-coin  take-coin")
         print("    block  unblock  list-blocks")
         print("    user  mural  user-files  file-info  extend-file")
-        print("    list-links  link-owner  rm-owner")
+        print("    list-links  link-owner  rm-link")
         print("    clear-agent  read-agent")
         print("    block-id  unblock-id  used-ids")
 
@@ -350,12 +350,11 @@ class AdminPanel:
     def clear_ai(self, username):
         self.cursor.execute("DELETE FROM agents WHERE username = ?", (username,))
         self.db.commit()
-        print(f"[~] AI history cleared for '{username}'.")
+        print(f"[~] History cleared for '{username}'.")
     # | (Read history of Agent from an user)
     def read_ai(self, username):
         self.cursor.execute("SELECT role, content FROM agents WHERE username = ?", (username,))
-        for row in self.cursor.fetchall():
-            print(f"[{row['role']}] {row['content']}")
+        for row in self.cursor.fetchall(): print(f"[{row['role']}] {row['content']}")
     # |
     # |
     # Control used usernames
@@ -372,7 +371,7 @@ class AdminPanel:
     # | (Print used IDs)
     def list_blocked_usernames(self):
         self.cursor.execute("SELECT username FROM used_usernames")
-        for row in self.cursor.fetchall(): print(f"- {row['username']}")
+        for row in self.cursor.fetchall(): print(f"{row['username']}")
 
 
 
