@@ -141,7 +141,7 @@ class AdminPanel:
         if not self.cursor.fetchone():
             print("[!] User not found."); return
         encrypted = self.fernet.encrypt(f"[{datetime.now()} - admin] {msg}".encode()).decode()
-        self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (user, "admin", encrypted, datetime.now().isoformat()))
+        self.cursor.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)", (user, "admin", encrypted, datetime.now().strftime("%H:%M %d/%m/%Y")))
         self.db.commit()
         print(f"[+] Sent to '{user}'.")
     # | (Send a mail for all users)
