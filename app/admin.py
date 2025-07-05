@@ -97,88 +97,88 @@ class AdminPanel:
         print("    clear-agent  read-agent")
         print("    block-id  unblock-id  used-ids")
 
-    
-def interactive_mode(self):
-    actions = [
-        ("Registrar usuário", self.register, ["username", "password"]),
-        ("Remover usuário", self.unregister, ["username"]),
-        ("Alterar senha", self.changepass, ["username", "nova senha"]),
-        ("Alterar biografia", self.changebio, ["username", "biografia"]),
-        ("Alterar papel", self.changerole, ["username", "role"]),
-        ("Listar usuários", self.list_users, []),
-        ("Enviar mensagem", self.send, ["username", "mensagem"]),
-        ("Notificar todos", self.notify_all, ["mensagem"]),
-        ("Ler mensagens", self.read, ["(username ou vazio)"]),
-        ("Remover mensagem", self.delete_message, ["id"]),
-        ("Limpar inbox do usuário", self.clear, ["username"]),
-        ("Limpar inbox de todos", self.clear_all, []),
-        ("Dar moedas", self.give_coins, ["username", "quantidade"]),
-        ("Remover moedas", self.take_coins, ["username", "quantidade"]),
-        ("Bloquear usuário", self.block, ["username", "alvo"]),
-        ("Desbloquear usuário", self.unblock, ["username", "alvo"]),
-        ("Listar bloqueios", self.list_spam_blocks, ["username"]),
-        ("Listar denúncias", self.list_reports, []),
-        ("Denúncias de um usuário", self.user_reports, ["username"]),
-        ("Remover denúncia", self.delete_report, ["id"]),
-        ("Limpar denúncias de um usuário", self.clear_user_reports, ["username"]),
-        ("Info de usuário", self.user_info, ["username"]),
-        ("Ver mural", self.view_mural, ["username"]),
-        ("Listar arquivos do usuário", self.list_user_files, ["username"]),
-        ("Info de arquivo", self.file_info, ["id"]),
-        ("Extender validade do arquivo", self.extend_file, ["id"]),
-        ("Links do usuário", self.list_short_links, ["username"]),
-        ("Dono de um link", self.link_owner, ["link_id"]),
-        ("Remover link", self.delete_link, ["link_id"]),
-        ("Limpar IA", self.clear_ai, ["username"]),
-        ("Ler IA", self.read_ai, ["username"]),
-        ("Bloquear ID", self.block_username, ["username"]),
-        ("Desbloquear ID", self.unblock_username, ["username"]),
-        ("IDs bloqueados", self.list_blocked_usernames, [])
-    ]
+        
+    def interactive_mode(self):
+        actions = [
+            ("Registrar usuário", self.register, ["username", "password"]),
+            ("Remover usuário", self.unregister, ["username"]),
+            ("Alterar senha", self.changepass, ["username", "nova senha"]),
+            ("Alterar biografia", self.changebio, ["username", "biografia"]),
+            ("Alterar papel", self.changerole, ["username", "role"]),
+            ("Listar usuários", self.list_users, []),
+            ("Enviar mensagem", self.send, ["username", "mensagem"]),
+            ("Notificar todos", self.notify_all, ["mensagem"]),
+            ("Ler mensagens", self.read, ["(username ou vazio)"]),
+            ("Remover mensagem", self.delete_message, ["id"]),
+            ("Limpar inbox do usuário", self.clear, ["username"]),
+            ("Limpar inbox de todos", self.clear_all, []),
+            ("Dar moedas", self.give_coins, ["username", "quantidade"]),
+            ("Remover moedas", self.take_coins, ["username", "quantidade"]),
+            ("Bloquear usuário", self.block, ["username", "alvo"]),
+            ("Desbloquear usuário", self.unblock, ["username", "alvo"]),
+            ("Listar bloqueios", self.list_spam_blocks, ["username"]),
+            ("Listar denúncias", self.list_reports, []),
+            ("Denúncias de um usuário", self.user_reports, ["username"]),
+            ("Remover denúncia", self.delete_report, ["id"]),
+            ("Limpar denúncias de um usuário", self.clear_user_reports, ["username"]),
+            ("Info de usuário", self.user_info, ["username"]),
+            ("Ver mural", self.view_mural, ["username"]),
+            ("Listar arquivos do usuário", self.list_user_files, ["username"]),
+            ("Info de arquivo", self.file_info, ["id"]),
+            ("Extender validade do arquivo", self.extend_file, ["id"]),
+            ("Links do usuário", self.list_short_links, ["username"]),
+            ("Dono de um link", self.link_owner, ["link_id"]),
+            ("Remover link", self.delete_link, ["link_id"]),
+            ("Limpar IA", self.clear_ai, ["username"]),
+            ("Ler IA", self.read_ai, ["username"]),
+            ("Bloquear ID", self.block_username, ["username"]),
+            ("Desbloquear ID", self.unblock_username, ["username"]),
+            ("IDs bloqueados", self.list_blocked_usernames, [])
+        ]
 
-    while True:
-        os.system("cls" if os.name == "nt" else "clear")
-        print("--- Painel Admin Interativo ---\n")
+        while True:
+            os.system("cls" if os.name == "nt" else "clear")
+            print("--- Painel Admin Interativo ---\n")
 
-        # tamanho do terminal
-        term_width = shutil.get_terminal_size().columns
-        col_width = 30 
-        cols = max(1, term_width // col_width)
+            # tamanho do terminal
+            term_width = shutil.get_terminal_size().columns
+            col_width = 30 
+            cols = max(1, term_width // col_width)
 
-        # imprime ações formatadas
-        for i, (desc, _, _) in enumerate(actions):
-            entry = f"[{i+1:2}] {desc:<22}"
-            end_char = "\n" if (i + 1) % cols == 0 else ""
-            print(entry, end=end_char)
-        if len(actions) % cols != 0:
-            print()
+            # imprime ações formatadas
+            for i, (desc, _, _) in enumerate(actions):
+                entry = f"[{i+1:2}] {desc:<22}"
+                end_char = "\n" if (i + 1) % cols == 0 else ""
+                print(entry, end=end_char)
+            if len(actions) % cols != 0:
+                print()
 
-        print("\n[ 0] Sair")
+            print("\n[ 0] Sair")
 
-        choice = input("\nEscolha uma opção: ").strip()
-        if choice == "0" or choice.lower() == "x":
-            print("Saindo.")
-            break
+            choice = input("\nEscolha uma opção: ").strip()
+            if choice == "0" or choice.lower() == "x":
+                print("Saindo.")
+                break
 
-        try:
-            idx = int(choice) - 1
-            desc, func, params = actions[idx]
-        except (ValueError, IndexError):
-            print("[!] Opção inválida.")
+            try:
+                idx = int(choice) - 1
+                desc, func, params = actions[idx]
+            except (ValueError, IndexError):
+                print("[!] Opção inválida.")
+                input("Pressione ENTER para continuar...")
+                continue
+
+            args = []
+            for p in params:
+                val = input(f"  {p}: ").strip()
+                args.append(val)
+
+            try:
+                func(*args)
+            except Exception as e:
+                print(f"[!] Erro ao executar '{desc}': {e}")
+
             input("Pressione ENTER para continuar...")
-            continue
-
-        args = []
-        for p in params:
-            val = input(f"  {p}: ").strip()
-            args.append(val)
-
-        try:
-            func(*args)
-        except Exception as e:
-            print(f"[!] Erro ao executar '{desc}': {e}")
-
-        input("Pressione ENTER para continuar...")
 
 
     # Users
