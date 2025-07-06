@@ -483,6 +483,7 @@ class POP3Handler(socketserver.BaseRequestHandler):
                     self.conn.sendall(b"USER\r\n")
                     self.conn.sendall(b"UIDL\r\n")
                     self.conn.sendall(b"TOP\r\n")
+                    self.conn.sendall(b"STLS\r\n")
                     self.conn.sendall(b".\r\n")
                 elif cmd == "UIDL":
                     self.conn.sendall(b"+OK unique-id listing\r\n")
