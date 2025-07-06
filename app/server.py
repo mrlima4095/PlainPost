@@ -473,6 +473,26 @@ class POP3Handler(socketserver.BaseRequestHandler):
                     else:
                         self.conn.sendall(b"-ERR no such message\r\n")
 
+                elif cmd in ("NOOP", "RSET"):
+                    self.conn.sendall(b"+OK\r\n")
+                elif cmd == "CAPA":
+                    self.conn.sendall(b"+OK Capability list follows\r\n")
+                    self.conn.sendall(b"USER\r\n")
+                    self.conn.sendall(b"UIDL\r\n")
+                    self.conn.sendall(b"TOP\r\n")
+                    self.conn.sendall(b".\r\n")
+                elif cmd == "UIDL":
+                    self.conn.sendall(b"+OK unique-id listing\r\n")
+                    for i, row in enumerate(self.mails, 1):
+                        self.conn.sendall(f"{i} {row['id']}\r\n".encode())
+                    self.conn.sendall(b".\r\n")
+                elif cmd == "TOP":
+                    self.conn.sendall(b"+OK dummy TOP response\r\n.\r\n")
+                elif cmd == "DELE":
+                    self.conn.sendall(b"+OK message marked for deletion (not really implemented)\r\n")
+                else:
+                    self.conn.sendall(b"-ERR unknown command\r\n")
+
                 elif cmd == "QUIT":
                     self.conn.sendall(b"+OK PlainPost POP3 goodbye\r\n")
                     break
