@@ -508,13 +508,11 @@ class AuthSMTPHandler:
         username_b64 = await server._reader.readline()
         username = base64.b64decode(username_b64.strip()).decode()
 
-        await server.push("334 UGFzc3dvcmQ6")  # 'Password:' em base64
+        await server.push("334 UGFzc3dvcmQ6") 
 
-        # Segundo passo: senha codificada em base64
         password_b64 = await server._reader.readline()
         password = base64.b64decode(password_b64.strip()).decode()
 
-        # Autenticação no banco:
         conn, cur = getdb()
         cur.execute("SELECT password FROM users WHERE username = ?", (username,))
         row = cur.fetchone()
