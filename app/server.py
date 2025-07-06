@@ -415,6 +415,7 @@ class POP3Handler(socketserver.BaseRequestHandler):
     def handle(self):
         self.conn = self.request
         self.conn.sendall(b"+OK PlainPost POP3 Ready\r\n")
+        print(self.conn)
         self.username = None
         self.logged_in = False
         self.mails = []
