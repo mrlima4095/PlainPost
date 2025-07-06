@@ -241,9 +241,9 @@ def mail():
         
         return jsonify({"response": "OK"}), 200
     elif payload['action'] == "changepass":
-        if not payload.get('newpass'): return jsonify({"response": "Blank new password!"}), 400
+        if not payload.get('newpass'): return jsonify({"response": "Invalid blank new password!"}), 400
 
-        mailcursor.execute("UPDATE users SET password = ?, credentials_update = ? WHERE username = ?", (bcrypt.hashpw(payload['newpass'].encode('utf-8'), bcrypt.gensalt()), datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone('America/Sao_Paulo')).isoformat(), username))
+        mailcursor.execute("UPDATE users SET password = ?, credentials_update = ? WHERE username = ?", (bcrypt.hashpw(payload['newpass'].encode('utf-8'), bcrypt.gensalt()), datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(SAO_PAULO_TZ).isoformat(), username))
         mailserver.commit() 
 
         return jsonify({"response": "OK"}), 200
