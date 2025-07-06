@@ -828,6 +828,11 @@ def extend_expires():
     return jsonify({"success": True, "new_expire_time": new_expire.isoformat()}), 200
 # |
 # |
+@app.route('/editor/<file_id>', methods=['GET'])
+def editor(file_id):
+    return render_template('editor', message=file_id), 404
+# |
+# |
 # Thread - Clear expired files
 def init_expiration_checker():
     def check_expired_files():
