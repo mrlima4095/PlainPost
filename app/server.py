@@ -490,8 +490,6 @@ class POP3Handler(socketserver.BaseRequestHandler):
                     self.conn.sendall(b"+OK dummy TOP response\r\n.\r\n")
                 elif cmd == "DELE":
                     self.conn.sendall(b"+OK message marked for deletion (not really implemented)\r\n")
-                else:
-                    self.conn.sendall(b"-ERR unknown command\r\n")
 
                 elif cmd == "QUIT":
                     self.conn.sendall(b"+OK PlainPost POP3 goodbye\r\n")
