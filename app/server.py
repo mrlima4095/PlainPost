@@ -504,8 +504,6 @@ class POP3Handler(socketserver.BaseRequestHandler):
 class AuthSMTPHandler:
     async def handle_AUTH(self, server, session, envelope, args):
         mechanism = args[0]
-        if mechanism != "LOGIN":
-            return "504 Auth mechanism not supported"
 
         # Primeiro passo do AUTH LOGIN: usuário codificado em base64
         username_b64 = await server._reader.readline()
