@@ -505,7 +505,6 @@ class AuthSMTPHandler:
     async def handle_AUTH(self, server, session, envelope, args):
         mechanism = args[0]
 
-        # Primeiro passo do AUTH LOGIN: usuário codificado em base64
         username_b64 = await server._reader.readline()
         username = base64.b64decode(username_b64.strip()).decode()
 
