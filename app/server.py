@@ -473,7 +473,7 @@ def submit_report():
     elif payload['type'] == "short_link":
         mailcursor.execute("SELECT * FROM short_links")
         with open(os.path.join(report_dir, "short_links.txt"), "w", encoding="utf-8") as f:
-            for row in mailcursor.fetchall(): f.write(f"ID: {row['id']} | Owner: {row['owner']} | Target: {row['original_url']}\n")
+            for row in mailcursor.fetchall(): f.write(f"ID: {row['id']} | Owner: {row['owner']} | To: {row['original_url']}\n")
     # | (Save all DB)
     else: shutil.copy("mailserver.db", os.path.join(report_dir, "mailserver_copy.db"))
 
