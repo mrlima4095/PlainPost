@@ -15,7 +15,7 @@ import smtplib
 from email.mime.text import MIMEText
 # | (Others) 
 import jwt
-import ssl1
+import ssl
 import time
 import json
 import uuid
