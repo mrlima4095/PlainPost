@@ -271,7 +271,7 @@ def mail():
     elif payload['action'] == "search":
         user = payload.get('user')
 
-        if to.endswith("@archsource.xyz") or to.endswith("@mail.archsource.xyz"): to = to.replace("@archsource.xyz", ""); to = to.replace("@mail.archsource.xyz", "");
+        if user.endswith("@archsource.xyz") or user.endswith("@mail.archsource.xyz"): user = user.replace("@archsource.xyz", ""); to = to.replace("@mail.archsource.xyz", "");
         elif "@" in user: return jsonify({"response": "Only supported to other PlainPost users!"}), 405
 
         mailcursor.execute("SELECT role, biography FROM users WHERE username = ?", (user,))
