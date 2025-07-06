@@ -439,8 +439,7 @@ def submit_report():
     payload['report-time'] = datetime.now().strftime("%H:%M %d/%m/%Y")
     with open(report_json_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=4, ensure_ascii=False)
-    # |
-    # | (Save a copy of reporter inbox)
+        
     if payload['type'] == "mail":
         mailcursor.execute("SELECT content FROM mails WHERE recipient = ?", (username,))
         messages = mailcursor.fetchall()
@@ -454,7 +453,6 @@ def submit_report():
             for msg in messages:
                 try: inbox.write(fernet.decrypt(msg['content'].encode()).decode() + "\n")
                 except: pass
-    # | (Save a copy of reported mural file)
     elif payload['type'] == "mural":
         mailcursor.execute("SELECT page FROM users WHERE username = ?", (target,))
         row = mailcursor.fetchone()
@@ -464,18 +462,15 @@ def submit_report():
             if file_row:
                 file_path = os.path.join(UPLOAD_FOLDER, file_row['saved_name'])
                 if os.path.exists(file_path): shutil.copy(file_path, os.path.join(report_dir, file_row['saved_name']))
-    # | (Save a copy of reported file)
     elif payload['type'] == "file":
         mailcursor.execute("SELECT saved_name FROM files WHERE owner = ?", (target,))
         for row in mailcursor.fetchall():
             file_path = os.path.join(UPLOAD_FOLDER, row['saved_name'])
             if os.path.exists(file_path): shutil.copy(file_path, os.path.join(report_dir, row['saved_name']))
-    # | (Save a copy of all short links)
     elif payload['type'] == "short_link":
         mailcursor.execute("SELECT * FROM short_links")
         with open(os.path.join(report_dir, "short_links.txt"), "w", encoding="utf-8") as f:
             for row in mailcursor.fetchall(): f.write(f"ID: {row['id']} | Owner: {row['owner']} | To: {row['original_url']}\n")
-    # | (Save all DB)
     else: shutil.copy("mailserver.db", os.path.join(report_dir, "mailserver_copy.db"))
 
     return jsonify({"response": "Report saved successfully!"}), 200
