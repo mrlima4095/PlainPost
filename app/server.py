@@ -541,6 +541,7 @@ class AuthSMTPHandler:
         return {'AUTH': 'LOGIN'}
 
     async def handle_AUTH(self, server, session, envelope, args):
+        print("CONECTADO")
         mechanism = args[0].upper()
         if mechanism != "LOGIN":
             return "504 Auth mechanism not supported"
