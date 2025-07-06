@@ -425,6 +425,7 @@ class POP3Handler(socketserver.BaseRequestHandler):
 
                 cmd, *args = data.split()
                 cmd = cmd.upper()
+                print(data)
 
                 if cmd == "USER":
                     self.username = args[0]
@@ -480,13 +481,12 @@ class POP3Handler(socketserver.BaseRequestHandler):
             except Exception as e:
                 print(f"[POP3 ERROR] {e}")
                 break
-
-# === SMTP Out (envio com autenticação) ===
 class AuthSMTPHandler:
     async def handle_AUTH(self, server, session, envelope, mechanism, auth_data):
         if mechanism != "LOGIN":
             return "504 Auth mechanism not supported"
         username, password = auth_data
+        print(auth_data)
         conn, cur = getdb()
         cur.execute("SELECT password FROM users WHERE username = ?", (username,))
         row = cur.fetchone()
