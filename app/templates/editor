@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
+  <script src="https://codemirror.net/lib/codemirror.js"></script>
+  <script src="https://codemirror.net/mode/htmlmixed/htmlmixed.js"></script>
+</head>
+<body>
+  <form method="POST" action="/api/drive/save_edit">
+    <textarea id="editor" name="content"></textarea>
+    <button type="submit">Salvar</button>
+  </form>
+  <script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+      lineNumbers: true,
+      mode: "htmlmixed",
+      theme: "default"
+    });
+    fetch('/api/drive/download/{{ file_id }}')
+      .then(res => res.text())
+      .then(txt => editor.setValue(txt));
+  </script>
+</body>
+</html>
