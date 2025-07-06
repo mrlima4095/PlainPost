@@ -1018,7 +1018,7 @@ if __name__ == '__main__':
         ssl_context.load_cert_chain(certfile="/etc/letsencrypt/live/archsource.xyz/fullchain.pem",
                             keyfile="/etc/letsencrypt/live/archsource.xyz/privkey.pem")
 
-        proxy2 = Controller(AuthSMTPHandler(), hostname="0.0.0.0", port=587, authenticator=AuthSMTPHandler().handle_AUTH, tls_context=ssl_context, require_starttls=True)
+        proxy2 = Controller(AuthSMTPHandler(), hostname="0.0.0.0", port=587, tls_context=ssl_context, require_starttls=True)
         proxy2.start(); print(" * Running POP3 Proxy at port 587")
 
         Thread(target=run_pop3, daemon=True).start()
