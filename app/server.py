@@ -162,7 +162,7 @@ def mail():
             sender = f"{username}@archsource.xyz"
 
             msg = MIMEText(body, "plain", "utf-8")
-            msg["To"] = to; msg["From"] = "[MOD]" + sender; msg["Subject"] = subject;
+            msg["To"] = to; msg["From"] = sender; msg["Subject"] = subject;
 
             try:
                 with smtplib.SMTP("localhost", 2525) as smtp: smtp.sendmail(sender, [to], msg.as_string())
