@@ -414,27 +414,56 @@ class ProxySMTP:
 class POP3Handler(socketserver.BaseRequestHandler):
     def handle(self):
         self.conn = self.request
-        self.conn.sendall(b"+OK PlainPost POP3 Ready\r\n")
-        print(self.conn)
+        self.ssl_enabled = False
         self.username = None
         self.logged_in = False
         self.mails = []
 
+        self.conn.sendall(b"+OK PlainPost POP3 Ready\r\n")
+
         while True:
             try:
-                data = self.conn.recv(1024).decode().strip()
+                data = self.conn.recv(1024).decode(errors="ignore").strip()
                 if not data:
                     break
 
                 cmd, *args = data.split()
                 cmd = cmd.upper()
-                print(data)
+                print(f"[POP3] {cmd} {' '.join(args)}")
 
-                if cmd == "USER":
+                if cmd == "STLS":
+                    if self.ssl_enabled:
+                        self.conn.sendall(b"-ERR TLS already active\r\n")
+                        continue
+
+                    self.conn.sendall(b"+OK Begin TLS negotiation\r\n")
+                    self.conn = self.server.ssl_context.wrap_socket(self.conn, server_side=True)
+                    self.ssl_enabled = True
+                    continue
+
+                elif cmd == "CAPA":
+                    self.conn.sendall(b"+OK Capability list follows\r\n")
+                    self.conn.sendall(b"USER\r\n")
+                    self.conn.sendall(b"UIDL\r\n")
+                    self.conn.sendall(b"TOP\r\n")
+                    self.conn.sendall(b"STLS\r\n")
+                    self.conn.sendall(b".\r\n")
+
+                elif cmd == "USER":
+                    if not args:
+                        self.conn.sendall(b"-ERR Missing username\r\n")
+                        continue
                     self.username = args[0]
                     self.conn.sendall(b"+OK user accepted\r\n")
 
                 elif cmd == "PASS":
+                    if not self.username:
+                        self.conn.sendall(b"-ERR USER not sent\r\n")
+                        continue
+                    if not args:
+                        self.conn.sendall(b"-ERR Missing password\r\n")
+                        continue
+
                     conn, cur = getdb()
                     cur.execute("SELECT password FROM users WHERE username = ?", (self.username,))
                     row = cur.fetchone()
@@ -466,6 +495,9 @@ class POP3Handler(socketserver.BaseRequestHandler):
                     if not self.logged_in:
                         self.conn.sendall(b"-ERR not logged in\r\n")
                         continue
+                    if not args:
+                        self.conn.sendall(b"-ERR Missing message ID\r\n")
+                        continue
                     index = int(args[0]) - 1
                     if 0 <= index < len(self.mails):
                         msg = fernet.decrypt(self.mails[index]["content"]).decode(errors="replace")
@@ -476,31 +508,31 @@ class POP3Handler(socketserver.BaseRequestHandler):
                     else:
                         self.conn.sendall(b"-ERR no such message\r\n")
 
-                elif cmd in ("NOOP", "RSET"):
-                    self.conn.sendall(b"+OK\r\n")
-                elif cmd == "CAPA":
-                    self.conn.sendall(b"+OK Capability list follows\r\n")
-                    self.conn.sendall(b"USER\r\n")
-                    self.conn.sendall(b"UIDL\r\n")
-                    self.conn.sendall(b"TOP\r\n")
-                    self.conn.sendall(b"STLS\r\n")
-                    self.conn.sendall(b".\r\n")
                 elif cmd == "UIDL":
+                    if not self.logged_in:
+                        self.conn.sendall(b"-ERR not logged in\r\n")
+                        continue
                     self.conn.sendall(b"+OK unique-id listing\r\n")
                     for i, row in enumerate(self.mails, 1):
                         self.conn.sendall(f"{i} {row['id']}\r\n".encode())
                     self.conn.sendall(b".\r\n")
+
                 elif cmd == "TOP":
                     self.conn.sendall(b"+OK dummy TOP response\r\n.\r\n")
+
                 elif cmd == "DELE":
                     self.conn.sendall(b"+OK message marked for deletion (not really implemented)\r\n")
-                elif cmd == "STLS":
-                    self.conn.sendall(b"+OK STLS not implemented\r\n")
+
+                elif cmd in ("NOOP", "RSET"):
+                    self.conn.sendall(b"+OK\r\n")
+
                 elif cmd == "QUIT":
                     self.conn.sendall(b"+OK PlainPost POP3 goodbye\r\n")
                     break
+
                 else:
                     self.conn.sendall(b"-ERR unknown command\r\n")
+
             except Exception as e:
                 print(f"[POP3 ERROR] {e}")
                 break
@@ -579,8 +611,20 @@ class AuthSMTPHandler:
         except Exception as e:
             return f"550 Erro ao enviar: {str(e)}"
 def run_pop3():
-    pop3server = socketserver.TCPServer(("0.0.0.0", 110), POP3Handler)
-    pop3server.serve_forever(); print(" * Running POP3 Proxy at port 100.")
+    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    ssl_context.load_cert_chain(
+        certfile="/etc/letsencrypt/live/archsource.xyz/fullchain.pem",
+        keyfile="/etc/letsencrypt/live/archsource.xyz/privkey.pem"
+    )
+
+    class SecurePOP3Server(socketserver.TCPServer):
+        def __init__(self, server_address, handler_class):
+            super().__init__(server_address, handler_class)
+            self.ssl_context = ssl_context
+
+    pop3server = SecurePOP3Server(("0.0.0.0", 110), POP3Handler)
+    print(" * Running POP3 Proxy at port 110 with STLS support.")
+    pop3server.serve_forever()
 # | 
 # Reports
 @app.route('/api/report', methods=['POST'])
@@ -1036,14 +1080,7 @@ if __name__ == '__main__':
     else:
         proxy = Controller(ProxySMTP(), hostname='0.0.0.0', port=25)
         proxy.start(); print(" * Running SMTP Proxy at port 25")
-        
-        ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-        ssl_context.load_cert_chain(certfile="/etc/letsencrypt/live/archsource.xyz/fullchain.pem",
-                            keyfile="/etc/letsencrypt/live/archsource.xyz/privkey.pem")
 
-        proxy2 = Controller(AuthSMTPHandler(), hostname="0.0.0.0", port=587, tls_context=ssl_context, require_starttls=True)
-        proxy2.start(); print(" * Running POP3 Proxy at port 587")
-
-        Thread(target=run_pop3, daemon=True).start()
+        Thread(target=run_pop3, daemon=False).start()
         app.run(port=9834, debug=True, host="127.0.0.1")
     
