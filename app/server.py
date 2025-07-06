@@ -501,18 +501,31 @@ class POP3Handler(socketserver.BaseRequestHandler):
                 print(f"[POP3 ERROR] {e}")
                 break
 class AuthSMTPHandler:
-    async def handle_AUTH(self, server, session, envelope, mechanism, auth_data):
+    async def handle_AUTH(self, server, session, envelope, args):
+        mechanism = args[0]
         if mechanism != "LOGIN":
             return "504 Auth mechanism not supported"
-        username, password = auth_data
-        print(auth_data)
+
+        # Primeiro passo do AUTH LOGIN: usuário codificado em base64
+        username_b64 = await server._reader.readline()
+        username = base64.b64decode(username_b64.strip()).decode()
+
+        await server.push("334 UGFzc3dvcmQ6")  # 'Password:' em base64
+
+        # Segundo passo: senha codificada em base64
+        password_b64 = await server._reader.readline()
+        password = base64.b64decode(password_b64.strip()).decode()
+
+        # Autenticação no banco:
         conn, cur = getdb()
         cur.execute("SELECT password FROM users WHERE username = ?", (username,))
         row = cur.fetchone()
+
         if row and bcrypt.checkpw(password.encode(), row["password"]):
             session.username = username
             return "235 Authentication successful"
         return "535 Authentication failed"
+
 
     async def handle_MAIL(self, server, session, envelope, address, mail_options):
         if not hasattr(session, "username"):
