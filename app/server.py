@@ -1013,7 +1013,7 @@ if __name__ == '__main__':
         proxy = Controller(ProxySMTP(), hostname='0.0.0.0', port=25)
         proxy.start(); print(" * Running SMTP Proxy at port 25")
 
-        controller = Controller(AuthSMTPHandler(), hostname="0.0.0.0", port=587, authenticator=AuthSMTPHandler().handle_AUTH, require_starttls=False)
+        controller = Controller(AuthSMTPHandler(), hostname="0.0.0.0", port=587, authenticator=AuthSMTPHandler().handle_AUTH, require_starttls=True)
         controller.start(); print(" * Running SMTP Proxy at port 587")
 
         Thread(target=run_pop3, daemon=True).start()
