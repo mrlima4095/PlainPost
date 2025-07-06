@@ -650,7 +650,7 @@ def redirect_short_link(short_id):
 
     if row: return flask.redirect(row['original_url'])
     
-    return jsonify({"response": "Short link not found."}), 404
+    return render_template('404.html', message="."), 404
 # | (Requests Handler API)
 @app.route('/api/short', methods=['POST'])
 def short_links_handler():
