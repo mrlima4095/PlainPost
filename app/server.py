@@ -423,8 +423,6 @@ class POP3Handler(socketserver.BaseRequestHandler):
                 if not data:
                     break
 
-                print(f"[POP3] {self.client_address[0]} >> {data}")
-
                 cmd, *args = data.split()
                 cmd = cmd.upper()
 
@@ -433,14 +431,9 @@ class POP3Handler(socketserver.BaseRequestHandler):
                     self.conn.sendall(b"+OK user accepted\r\n")
 
                 elif cmd == "PASS":
-                    if not self.username:
-                        self.conn.sendall(b"-ERR USER required first\r\n")
-                        continue
-
                     conn, cur = getdb()
                     cur.execute("SELECT password FROM users WHERE username = ?", (self.username,))
                     row = cur.fetchone()
-
                     if row and bcrypt.checkpw(args[0].encode(), row["password"]):
                         self.logged_in = True
                         cur.execute("SELECT id, content FROM mails WHERE recipient = ?", (self.username,))
@@ -469,34 +462,30 @@ class POP3Handler(socketserver.BaseRequestHandler):
                     if not self.logged_in:
                         self.conn.sendall(b"-ERR not logged in\r\n")
                         continue
-                    try:
-                        index = int(args[0]) - 1
-                        if 0 <= index < len(self.mails):
-                            msg = fernet.decrypt(self.mails[index]["content"]).decode(errors="replace")
-                            self.conn.sendall(b"+OK message follows\r\n")
-                            for line in msg.splitlines():
-                                self.conn.sendall((line + "\r\n").encode())
-                            self.conn.sendall(b".\r\n")
-                        else:
-                            self.conn.sendall(b"-ERR no such message\r\n")
-                    except:
-                        self.conn.sendall(b"-ERR invalid RETR command\r\n")
+                    index = int(args[0]) - 1
+                    if 0 <= index < len(self.mails):
+                        msg = fernet.decrypt(self.mails[index]["content"]).decode(errors="replace")
+                        self.conn.sendall(b"+OK message follows\r\n")
+                        for line in msg.splitlines():
+                            self.conn.sendall((line + "\r\n").encode())
+                        self.conn.sendall(b".\r\n")
+                    else:
+                        self.conn.sendall(b"-ERR no such message\r\n")
 
                 elif cmd == "QUIT":
                     self.conn.sendall(b"+OK PlainPost POP3 goodbye\r\n")
                     break
-
                 else:
                     self.conn.sendall(b"-ERR unknown command\r\n")
-
             except Exception as e:
                 print(f"[POP3 ERROR] {e}")
                 break
+
+# === SMTP Out (envio com autenticação) ===
 class AuthSMTPHandler:
     async def handle_AUTH(self, server, session, envelope, mechanism, auth_data):
         if mechanism != "LOGIN":
             return "504 Auth mechanism not supported"
-
         username, password = auth_data
         conn, cur = getdb()
         cur.execute("SELECT password FROM users WHERE username = ?", (username,))
@@ -527,12 +516,26 @@ class AuthSMTPHandler:
         to_addr = envelope.rcpt_tos[0]
         username = session.username
 
+        if to_addr.endswith("@archsource.xyz"):
+            dest_user = to_addr.split("@")[0]
+            conn, cur = getdb()
+            cur.execute("SELECT * FROM users WHERE username = ?", (dest_user,))
+            if not cur.fetchone():
+                return "550 Usuário não existe"
+            timestamp = datetime.now().strftime("%H:%M %d/%m/%Y")
+            content = f"[{timestamp} - {from_addr}] Assunto: {msg['Subject']} - {msg.get_content()}"
+            encrypted = fernet.encrypt(content.encode()).decode()
+            cur.execute("INSERT INTO mails (recipient, sender, content, timestamp) VALUES (?, ?, ?, ?)",
+                        (dest_user, from_addr, encrypted, timestamp))
+            conn.commit()
+            return "250 Entregue internamente"
+
         try:
             with smtplib.SMTP("localhost", 2525) as smtp:
                 smtp.sendmail(from_addr, envelope.rcpt_tos, envelope.content)
-            return "250 Mensagem enviada externamente"
+            return "250 Enviado externamente"
         except Exception as e:
-            return f"550 Falha ao enviar: {str(e)}"
+            return f"550 Erro ao enviar: {str(e)}"
 def run_pop3():
     pop3server = socketserver.TCPServer(("0.0.0.0", 110), POP3Handler)
     pop3server.serve_forever(); print(" * Running POP3 Proxy at port 100.")
