@@ -428,7 +428,8 @@ def submit_report():
     if target.lower() not in ["desconhecido", "unknown"]:
         mailcursor.execute("SELECT * FROM users WHERE username = ?", (target,))
         if not mailcursor.fetchone(): return jsonify({"response": "Target not found!"}), 404
-
+    else: target = target.lower()
+    
     report_id = str(uuid.uuid4())
     report_dir = os.path.join("reports", target, report_id)
     os.makedirs(report_dir, exist_ok=True)
