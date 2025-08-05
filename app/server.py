@@ -124,7 +124,7 @@ def signup():
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
-    username = payload.get('username')
+    username = payload.get('username').lower()
     password = bcrypt.hashpw(payload['password'].encode('utf-8'), bcrypt.gensalt())
 
     mailcursor.execute("SELECT 1 FROM used_usernames WHERE username = ?", (username,))
