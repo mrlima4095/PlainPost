@@ -124,7 +124,7 @@ def signup():
     if not request.is_json: return jsonify({"response": "Invalid content type. Must be JSON."}), 400
 
     payload = request.get_json()
-    username = payload.get('username').lower()
+    username = payload.get('username').strip().lower()
     password = bcrypt.hashpw(payload['password'].encode('utf-8'), bcrypt.gensalt())
 
     mailcursor.execute("SELECT 1 FROM used_usernames WHERE username = ?", (username,))
@@ -142,6 +142,7 @@ def signup():
     response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax', max_age=60*60*24*7)
 
     return response
+# | (Account recovery)
 # |
 # Social API
 # | (Main Handler)
