@@ -496,7 +496,7 @@ def ollama_agent():
     role = row["role"]
     coins = row["coins"]
 
-    if role not in ["Admin", "MOD", "DEV"]:
+    if role not in ["Owner", "Admin", "MOD", "DEV"]:
         if coins <= 0: return jsonify({"response": "Not enough coins!"}), 402
 
         mailcursor.execute("UPDATE users SET coins = coins - 1 WHERE username = ?", (username,))
