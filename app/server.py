@@ -795,6 +795,13 @@ def drive_list():
         })
     return jsonify(result), 200
 # | (Online Editor)
+@app.route('/editor/<file_id>', methods=['GET'])
+def editor_page(file_id):
+    username = get_user(request.cookies.get('token'))
+    if not username:
+        return render_template('401.html', message="Você precisa estar logado."), 401
+
+    return render_template('editor', file_id=file_id)
 @app.route('/api/drive/view/<file_id>', methods=['GET'])
 def drive_view(file_id):
     username = get_user(request.cookies.get('token'))
