@@ -752,6 +752,7 @@ def drive_download(file_id):
     original_name, saved_name = row
     path = os.path.join(UPLOAD_FOLDER, saved_name)
     return send_file(path, as_attachment=True, download_name=original_name)
+# | (Delete API)
 @app.route('/api/drive/delete/<file_id>', methods=['DELETE'])
 def drive_delete(file_id):
     username = get_user(request.cookies.get('token'))
@@ -793,6 +794,25 @@ def drive_list():
             "expire_time": row[4]
         })
     return jsonify(result), 200
+# | (Online Editor)
+@app.route('/api/drive/view/<file_id>', methods=['GET'])
+def drive_view(file_id):
+    username = get_user(request.cookies.get('token'))
+    if not username:
+        return jsonify({"success": False, "response": "Bad credentials!"}), 401
+
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
+    row = mailcursor.fetchone()
+    if not row: return jsonify({"success": False, "response": "File not found or access denied."}), 404
+
+    file_path = os.path.join(UPLOAD_FOLDER, row['saved_name'])
+    if not os.path.exists(file_path): return jsonify({"success": False, "response": "File missing."}), 410
+
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f: content = f.read()
+
+    return jsonify({"success": True, "content": content}), 200
+
 # | (Extend File expire time API)
 @app.route('/api/drive/extend_expires', methods=['POST'])
 def extend_expires():
