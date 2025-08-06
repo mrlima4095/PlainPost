@@ -807,16 +807,21 @@ def drive_view(file_id):
     if not username: return jsonify({"success": False, "response": "Bad credentials!"}), 401
 
     mailserver, mailcursor = getdb()
-    mailcursor.execute("SELECT saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
+    mailcursor.execute("SELECT original_name, saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
     row = mailcursor.fetchone()
     if not row: return jsonify({"success": False, "response": "File not found or access denied."}), 404
 
-    file_path = os.path.join(UPLOAD_FOLDER, row['saved_name'])
+    original_name, saved_name = row["original_name"], row["saved_name"]
+    file_path = os.path.join(UPLOAD_FOLDER, saved_name)
+
     if not os.path.exists(file_path): return jsonify({"success": False, "response": "File missing."}), 410
 
-    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f: content = f.read()
+    try:
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+    except Exception as e: return jsonify({"success": False, "response": f"Error reading file: {str(e)}"}), 500
 
-    return jsonify({"success": True, "content": content}), 200
+    return jsonify({ "success": True, "content": content, "filename": original_name }), 200
 @app.route('/api/drive/save/<file_id>', methods=['POST'])
 def drive_save(file_id):
     username = get_user(request.cookies.get('token'))
