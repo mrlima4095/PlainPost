@@ -50,9 +50,7 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        button:hover {
-            background: #3700b3;
-        }
+        button:hover { background: #3700b3; }
     </style>
 </head>
 <body>
@@ -67,6 +65,7 @@
     <div id="buttons">
         <button onclick="saveFile()">Salvar Alterações</button>
         <button onclick="window.location.href='/api/drive/download/{{ file_id }}'">Baixar</button>
+        <button onclick="window.location.href='/drive'">Voltar</button>
     </div>
 
     <!-- CodeMirror JS -->
