@@ -3,47 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Arquivo - BinDrop</title>
+    <title id="page-title">Editor - BinDrop</title>
     
     <!-- CodeMirror CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
     
     <style>
-        body {
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
             background-color: #121212;
             color: #fff;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
         }
         header {
             background: #1f1f1f;
-            padding: 10px;
-            text-align: center;
+            padding: 10px 15px;
             font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         #editor-container {
             flex: 1;
             display: flex;
             flex-direction: column;
         }
-        #editor {
-            flex: 1;
-            border: 1px solid #333;
+        .CodeMirror {
+            height: 100% !important;
             font-size: 14px;
+            border-top: 1px solid #333;
         }
         #buttons {
             background: #1f1f1f;
             padding: 10px;
-            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
         }
         button {
             padding: 8px 15px;
-            margin-left: 10px;
             background: #6200ee;
             color: white;
             border: none;
@@ -55,17 +58,16 @@
 </head>
 <body>
     <header>
-        Editor de Arquivo - BinDrop
+        <span id="file-name">Carregando...</span>
+        <div id="buttons">
+            <button onclick="saveFile()">Salvar</button>
+            <button onclick="baixar()">Baixar</button>
+            <button onclick="window.location.href='/drive'">Voltar</button>
+        </div>
     </header>
     
     <div id="editor-container">
         <textarea id="editor"></textarea>
-    </div>
-
-    <div id="buttons">
-        <button onclick="saveFile()">Salvar Alterações</button>
-        <button onclick="window.location.href='/api/drive/download/{{ file_id }}'">Baixar</button>
-        <button onclick="window.location.href='/drive'">Voltar</button>
     </div>
 
     <!-- CodeMirror JS -->
@@ -77,24 +79,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/htmlmixed/htmlmixed.min.js"></script>
     
     <script>
-        const fileId = "{{ file_id }}";
+        const fileId = "{{ file_id }}"; // Vem do Flask
         let editor;
+        let filename = "";
 
-        // Inicializa CodeMirror
         editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
             lineNumbers: true,
             theme: 'dracula',
-            mode: 'javascript',
+            mode: 'javascript', // Ajustaremos depois pelo tipo
             tabSize: 4,
             indentWithTabs: true
         });
 
-        // Carregar conteúdo do arquivo
+        // Buscar conteúdo do arquivo
         fetch(`/api/drive/view/${fileId}`)
             .then(response => response.json())
             .then(data => {
-                if(data.success) {
+                if (data.success) {
                     editor.setValue(data.content);
+                    filename = data.filename || "Arquivo";
+                    document.getElementById("file-name").textContent = filename;
+                    document.title = filename + " - BinDrop";
+                    detectarModo(filename);
                 } else {
                     alert(data.response);
                 }
@@ -104,7 +110,6 @@
         // Salvar alterações
         function saveFile() {
             const newContent = editor.getValue();
-            
             fetch(`/api/drive/save/${fileId}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -115,6 +120,19 @@
                 alert(data.response || "Erro ao salvar");
             })
             .catch(err => alert("Erro: " + err));
+        }
+
+        function baixar() {
+            window.location.href = `/api/drive/download/${fileId}`;
+        }
+
+        // Detectar linguagem pelo nome do arquivo
+        function detectarModo(nome) {
+            if (nome.endsWith('.js')) editor.setOption('mode', 'javascript');
+            else if (nome.endsWith('.py')) editor.setOption('mode', 'python');
+            else if (nome.endsWith('.html')) editor.setOption('mode', 'htmlmixed');
+            else if (nome.endsWith('.css')) editor.setOption('mode', 'css');
+            else editor.setOption('mode', 'text/plain');
         }
     </script>
 </body>
