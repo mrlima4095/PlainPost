@@ -122,9 +122,7 @@
             .catch(err => alert("Erro: " + err));
         }
 
-        function baixar() {
-            window.location.href = `/api/drive/download/${fileId}`;
-        }
+        function baixar() { saveFile(); window.location.href = `/api/drive/download/${fileId}`; }
 
         // Detectar linguagem pelo nome do arquivo
         function detectarModo(nome) {
