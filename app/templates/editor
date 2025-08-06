@@ -1,24 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-  <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
-  <script src="https://codemirror.net/lib/codemirror.js"></script>
-  <script src="https://codemirror.net/mode/htmlmixed/htmlmixed.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Arquivo - BinDrop</title>
+    
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    
+    <style>
+        body {
+            background-color: #121212;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background: #1f1f1f;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+        }
+        #editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #editor {
+            flex: 1;
+            border: 1px solid #333;
+            font-size: 14px;
+        }
+        #buttons {
+            background: #1f1f1f;
+            padding: 10px;
+            text-align: right;
+        }
+        button {
+            padding: 8px 15px;
+            margin-left: 10px;
+            background: #6200ee;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #3700b3;
+        }
+    </style>
 </head>
 <body>
-  <form method="POST" action="/api/drive/save_edit">
-    <textarea id="editor" name="content"></textarea>
-    <button type="submit">Salvar</button>
-  </form>
-  <script>
-    var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
-      lineNumbers: true,
-      mode: "htmlmixed",
-      theme: "default"
-    });
-    fetch('/api/drive/download/{{ file_id }}')
-      .then(res => res.text())
-      .then(txt => editor.setValue(txt));
-  </script>
+    <header>
+        Editor de Arquivo - BinDrop
+    </header>
+    
+    <div id="editor-container">
+        <textarea id="editor"></textarea>
+    </div>
+
+    <div id="buttons">
+        <button onclick="saveFile()">Salvar Alterações</button>
+        <button onclick="window.location.href='/api/drive/download/{{ file_id }}'">Baixar</button>
+    </div>
+
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/htmlmixed/htmlmixed.min.js"></script>
+    
+    <script>
+        const fileId = "{{ file_id }}";
+        let editor;
+
+        // Inicializa CodeMirror
+        editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+            lineNumbers: true,
+            theme: 'dracula',
+            mode: 'javascript', // Pode ajustar dinamicamente conforme extensão
+            tabSize: 4,
+            indentWithTabs: true
+        });
+
+        // Carregar conteúdo do arquivo
+        fetch(`/api/drive/view/${fileId}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    editor.setValue(data.content);
+                } else {
+                    alert(data.response);
+                }
+            })
+            .catch(err => alert("Erro ao carregar arquivo: " + err));
+
+        // Salvar alterações
+        function saveFile() {
+            const newContent = editor.getValue();
+            
+            fetch(`/api/drive/save/${fileId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({content: newContent})
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.response || "Erro ao salvar");
+            })
+            .catch(err => alert("Erro: " + err));
+        }
+    </script>
 </body>
 </html>
