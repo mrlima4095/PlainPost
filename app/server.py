@@ -812,6 +812,25 @@ def drive_view(file_id):
     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f: content = f.read()
 
     return jsonify({"success": True, "content": content}), 200
+@app.route('/api/drive/save/<file_id>', methods=['POST'])
+def drive_save(file_id):
+    username = get_user(request.cookies.get('token'))
+    if not username: return jsonify({"success": False, "response": "Bad credentials!"}), 401
+
+    data = request.get_json()
+    if not data or "content" not in data: return jsonify({"success": False, "response": "Missing content!"}), 400
+
+    mailserver, mailcursor = getdb()
+    mailcursor.execute("SELECT saved_name FROM files WHERE id = ? AND owner = ?", (file_id, username))
+    row = mailcursor.fetchone()
+    if not row: return jsonify({"success": False, "response": "File not found or access denied."}), 404
+
+    file_path = os.path.join(UPLOAD_FOLDER, row['saved_name'])
+    if not os.path.exists(file_path): return jsonify({"success": False, "response": "File missing."}), 410
+
+    with open(file_path, 'w', encoding='utf-8') as f: f.write(data["content"])
+
+    return jsonify({"success": True, "response": "File updated successfully."}), 200
 
 # | (Extend File expire time API)
 @app.route('/api/drive/extend_expires', methods=['POST'])
