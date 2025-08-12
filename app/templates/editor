@@ -66,6 +66,11 @@
         </div>
     </header>
 
+    <div id="editor-container">
+        <textarea id="editor"></textarea>
+    </div>
+
+
     <!-- Barra de seleção de linguagem -->
     <div id="mode-selector" style="background:#1f1f1f; padding: 5px 15px; display: flex; align-items: center; color:#ccc;">
         <label for="syntax-mode" style="margin-right:10px;">Sintaxe:</label>
@@ -194,7 +199,6 @@
             }
 
             editor.setOption('mode', mode);
-            // Atualiza o select para refletir o modo detectado
             const select = document.getElementById('syntax-mode');
             select.value = mode;
         }
