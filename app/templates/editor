@@ -65,9 +65,28 @@
             <button onclick="window.location.href='/drive'">Voltar</button>
         </div>
     </header>
-    
-    <div id="editor-container">
-        <textarea id="editor"></textarea>
+
+    <!-- Barra de seleção de linguagem -->
+    <div id="mode-selector" style="background:#1f1f1f; padding: 5px 15px; display: flex; align-items: center; color:#ccc;">
+        <label for="syntax-mode" style="margin-right:10px;">Sintaxe:</label>
+        <select id="syntax-mode" style="background:#121212; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:14px;">
+            <option value="text/plain">Plain Text</option>
+            <option value="javascript">JavaScript</option>
+            <option value="text/typescript">TypeScript</option>
+            <option value="python">Python</option>
+            <option value="htmlmixed">HTML</option>
+            <option value="css">CSS</option>
+            <option value="application/json">JSON</option>
+            <option value="xml">XML</option>
+            <option value="php">PHP</option>
+            <option value="text/x-java">Java</option>
+            <option value="text/x-csrc">C</option>
+            <option value="text/x-c++src">C++</option>
+            <option value="shell">Shell</option>
+            <option value="text/x-sql">SQL</option>
+            <option value="markdown">Markdown</option>
+            <option value="yaml">YAML</option>
+        </select>
     </div>
 
     <!-- CodeMirror JS -->
@@ -137,43 +156,54 @@
         function baixar() { saveFile(); window.location.href = `/api/drive/download/${fileId}`; }
 
         // Detectar linguagem pelo nome do arquivo
+        // Após detectar o modo automaticamente, atualizar o select
         function detectarModo(nome) {
             nome = nome.toLowerCase();
+            let mode = 'text/plain';
+
             if (nome.endsWith('.js') || nome.endsWith('.mjs') || nome.endsWith('.cjs')) {
-                editor.setOption('mode', 'javascript');
+                mode = 'javascript';
             } else if (nome.endsWith('.ts')) {
-                editor.setOption('mode', 'text/typescript');
+                mode = 'text/typescript';
             } else if (nome.endsWith('.py')) {
-                editor.setOption('mode', 'python');
+                mode = 'python';
             } else if (nome.endsWith('.html') || nome.endsWith('.htm')) {
-                editor.setOption('mode', 'htmlmixed');
+                mode = 'htmlmixed';
             } else if (nome.endsWith('.css') || nome.endsWith('.scss')) {
-                editor.setOption('mode', 'css');
+                mode = 'css';
             } else if (nome.endsWith('.json')) {
-                editor.setOption('mode', 'application/json');
+                mode = 'application/json';
             } else if (nome.endsWith('.xml') || nome.endsWith('.svg')) {
-                editor.setOption('mode', 'xml');
+                mode = 'xml';
             } else if (nome.endsWith('.php')) {
-                editor.setOption('mode', 'php');
+                mode = 'php';
             } else if (nome.endsWith('.java')) {
-                editor.setOption('mode', 'text/x-java');
+                mode = 'text/x-java';
             } else if (nome.endsWith('.c') || nome.endsWith('.h')) {
-                editor.setOption('mode', 'text/x-csrc');
+                mode = 'text/x-csrc';
             } else if (nome.endsWith('.cpp') || nome.endsWith('.hpp')) {
-                editor.setOption('mode', 'text/x-c++src');
+                mode = 'text/x-c++src';
             } else if (nome.endsWith('.sh') || nome.endsWith('.bash')) {
-                editor.setOption('mode', 'shell');
+                mode = 'shell';
             } else if (nome.endsWith('.sql')) {
-                editor.setOption('mode', 'text/x-sql');
+                mode = 'text/x-sql';
             } else if (nome.endsWith('.md')) {
-                editor.setOption('mode', 'markdown');
+                mode = 'markdown';
             } else if (nome.endsWith('.yml') || nome.endsWith('.yaml')) {
-                editor.setOption('mode', 'yaml');
-            } else {
-                editor.setOption('mode', 'text/plain');
+                mode = 'yaml';
             }
+
+            editor.setOption('mode', mode);
+            // Atualiza o select para refletir o modo detectado
+            const select = document.getElementById('syntax-mode');
+            select.value = mode;
         }
 
+        // Quando o usuário mudar manualmente o select, atualiza o editor
+        document.getElementById('syntax-mode').addEventListener('change', (e) => {
+            const mode = e.target.value;
+            editor.setOption('mode', mode);
+        });
     </script>
 </body>
 </html>
